@@ -1,0 +1,52 @@
+# Project: CodeEditor
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = ../obj/main.o ../obj/exception.o ../obj/genlib.o ../obj/graphics.o ../obj/imgui.o ../obj/linkedlist.o ../obj/random.o ../obj/simpio.o ../obj/strlib.o
+LINKOBJ  = ../obj/main.o ../obj/exception.o ../obj/genlib.o ../obj/graphics.o ../obj/imgui.o ../obj/linkedlist.o ../obj/random.o ../obj/simpio.o ../obj/strlib.o
+LIBS     = -L"D:/Dev-Cpp/MinGW64/lib" -L"D:/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -mwindows
+INCS     = -I"D:/Dev-Cpp/MinGW64/include" -I"D:/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"../lib"
+CXXINCS  = -I"D:/Dev-Cpp/MinGW64/include" -I"D:/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"D:/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++" -I"../lib"
+BIN      = ../CodeEditor.exe
+CXXFLAGS = $(CXXINCS) 
+CFLAGS   = $(INCS) 
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+../obj/main.o: ../src/main.c
+	$(CC) -c ../src/main.c -o ../obj/main.o $(CFLAGS)
+
+../obj/exception.o: ../lib/exception.c
+	$(CC) -c ../lib/exception.c -o ../obj/exception.o $(CFLAGS)
+
+../obj/genlib.o: ../lib/genlib.c
+	$(CC) -c ../lib/genlib.c -o ../obj/genlib.o $(CFLAGS)
+
+../obj/graphics.o: ../lib/graphics.c
+	$(CC) -c ../lib/graphics.c -o ../obj/graphics.o $(CFLAGS)
+
+../obj/imgui.o: ../lib/imgui.c
+	$(CC) -c ../lib/imgui.c -o ../obj/imgui.o $(CFLAGS)
+
+../obj/linkedlist.o: ../lib/linkedlist.c
+	$(CC) -c ../lib/linkedlist.c -o ../obj/linkedlist.o $(CFLAGS)
+
+../obj/random.o: ../lib/random.c
+	$(CC) -c ../lib/random.c -o ../obj/random.o $(CFLAGS)
+
+../obj/simpio.o: ../lib/simpio.c
+	$(CC) -c ../lib/simpio.c -o ../obj/simpio.o $(CFLAGS)
+
+../obj/strlib.o: ../lib/strlib.c
+	$(CC) -c ../lib/strlib.c -o ../obj/strlib.o $(CFLAGS)
