@@ -1,0 +1,8 @@
+# Files generated automatically by Dev-C++
+*.layout
+*.win
+
+# Executable files
+*.exe
+# Obj files
+*.o
