@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000000000000
-UnitCount=20
+UnitCount=22
 
 [VersionInfo]
 Major=1
@@ -244,6 +244,26 @@ BuildCmd=
 FileName=..\lib\strlib.h
 CompileCpp=0
 Folder=lib
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit21]
+FileName=..\src\deque.h
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit22]
+FileName=..\src\textarea.h
+CompileCpp=0
+Folder=src
 Compile=1
 Link=1
 Priority=1000

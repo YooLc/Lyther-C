@@ -1,6 +1,9 @@
 #ifndef _textarea_h
 #define _textarea_h
 
+#include "deque.h"
+#include "linkedlist.h"
+
 /*
     Struct: Palette
     Storage colors used for each page.
@@ -28,6 +31,8 @@ typedef struct {
     Palette palette;
 
     double width, height; // Border of the page
-    
+    Deque codeStack, undoStack;
+    linkedlistADT codeList;
 } Page;
+
 #endif

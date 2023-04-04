@@ -12,6 +12,5 @@ struct DequeNode {
     struct DequeNode *next;
 };
 
-typedef struct DequeNode *Deque;
-
+typedef struct DequeNode* Deque;
 #endif
