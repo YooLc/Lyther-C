@@ -27,12 +27,12 @@ typedef struct {
     Struct: Page
     Single page in the text area, to display single .c file.
 */
-typedef struct {
-    Palette palette;
-
-    double width, height; // Border of the page
-    LinkedList codeStack, undoStack;
-    linkedlistADT codeList;
-} Page;
+//typedef struct {
+//    Palette palette;
+//
+//    double width, height; // Border of the page
+//    LinkedList codeStack, undoStack;
+//    linkedlistADT codeList;
+//} Page;
 
 #endif

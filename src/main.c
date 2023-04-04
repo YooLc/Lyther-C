@@ -6,6 +6,8 @@
 #include "textarea.h"
 #include "codeparser.h"
 
+Passage passage;
+
 void Display(void);
 
 void KeyboardEventProcess(int key, int event)
@@ -19,19 +21,25 @@ void Main()
     SetWindowTitle("Light C code editor");
 	InitGraphics();
 	InitConsole(); // For debug use. 
-	Passage p;
-	initPassage(&p);
-
-	addString(&p, "1234", 1, 1);//add "1234" at line 1 column 1
-	addString(&p, "abcd", 2, 1);//add "abcd" at line 2 column 1
-	addString(&p, "####", 1, 2);//insert "####" at line 1 column 2
-    printPassage(&p);
+	
+	initPassage(&passage);
+	// Same font to the Windows Terminal in Windows 11
+	// which is 29 years later than libgraphics
+    SetFont("Cascadia Code");
+    // A simple test case
+	addString(&passage, "#include <stdio.h>", 1, 1);
+	addString(&passage, "void main() {", 2, 1);
+	addString(&passage, "    printf(\"Hello World\");", 3, 1);
+	addString(&passage, "}", 4, 1);
+	addString(&passage, "this great ", 3, 19);
+    printPassage(&passage);
 	InitGUI();
+	Display();
 	registerKeyboardEvent(KeyboardEventProcess);
 }
 
 void Display(void)
 {
     DisplayClear();
-    //DrawTextArea();
+    DrawTextArea(&passage);
 }

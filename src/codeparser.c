@@ -21,7 +21,7 @@ void initPassage(Passage *p){
 void addString(Passage *passage, char *str, int row, int col) {
 	int addLen = strlen(str), i=0;
 	// If it is a new row
-	if(passage->passList.listLen == row-1) {
+	if(passage->passList.listLen == row - 1) {
 		Line  *line  = NEW(Line);
 		Token *token = NEW(Token);
 		strcpy(token->content, str);
