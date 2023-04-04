@@ -1,7 +1,7 @@
-#ifndef _textarea_h
-#define _textarea_h
+#ifndef _TEXTAREA_H_
+#define _TEXTAREA_H_
 
-#include "deque.h"
+#include "doublylinkedlist.h"
 #include "linkedlist.h"
 
 /*
@@ -31,7 +31,7 @@ typedef struct {
     Palette palette;
 
     double width, height; // Border of the page
-    Deque codeStack, undoStack;
+    LinkedList codeStack, undoStack;
     linkedlistADT codeList;
 } Page;
 

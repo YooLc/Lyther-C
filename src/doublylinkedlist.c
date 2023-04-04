@@ -1,51 +1,51 @@
-#include "bilinkedlist.h"
+#include "doublylinkedlist.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-void initList(linkedList* list){
+void initList(LinkedList* list) {
 	list->head = list->tail = NULL;
 }
 
-void addNodeToTail(linkedList* list, void* datptr){
-	listptr newNode = (listptr)malloc(sizeof(listNode));
+void addNodeToTail(LinkedList* list, void* datptr) {
+	Listptr newNode = (Listptr)malloc(sizeof(ListNode));
 	newNode->datptr = datptr;
 	
 	if(list->listLen == 0){
-		
-		newNode->next = newNode->last = NULL;
+		newNode->next = newNode->prev = NULL;
 		list->head = list->tail = newNode;
 		list->listLen++;
 		return;
 	}
 	
-	newNode->last = list->tail;
+	newNode->prev = list->tail;
 	newNode->next = NULL;
 	list->tail = newNode;
 	list->listLen++;
 }
 
-void addNodeToHead(linkedList* list, void* datptr){
-	listptr newNode = (listptr)malloc(sizeof(listNode));
+void addNodeToHead(LinkedList* list, void* datptr) {
+	Listptr newNode = (Listptr)malloc(sizeof(ListNode));
 	newNode->datptr = datptr;
 	
 	if(list->listLen == 0){
 		
-		newNode->next = newNode->last = NULL;
+		newNode->next = newNode->prev = NULL;
 		list->head = list->tail = newNode;
 		list->listLen++;
 		return;
 	}
 	
 	newNode->next = list->head;
-	newNode->last = NULL;
+	newNode->prev = NULL;
 	list->head = newNode;
 	list->listLen++;
 }
 
-listptr kthNode(linkedList* list, int index){
+Listptr kthNode(LinkedList* list, int index) {
 	if(index > list->listLen || index <= 0) return NULL;
 	
 	int nowIndex = 1;
-	listptr nowptr = list->head;
+	Listptr nowptr = list->head;
 	while(nowIndex < index){
 		nowptr = nowptr->next;
 		nowIndex++;
@@ -53,6 +53,6 @@ listptr kthNode(linkedList* list, int index){
 	return nowptr;
 }
 
-void modifyNode(listptr node, void* datptr){
+void modifyNode(Listptr node, void* datptr) {
 	node->datptr = datptr;
 }

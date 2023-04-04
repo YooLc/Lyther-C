@@ -1,9 +1,10 @@
 #ifndef _CODE_PARSER_H_
 #define _CODE_PARSER_H_
 
-#include "bilinkedlist.h"
+#include "doublylinkedlist.h"
 
-#define MAX_WORD_SIZE 40
+#define MAX_WORD_SIZE 128
+#define NEW(T) (T*)malloc(sizeof(T)) 
 
 //define token types
 typedef enum{
@@ -19,24 +20,24 @@ typedef enum{
 	DOUBLE_QUOTE,
 	SPACE,
 	OTHER
-}tokenType;
+} TokenType;
 
-//struct of a word
+//struct of a token
 typedef struct{
-	char str[MAX_WORD_SIZE];
-	int strlen;
-	tokenType type;
-}word;
+	char content[MAX_WORD_SIZE];
+	int length;
+	TokenType type;
+} Token;
 
 //struct of a line, each line is a linked list of words
 typedef struct{
-	linkedList lineList;
-}line;
+	LinkedList lineList;
+} Line;
 
 //struct of a passage, each passage is a linked list of lines
 typedef struct{
-	linkedList passList;
-}passage;
+	LinkedList passList;
+} Passage;
 
 void initPassage(passage *p);
 
