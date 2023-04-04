@@ -9,7 +9,7 @@ void Display(void);
 
 void KeyboardEventProcess(int key, int event)
 {
-    uiGetKeyborad(key, event);
+    uiGetKeyboard(key, event);
     Display();
 }
 
