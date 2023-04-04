@@ -6,6 +6,7 @@
 
 void Main() 
 {
+    SetWindowTitle("Light C code editor");
 	InitGraphics();
 	InitGUI();
 	return 0;
