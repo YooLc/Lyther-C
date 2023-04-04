@@ -39,11 +39,13 @@ typedef struct{
 	LinkedList passList;
 } Passage;
 
-void initPassage(passage *p);
+void initPassage(Passage *p);
 
 //add a string at (row, col), unit = char
-void addString(passage *p, char *str, int row, int col);
+void addString(Passage *p, char *str, int row, int col);
 
 void inputString(char *str);
 
+//debug use
+void printPassage(Passage *p);
 #endif
