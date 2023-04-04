@@ -4,6 +4,7 @@
 #include "graphics.h"
 #include "imgui.h"
 #include "textarea.h"
+#include "codeparser.h"
 
 void Display(void);
 
@@ -17,14 +18,13 @@ void Main()
 {
     SetWindowTitle("Light C code editor");
 	InitGraphics();
-	// InitConsole(); // For debug use. 
+	//InitConsole(); // For debug use. 
 	InitGUI();
 	registerKeyboardEvent(KeyboardEventProcess);
-
 }
 
 void Display(void)
 {
     DisplayClear();
-    DrawTextArea();
+    //DrawTextArea();
 }

@@ -3,6 +3,7 @@
 
 void initList(linkedList* list){
 	list->head = list->tail = NULL;
+	list->listLen = 0;
 }
 
 void addNodeToTail(linkedList* list, void* datptr){
@@ -10,7 +11,6 @@ void addNodeToTail(linkedList* list, void* datptr){
 	newNode->datptr = datptr;
 	
 	if(list->listLen == 0){
-		
 		newNode->next = newNode->last = NULL;
 		list->head = list->tail = newNode;
 		list->listLen++;
@@ -19,6 +19,7 @@ void addNodeToTail(linkedList* list, void* datptr){
 	
 	newNode->last = list->tail;
 	newNode->next = NULL;
+	list->tail->next = newNode;
 	list->tail = newNode;
 	list->listLen++;
 }
@@ -37,6 +38,7 @@ void addNodeToHead(linkedList* list, void* datptr){
 	
 	newNode->next = list->head;
 	newNode->last = NULL;
+	list->head->last = newNode;
 	list->head = newNode;
 	list->listLen++;
 }

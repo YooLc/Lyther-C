@@ -3,7 +3,7 @@
 
 #include "bilinkedlist.h"
 
-#define MAX_WORD_SIZE 40
+#define MAX_WORD_SIZE 50
 
 //define token types
 typedef enum{
@@ -45,4 +45,6 @@ void addString(passage *p, char *str, int row, int col);
 
 void inputString(char *str);
 
+//debug use
+void printPassage(passage *p);
 #endif
