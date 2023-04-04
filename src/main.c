@@ -18,7 +18,14 @@ void Main()
 {
     SetWindowTitle("Light C code editor");
 	InitGraphics();
-	//InitConsole(); // For debug use. 
+	InitConsole(); // For debug use. 
+	Passage p;
+	initPassage(&p);
+
+	addString(&p, "1234", 1, 1);//add "1234" at line 1 column 1
+	addString(&p, "abcd", 2, 1);//add "abcd" at line 2 column 1
+	addString(&p, "####", 1, 2);//insert "####" at line 1 column 2
+    printPassage(&p);
 	InitGUI();
 	registerKeyboardEvent(KeyboardEventProcess);
 }
