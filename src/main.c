@@ -5,13 +5,13 @@
 #include "imgui.h"
 #include "textarea.h"
 
+void Display(void);
+
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyborad(key, event);
     Display();
 }
-
-void Display(void);
 
 void Main() 
 {
@@ -19,9 +19,8 @@ void Main()
 	InitGraphics();
 	// InitConsole(); // For debug use. 
 	InitGUI();
-	
-	registerKeyboardEvent(KeyboradEventProcess);
-	return 0;
+	registerKeyboardEvent(KeyboardEventProcess);
+
 }
 
 void Display(void)

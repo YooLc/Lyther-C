@@ -1,4 +1,5 @@
 #include "bilinkedlist.h"
+#include <stdio.h>
 
 void initList(linkedList* list){
 	list->head = list->tail = NULL;
@@ -11,15 +12,15 @@ void addNodeToTail(linkedList* list, void* datptr){
 	if(list->listLen == 0){
 		
 		newNode->next = newNode->last = NULL;
-		head = tail = newNode;
-		listLen++;
+		list->head = list->tail = newNode;
+		list->listLen++;
 		return;
 	}
 	
-	newNode->last = tail;
+	newNode->last = list->tail;
 	newNode->next = NULL;
-	tail = newNode;
-	listLen++;
+	list->tail = newNode;
+	list->listLen++;
 }
 
 void addNodeToHead(linkedList* list, void* datptr){
@@ -29,13 +30,29 @@ void addNodeToHead(linkedList* list, void* datptr){
 	if(list->listLen == 0){
 		
 		newNode->next = newNode->last = NULL;
-		head = tail = newNode;
-		listLen++;
+		list->head = list->tail = newNode;
+		list->listLen++;
 		return;
 	}
 	
-	newNode->next = head;
+	newNode->next = list->head;
 	newNode->last = NULL;
-	head = newNode;
-	listLen++;
+	list->head = newNode;
+	list->listLen++;
+}
+
+listptr kthNode(linkedList* list, int index){
+	if(index > list->listLen || index <= 0) return NULL;
+	
+	int nowIndex = 1;
+	listptr nowptr = list->head;
+	while(nowIndex < index){
+		nowptr = nowptr->next;
+		nowIndex++;
+	}
+	return nowptr;
+}
+
+void modifyNode(listptr node, void* datptr){
+	node->datptr = datptr;
 }
