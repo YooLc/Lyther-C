@@ -16,6 +16,11 @@ void KeyboardEventProcess(int key, int event)
     Display();
 }
 
+void CharEventProcess(char ch)
+{
+    uiGetChar(ch);
+    Display();
+}
 void Main() 
 {
     SetWindowTitle("Light C code editor");
@@ -36,6 +41,7 @@ void Main()
 	InitGUI();
 	Display();
 	registerKeyboardEvent(KeyboardEventProcess);
+	registerCharEvent(CharEventProcess);
 }
 
 void Display(void)

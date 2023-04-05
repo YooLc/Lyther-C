@@ -3,6 +3,7 @@
 
 #include "doublylinkedlist.h"
 #include "linkedlist.h"
+#include "style.h"
 
 /*
     Struct: Palette

@@ -199,6 +199,9 @@ double GetFontAscent(void);
 double GetFontDescent(void);
 double GetFontHeight(void);
 
+// This function is added to get font width
+double GetFontWidth(void);
+
 /* Section 5 -- Mouse support */
 
 /*

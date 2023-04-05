@@ -100,6 +100,10 @@ void parseLine(Passage *passage, int row){
 				setToken(token, " ", SPACE);
 				idx++;
 				break;
+			case ';':
+			    setToken(token, ";", SEMI_COLON);
+			    idx++;
+			    break;
 			case '/':
 				
 				if(idx < totLen && tmpLine[idx] == '/'){

@@ -24,6 +24,7 @@ typedef enum{
 	RIGHT_BRACE,
 	SINGLE_QUOTE,
 	DOUBLE_QUOTE,
+    SEMI_COLON,
 	SPACE,
 	OTHER
 } TokenType;
