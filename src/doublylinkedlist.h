@@ -31,4 +31,8 @@ void addNodeToHead(LinkedList* list, void* datptr);
 Listptr kthNode(LinkedList* list, int index);
 
 void modifyNode(Listptr node, void* datptr);
+
+void deleteNode(LinkedList* list, int index);
+
+void addNode(LinkedList* list, int index, void* datptr);
 #endif

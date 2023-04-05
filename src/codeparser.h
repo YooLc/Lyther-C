@@ -4,6 +4,7 @@
 #include "doublylinkedlist.h"
 
 #define MAX_WORD_SIZE 128
+#define MAX_LINE_SIZE 2048
 #define NEW(T) (T*)malloc(sizeof(T)) 
 
 /*
@@ -14,6 +15,7 @@
 typedef enum{
 	STRING,
 	COMMENT,
+	PREPROCESS,
 	LEFT_PARENTHESES,
 	RIGHT_PARENTHESES,
 	LEFT_BRACKETS,
@@ -58,6 +60,33 @@ typedef struct{
     Initialize doubly linked list for a passage
 */
 void initPassage(Passage *p);
+
+/*
+    Function: getline(Passage *passage, char *dst, int row)
+    store all the content in dst in line by row
+    returns the total length of this line
+    **It will OVERWRITE data in dst.
+*/ 
+int getLine(Passage *passage, char *dst, int row);
+
+/*
+    Function: deleteLine(Passage *passage, int row)
+    delete line by row and free the memory
+*/ 
+void deleteLine(Passage *passage, int row);
+
+/*
+    Function: parseLine(Passage *passage, int row)
+    parse line by row
+*/ 
+void parseLine(Passage *passage, int row);
+
+/*
+    Function: getPos(Passage *p, int row, int col, int *offset)
+    Find the char by row and col index
+    returns the pointer to that node, and gives the offset to variable <offset>
+*/ 
+Listptr getPos(Passage *passage, int row, int col, int *offset);
 
 /*
     Function: addString(Passage *p, char *str, int row, int col)

@@ -59,3 +59,54 @@ Listptr kthNode(LinkedList* list, int index) {
 void modifyNode(Listptr node, void* datptr) {
 	node->datptr = datptr;
 }
+
+void deleteNode(LinkedList* list, int index){
+	if(index > list->listLen || index <= 0) return;
+	
+	Listptr nowNode = kthNode(list, index);
+	list->listLen--;
+	
+	if(nowNode->prev == NULL){
+		list->head = nowNode->next;
+	}else{
+		Listptr prevNode = nowNode->prev;
+		prevNode->next = nowNode->next;
+	}
+	
+	if(nowNode->next == NULL){
+		list->tail = nowNode->prev;
+	}else{
+		Listptr nextNode = nowNode->next;
+		nextNode->prev = nowNode->prev;
+	}
+	
+	free(nowNode);
+}
+
+void addNode(LinkedList* list, int index, void* datptr){
+	
+	if(index <= 0 || index > list->listLen + 1) return;
+	
+	if(index == 1){
+		addNodeToHead(list, datptr);
+		return;
+	}
+	
+	if(index == list->listLen + 1){
+		addNodeToTail(list, datptr);
+		return;
+	}
+	
+	list->listLen++;
+	
+	Listptr lastNode = kthNode(list, index-1);
+	Listptr nextNode = kthNode(list, index);
+	Listptr newNode = (Listptr)malloc(sizeof(ListNode));
+
+	newNode->datptr = datptr;
+	newNode->next = lastNode->next;
+	newNode->prev = lastNode;
+	nextNode->prev = newNode;
+	lastNode->next = newNode;
+	
+}
