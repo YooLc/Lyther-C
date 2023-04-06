@@ -50,7 +50,7 @@ static void setToken(Token* token, char *content, TokenType type){
 void parseLine(Passage *passage, int row){
 	
 	char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
-	int totLen = 0, idx = 1;
+	int totLen = 0, idx = 1, newLine = 0;
 
 	Line  *line  = NEW(Line);
  	initList(&(line->lineList));
@@ -120,11 +120,18 @@ void parseLine(Passage *passage, int row){
 			    setToken(token, ";", SEMI_COLON);
 			    idx++;
 			    break;
+			case '\n':
+				setToken(token, "\n", ENTER);
+			    idx++;
+			    //if this is not the end of the line, creat a newline tag
+				if(idx <= totLen) newLine = 1;
+				break;
 			case '/':
-				
 				if(idx < totLen && tmpLine[idx] == '/'){
 					setToken(token, &tmpLine[idx-1], COMMENT);
-					idx = totLen+1;
+					token->content[token->length-1] = '\0'; //deal with \n
+					token->length--;
+					idx = totLen;
 				}else{
 					strncpy(token->content, &tmpLine[idx-1], 1);
 					token->content[1] = '\0';
@@ -154,8 +161,14 @@ void parseLine(Passage *passage, int row){
 		}
 		printf("# %s\n", token->content);
 		addNodeToTail(&(line->lineList), token);
+		//If there is \n more than one, add a new line
+		if(newLine){
+			line  = NEW(Line);
+ 			initList(&(line->lineList));
+ 			addNode(&(passage->passList), ++row, line);
+ 			newLine = 0;
+		}
 	}
-	
 }
 
 Listptr getPos(Passage *passage, int row, int col, int *offset){

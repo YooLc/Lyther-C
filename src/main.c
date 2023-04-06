@@ -32,10 +32,10 @@ void Main()
 	// which is 29 years later than libgraphics
     SetFont("Cascadia Code");
     // A simple test case
-	addString(&passage, "#include <stdio.h>", 1, 1);
-	addString(&passage, "void main() { //test comment", 2, 1);
-	addString(&passage, "    printf(\"Hello World\");", 3, 1);
-	addString(&passage, "}", 4, 1);
+	addString(&passage, "#include <stdio.h>\n", 1, 1);
+	addString(&passage, "void main() { //test comment\n", 2, 1);
+	addString(&passage, "    printf(\"Hello World\");\n\n", 3, 1);
+	addString(&passage, "}\n", 5, 1);
 	addString(&passage, "this great ", 3, 19);
     printPassage(&passage);
 	InitGUI();
