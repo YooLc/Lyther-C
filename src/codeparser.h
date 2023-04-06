@@ -25,6 +25,7 @@ typedef enum{
 	SINGLE_QUOTE,
 	DOUBLE_QUOTE,
     SEMI_COLON,
+    ENTER,
 	SPACE,
 	OTHER
 } TokenType;

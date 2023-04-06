@@ -89,12 +89,28 @@ void parseLine(Passage *passage, int row){
 				idx++;
 				break;
 			case '\'':
-				setToken(token, "'", SINGLE_QUOTE);
 				idx++;
+				tmpWord[cnt = 0] = '\'';
+				while(idx <= totLen){
+					tmpWord[++cnt] = tmpLine[idx-1];
+					if(tmpLine[idx-1] == '\'') break;
+					idx++;
+				}
+				idx++;
+				tmpWord[cnt+1] = '\0';
+				setToken(token, tmpWord, SINGLE_QUOTE);
 				break;
 			case '"':
-				setToken(token, "\"", DOUBLE_QUOTE);
 				idx++;
+				tmpWord[cnt = 0] = '"';
+				while(idx <= totLen){
+					tmpWord[++cnt] = tmpLine[idx-1];
+					if(tmpLine[idx-1] == '"') break;
+					idx++;
+				}
+				idx++;
+				tmpWord[cnt+1] = '\0';
+				setToken(token, tmpWord, DOUBLE_QUOTE);
 				break;
 			case ' ':
 				setToken(token, " ", SPACE);
@@ -116,6 +132,10 @@ void parseLine(Passage *passage, int row){
 					idx++;
 				}
 				break;
+			case '#':
+				setToken(token, &tmpLine[idx-1], PREPROCESS);
+				idx = totLen+1;
+				break;
 			default:
 				if(!(tmpLine[idx-1] >= 'a' && tmpLine[idx-1] <= 'z' || tmpLine[idx-1] >= 'A' && tmpLine[idx-1] <= 'Z')){
 					strncpy(token->content, &tmpLine[idx-1], 1);
@@ -124,6 +144,7 @@ void parseLine(Passage *passage, int row){
 					idx++;
 					break;
 				}
+				cnt = 0;
 				while(idx <= totLen && (tmpLine[idx-1] >= 'a' && tmpLine[idx-1] <= 'z' || tmpLine[idx-1] >= 'A' && tmpLine[idx-1] <= 'Z')){
 					tmpWord[cnt++] = tmpLine[idx-1];
 					idx++;
@@ -176,6 +197,7 @@ void addString(Passage *passage, char *str, int row, int col) {
 		initList(&(line->lineList));
 		addNodeToTail(&(line->lineList), token);
 		addNodeToTail(&(passage->passList), line);
+		parseLine(passage, row);
 		return;
 	}
 

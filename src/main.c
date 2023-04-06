@@ -33,7 +33,7 @@ void Main()
     SetFont("Cascadia Code");
     // A simple test case
 	addString(&passage, "#include <stdio.h>", 1, 1);
-	addString(&passage, "void main() {", 2, 1);
+	addString(&passage, "void main() { //test comment", 2, 1);
 	addString(&passage, "    printf(\"Hello World\");", 3, 1);
 	addString(&passage, "}", 4, 1);
 	addString(&passage, "this great ", 3, 19);
