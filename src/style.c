@@ -1,7 +1,7 @@
 #include "style.h"
 #include "codeparser.h"
 
-string getColorByTokenType(TokenType type)
+string getColorByTokenType(CodeTokenType type)
 {
     switch(type) {
         case PREPROCESS:

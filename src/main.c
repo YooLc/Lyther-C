@@ -13,6 +13,7 @@ void Display(void);
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
+    moveCursor(key, event);
     Display();
 }
 
@@ -30,7 +31,7 @@ void Main()
 	initPassage(&passage);
 	// Same font to the Windows Terminal in Windows 11
 	// which is 29 years later than libgraphics
-    SetFont("Cascadia Code");
+    SetFont("Cascadia Mono");
     // A simple test case
 	addString(&passage, "#include <stdio.h>\n", 1, 1);
 	addString(&passage, "void main() { //test comment\n", 2, 1);

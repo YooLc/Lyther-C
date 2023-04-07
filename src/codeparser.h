@@ -30,7 +30,7 @@ typedef enum{
     ENTER,
 	SPACE,
 	OTHER
-} TokenType;
+} CodeTokenType;
 
 /*
     Struct: Token
@@ -40,7 +40,7 @@ typedef enum{
 typedef struct{
 	char content[MAX_WORD_SIZE];
 	int length;
-	TokenType type;
+	CodeTokenType type;
 } Token;
 
 /*

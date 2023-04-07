@@ -3,7 +3,13 @@
 
 #include "doublylinkedlist.h"
 #include "linkedlist.h"
-#include "style.h"
+#include "codeparser.h"
+
+typedef struct {
+    int r, c;
+} PosRC;
+
+PosRC g_cursorPos;
 
 /*
     Struct: Palette

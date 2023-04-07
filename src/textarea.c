@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
+
 #include "textarea.h"
 #include "codeparser.h"
 #include "style.h"
@@ -26,13 +28,14 @@ void drawCodeForm(Passage *passage) {
 
 void drawCodeLine(Line* line, double x, double y, double w, double h) {
     Listptr curToken = kthNode(&(line->lineList), 1);
-    double fontWidth = GetFontWidth();
     double tokenWidth;
+    int curLength = 0;
  	double curTokenPosX = 0;
  	while (curToken != NULL) {
  		Token* token = curToken->datptr;
- 		tokenWidth = fontWidth * strlen(curToken->datptr);
- 		// printf("Token: \'%s\' curTokenPosX: %.2f TokenWidth: %.2f Color: %s\n", token->content, curTokenPosX, tokenWidth, getColorByTokenType(token->type));
+ 		tokenWidth = TextStringWidth(token->content);
+ 		curLength += token->length;
+ 		printf("Drawing Token: \'%s\' curTokenPosX: %.4f TokenWidth: %.4f Color: %s\n", token->content, curTokenPosX, tokenWidth, getColorByTokenType(token->type));
  		    
  		// Easiest way to implement textbox() with no extra functions
  		drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
@@ -47,3 +50,8 @@ void drawTokenBox(Token* token, double x, double y, double w, double h) {
     MovePen(x, y);
     DrawTextString(token->content);
 }
+
+void moveCursor(int key, int event) {
+    printf("%d", VK_LEFT);
+}
+

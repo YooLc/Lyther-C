@@ -5,6 +5,6 @@
 #include "graphics.h"
 #include "codeparser.h"
 
-string getColorByTokenType(TokenType type);
+string getColorByTokenType(CodeTokenType type);
 
 #endif

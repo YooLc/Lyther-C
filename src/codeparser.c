@@ -41,7 +41,7 @@ int getLine(Passage *passage, char *dst, int row){
  	return totLen;
 }
 
-static void setToken(Token* token, char *content, TokenType type){
+static void setToken(Token* token, char *content, CodeTokenType type){
 	strcpy(token->content, content);
 	token->length = strlen(content);
 	token->type = type;
