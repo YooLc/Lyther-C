@@ -59,8 +59,8 @@ void parseLine(Passage *passage, int row){
  	totLen = getLine(passage, tmpLine, row);
  	deleteLine(passage, row);
  	addNode(&(passage->passList), row, line);
- 	
-	while(idx <= totLen){
+ 	printf("Attempt to parse %s (length %d)", tmpLine, totLen);
+	while(idx <= totLen) {
 		int cnt = 0;
 		Token *token = NEW(Token);
 		switch(tmpLine[idx-1]){
@@ -176,6 +176,7 @@ void parseLine(Passage *passage, int row){
 				tmpWord[cnt] = '\0';
 				setToken(token, tmpWord, STRING);
 		}
+		token->length = strlen(token->content);
 		// printf("# %s\n", token->content);
 		addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line

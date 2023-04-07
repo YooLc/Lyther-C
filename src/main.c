@@ -22,10 +22,14 @@ void KeyboardEventProcess(int key, int event)
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
-    char tmpstr[MAX_LINE_SIZE] = "";
-    sprintf(tmpstr, "%c", ch);
-    // Uncommenting next line is DANGEROUS. PROCEED CAREFULLY.
-    // addString(&passage, tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
+    if (ch >= 32 && ch < 127) {
+        char tmpstr[MAX_LINE_SIZE] = "";
+        sprintf(tmpstr, "%c", ch);
+        printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
+        addString(&passage, tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
+        g_cursorPos.c++;
+        printPassage(&passage);
+    }
     Display();
 }
 
