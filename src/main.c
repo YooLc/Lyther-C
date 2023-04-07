@@ -48,5 +48,5 @@ void Main()
 void Display(void)
 {
     DisplayClear();
-    DrawTextArea(&passage);
+    drawCodeForm(&passage);
 }
