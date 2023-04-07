@@ -34,10 +34,9 @@ void Main()
     // A simple test case
 	addString(&passage, "#include <stdio.h>\n", 1, 1);
 	addString(&passage, "void main() { //test comment\n", 2, 1);
-	addString(&passage, "    printf(\"Hello World\");\n\n", 3, 1);
+	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
 	addString(&passage, "}\n", 5, 1);
 	addString(&passage, "this great ", 3, 19);
-	deleteString(&passage,3,27,4,1);
     printPassage(&passage);
 	InitGUI();
 	Display();
