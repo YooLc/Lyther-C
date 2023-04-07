@@ -132,6 +132,10 @@ void parseLine(Passage *passage, int row){
 					token->content[token->length-1] = '\0'; //deal with \n
 					token->length--;
 					idx = totLen;
+				}else if(idx < totLen && tmpLine[idx] == '*'){
+					setToken(token, "/*", LEFT_COMMENT);
+					token->length = 2;
+					idx += 2;
 				}else{
 					strncpy(token->content, &tmpLine[idx-1], 1);
 					token->content[1] = '\0';
@@ -139,9 +143,22 @@ void parseLine(Passage *passage, int row){
 					idx++;
 				}
 				break;
+			case '*':
+				if(idx < totLen && tmpLine[idx] == '/'){
+					setToken(token, "*/", RIGHT_COMMENT);
+					token->length = 2;
+					idx += 2;
+				}else{
+					setToken(token, "*", RIGHT_COMMENT);
+					token->length = 1;
+					idx++;
+				}
+				break;
 			case '#':
 				setToken(token, &tmpLine[idx-1], PREPROCESS);
-				idx = totLen+1;
+				token->content[token->length-1] = '\0'; //deal with \n
+				token->length--;
+				idx = totLen;
 				break;
 			default:
 				if(!(tmpLine[idx-1] >= 'a' && tmpLine[idx-1] <= 'z' || tmpLine[idx-1] >= 'A' && tmpLine[idx-1] <= 'Z')){
