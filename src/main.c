@@ -6,8 +6,10 @@
 #include "textarea.h"
 #include "codeparser.h"
 
-Passage passage;
+#define REFRESH_TIMER 1
 
+Passage passage;
+extern PosRC g_cursorPos;
 void Display(void);
 
 void KeyboardEventProcess(int key, int event)
@@ -20,13 +22,25 @@ void KeyboardEventProcess(int key, int event)
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
+    char tmpstr[MAX_LINE_SIZE] = "";
+    sprintf(tmpstr, "%c", ch);
+    // Uncommenting next line is DANGEROUS. PROCEED CAREFULLY.
+    // addString(&passage, tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
     Display();
 }
+
+void TimerEventProcess(int timerID)
+{
+    if (timerID == REFRESH_TIMER)
+        Display();
+}
+
 void Main() 
 {
     SetWindowTitle("Light C code editor");
 	InitGraphics();
 	InitConsole(); // For debug use. 
+	InitStyle();
 	
 	initPassage(&passage);
 	// Same font to the Windows Terminal in Windows 11
@@ -41,8 +55,10 @@ void Main()
     printPassage(&passage);
 	InitGUI();
 	Display();
+	startTimer(REFRESH_TIMER, 50);
 	registerKeyboardEvent(KeyboardEventProcess);
 	registerCharEvent(CharEventProcess);
+	registerTimerEvent(TimerEventProcess);
 }
 
 void Display(void)

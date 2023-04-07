@@ -176,7 +176,7 @@ void parseLine(Passage *passage, int row){
 				tmpWord[cnt] = '\0';
 				setToken(token, tmpWord, STRING);
 		}
-		printf("# %s\n", token->content);
+		// printf("# %s\n", token->content);
 		addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line
 		if(newLine){

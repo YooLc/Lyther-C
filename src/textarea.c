@@ -8,11 +8,14 @@
 #include "extgraph.h"
 #include "graphics.h"
 
+PosRC g_cursorPos = {0, 0}, g_renderPos;
+
 void drawCodeForm(Passage *passage) {
     double winWidth = GetWindowWidth();
     double winHeight = GetWindowHeight();
     double fontHeight = GetFontHeight();
     double curLinePosY = winHeight - fontHeight;
+    g_renderPos.r = g_renderPos.c = 0;
     // printf("Font Height: %.2f  Width: %.15f\n", fontHeight, fontWidth);
 
     // Traverse passage (list of lines)
@@ -22,36 +25,77 @@ void drawCodeForm(Passage *passage) {
  		drawCodeLine(curLine->datptr, 0, curLinePosY, winWidth, fontHeight);
  		curLine = curLine->next;
         curLinePosY -= fontHeight;
+        g_renderPos.r++;
+        g_renderPos.c = 0;
  	}
+ 	// printf("%d %d", g_cursorPos.r, g_cursorPos.c);
     return;
+}
+
+void drawMyRectangle(double x, double y, double w, double h, int fillflag)
+{
+	MovePen(x, y);
+	if( fillflag ) StartFilledRegion(0.5); // Modified grayscale
+	DrawLine(0, h);
+	DrawLine(w, 0);
+	DrawLine(0, -h);
+	DrawLine(-w, 0);
+	if( fillflag ) EndFilledRegion();
 }
 
 void drawCodeLine(Line* line, double x, double y, double w, double h) {
     Listptr curToken = kthNode(&(line->lineList), 1);
+    
     double tokenWidth;
-    int curLength = 0;
  	double curTokenPosX = 0;
+ 	if (g_renderPos.r == g_cursorPos.r) {
+ 	    SetPenColor("Light");
+ 		drawRectangle(x, y, w, h, 1);
+ 		if ((clock() >> 8) & 1) {
+ 		    char tmpstr[MAX_LINE_SIZE] = "\0"; 
+ 		    int i;
+ 		    // Pure Brute Force, wait for better implementation.
+            for (i = 0; i < g_cursorPos.c; i++) strcat(tmpstr, " ");
+            strcat(tmpstr, "|");
+            MovePen(x - GetFontAscent() / 6, y + GetFontDescent()); // This is relatively correct, not exact.
+            SetPenColor("Black");
+            DrawTextString(tmpstr);
+        }
+    }
  	while (curToken != NULL) {
  		Token* token = curToken->datptr;
  		tokenWidth = TextStringWidth(token->content);
- 		curLength += token->length;
- 		printf("Drawing Token: \'%s\' curTokenPosX: %.4f TokenWidth: %.4f Color: %s\n", token->content, curTokenPosX, tokenWidth, getColorByTokenType(token->type));
- 		    
+ 		//printf("Drawing Token: \'%s\' curTokenPosX: %.4f TokenWidth: %.4f Color: %s\n", token->content, curTokenPosX, tokenWidth, getColorByTokenType(token->type));  
  		// Easiest way to implement textbox() with no extra functions
- 		drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
+        drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
+        g_renderPos.c += token->length;
         curToken = curToken->next;	
         curTokenPosX += tokenWidth;
     }
-    putchar('\n'); 
 }
 
 void drawTokenBox(Token* token, double x, double y, double w, double h) {
     SetPenColor(getColorByTokenType(token->type));
-    MovePen(x, y);
+    MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
 }
 
 void moveCursor(int key, int event) {
-    printf("%d", VK_LEFT);
+    if (event != KEY_DOWN) return; // This makes the cursor can only move one char at a time.
+    switch(key) {
+        case VK_LEFT:
+            if (g_cursorPos.c > 0) g_cursorPos.c--;
+            else if (g_cursorPos.r > 0) g_cursorPos.r--;
+            break;
+        case VK_RIGHT:
+            g_cursorPos.c++;
+            break;
+        case VK_UP:
+            if (g_cursorPos.r > 0) g_cursorPos.r--;
+            break;
+        case VK_DOWN:
+            g_cursorPos.r++;
+            break;
+    }
 }
 

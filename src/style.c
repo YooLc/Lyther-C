@@ -1,5 +1,11 @@
 #include "style.h"
+#include "extgraph.h"
 #include "codeparser.h"
+
+void InitStyle()
+{
+    DefineColor("Light", .8, 1, 1);
+}
 
 string getColorByTokenType(CodeTokenType type)
 {
