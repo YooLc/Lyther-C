@@ -37,6 +37,7 @@ void Main()
 	addString(&passage, "    printf(\"Hello World\");\n\n", 3, 1);
 	addString(&passage, "}\n", 5, 1);
 	addString(&passage, "this great ", 3, 19);
+	deleteString(&passage,3,27,4,1);
     printPassage(&passage);
 	InitGUI();
 	Display();

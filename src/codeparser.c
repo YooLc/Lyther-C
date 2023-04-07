@@ -180,7 +180,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
 	
 	// Find the node which contains the 'col'th column
 	int nowcol = token->length;
-	while(nowcol < col - 1) {
+	while(nowcol < col) {
 		nowNode = nowNode->next;
 		token = nowNode->datptr;
 		nowcol += token->length;
@@ -227,6 +227,36 @@ void addString(Passage *passage, char *str, int row, int col) {
 	token->length = strlen(token->content);
 	
 	parseLine(passage, row);
+}
+
+void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
+	int i = 0;
+	
+	char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE];    //store string in the first and last row
+	
+	getLine(passage, tmpLine1, rows);
+	getLine(passage, tmpLine2, rowt);
+	
+	//store the remaining string in tmpLine1
+	tmpLine1[cols-1] = '\0';
+	strcat(tmpLine1, tmpLine2 + colt);
+	
+	//delete original string
+	for(i=rowt; i>=rows; i--){
+		deleteLine(&(passage->passList), i);	
+	}
+	
+	//initialize and insert the remaining string
+	Line  *line  = NEW(Line);
+	Token *token = NEW(Token);
+	strcpy(token->content, tmpLine1);
+	token->length = strlen(tmpLine1);
+	token->type = STRING;
+	initList(&(line->lineList));
+	addNodeToTail(&(line->lineList), token);
+	addNode(&(passage->passList), rows, line);
+
+	parseLine(passage, rows);
 }
 
 //for debug use

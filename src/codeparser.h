@@ -98,6 +98,15 @@ Listptr getPos(Passage *passage, int row, int col, int *offset);
 */ 
 void addString(Passage *passage, char *str, int row, int col);
 
+/*
+    Function: deleteString(Passage *p, int rows, int cols, int rowt, int colt)
+    Delete string in the passage at given range, (closed interval)
+    which is represented by row and col index.
+    If want to delete the empty line(contaning only \n) at i colomn, need to call:
+		deleteString(passage, i-1, (i-1).length, i, 1)
+*/ 
+void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
+
 void inputString(char *str);
 
 // debug use
