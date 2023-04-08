@@ -15,7 +15,7 @@ void Display(void);
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
-    moveCursor(key, event);
+    moveCursor(&passage, key, event);
     Display();
 }
 

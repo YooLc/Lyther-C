@@ -32,24 +32,13 @@ void drawCodeForm(Passage *passage) {
     return;
 }
 
-void drawMyRectangle(double x, double y, double w, double h, int fillflag)
-{
-	MovePen(x, y);
-	if( fillflag ) StartFilledRegion(0.5); // Modified grayscale
-	DrawLine(0, h);
-	DrawLine(w, 0);
-	DrawLine(0, -h);
-	DrawLine(-w, 0);
-	if( fillflag ) EndFilledRegion();
-}
-
 void drawCodeLine(Line* line, double x, double y, double w, double h) {
     Listptr curToken = kthNode(&(line->lineList), 1);
     
     double tokenWidth;
  	double curTokenPosX = 0;
  	if (g_renderPos.r == g_cursorPos.r) {
- 	    SetPenColor("Light");
+ 	    SetPenColor("Light Blue");
  		drawRectangle(x, y, w, h, 1);
  		if ((clock() >> 8) & 1) {
  		    char tmpstr[MAX_LINE_SIZE] = "\0"; 
@@ -57,8 +46,8 @@ void drawCodeLine(Line* line, double x, double y, double w, double h) {
  		    // Pure Brute Force, wait for better implementation.
             for (i = 0; i < g_cursorPos.c; i++) strcat(tmpstr, " ");
             strcat(tmpstr, "|");
-            MovePen(x - GetFontAscent() / 6, y + GetFontDescent()); // This is relatively correct, not exact.
             SetPenColor("Black");
+            MovePen(x - GetFontAscent() / 6, y + GetFontDescent()); // This is relatively correct, not exact.
             DrawTextString(tmpstr);
         }
     }
@@ -75,13 +64,19 @@ void drawCodeLine(Line* line, double x, double y, double w, double h) {
 }
 
 void drawTokenBox(Token* token, double x, double y, double w, double h) {
+//    if (token->selected) {
+//        SetPenColor("Blue");
+//        drawRectangle(x, y, w, h, 1);
+//        SetPenColor("White");
+//    }
+//    else SetPenColor(getColorByTokenType(token->type));
     SetPenColor(getColorByTokenType(token->type));
     MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
 }
 
-void moveCursor(int key, int event) {
-    if (event != KEY_DOWN) return; // This makes the cursor can only move one char at a time.
+void moveCursor(Passage* passage, int key, int event) {
+    if (event != KEY_DOWN) return; 
     switch(key) {
         case VK_LEFT:
             if (g_cursorPos.c > 0) g_cursorPos.c--;
@@ -94,6 +89,17 @@ void moveCursor(int key, int event) {
             if (g_cursorPos.r > 0) g_cursorPos.r--;
             break;
         case VK_DOWN:
+            g_cursorPos.r++;
+            break;
+        case VK_BACK:
+            deleteString(passage, g_cursorPos.r + 1, g_cursorPos.c, g_cursorPos.r + 1, g_cursorPos.c);
+            g_cursorPos.c--;
+            break;
+        case VK_DELETE:
+            deleteString(passage, g_cursorPos.r + 1, g_cursorPos.c + 1, g_cursorPos.r + 1, g_cursorPos.c + 1);
+            break;
+        case VK_RETURN:
+            addString(passage, "\n", g_cursorPos.r + 1, g_cursorPos.c + 1);
             g_cursorPos.r++;
             break;
     }

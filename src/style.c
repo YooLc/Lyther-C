@@ -4,7 +4,7 @@
 
 void InitStyle()
 {
-    DefineColor("Light", .8, 1, 1);
+    DefineColor("Light Blue", .8, 1, 1);
 }
 
 string getColorByTokenType(CodeTokenType type)

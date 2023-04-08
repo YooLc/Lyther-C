@@ -43,6 +43,6 @@ typedef struct {
 void drawCodeForm(Passage *passage);
 void drawCodeLine(Line* line, double x, double y, double w, double h);
 void drawTokenBox(Token* token, double x, double y, double w, double h);
-void moveCursor(int key, int event);
+void moveCursor(Passage* passage, int key, int event);
 void addChar(char ch);
 #endif

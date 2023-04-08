@@ -63,6 +63,7 @@ void parseLine(Passage *passage, int row){
 	while(idx <= totLen) {
 		int cnt = 0;
 		Token *token = NEW(Token);
+		// token->selected = 1; // For test
 		switch(tmpLine[idx-1]){
 			case '(':
 				setToken(token, "(", LEFT_PARENTHESES);
@@ -181,7 +182,7 @@ void parseLine(Passage *passage, int row){
 		addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line
 		if(newLine){
-			line  = NEW(Line);
+			line = NEW(Line);
  			initList(&(line->lineList));
  			addNode(&(passage->passList), ++row, line);
  			newLine = 0;

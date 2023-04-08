@@ -39,7 +39,7 @@ typedef enum{
 */
 typedef struct{
 	char content[MAX_WORD_SIZE];
-	int length;
+	int length;//, selected;
 	CodeTokenType type;
 } Token;
 
