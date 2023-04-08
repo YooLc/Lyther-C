@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "codeparser.h"
-
+#include "textarea.h"
 /*
     Function: initPassage
     Initialize doubly linked list for a passage
@@ -47,7 +47,7 @@ static void setToken(Token* token, char *content, CodeTokenType type){
 	token->type = type;
 }
 
-void parseLine(Passage *passage, int row){
+int parseLine(Passage *passage, int row){
 	
 	char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
 	int totLen = 0, idx = 1, newLine = 0;
@@ -188,6 +188,8 @@ void parseLine(Passage *passage, int row){
  			newLine = 0;
 		}
 	}
+	
+	return row;
 }
 
 Listptr getPos(Passage *passage, int row, int col, int *offset){
@@ -217,7 +219,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
     which is represented by row and col index.
     If give row is not in the passage, then create a new row in the list.
 */ 
-void addString(Passage *passage, char *str, int row, int col) {
+PosRC addString(Passage *passage, char *str, int row, int col) {
 	int addLen = strlen(str), i=0;
 	// If it is a new row
 	if(passage->passList.listLen == row - 1) {
@@ -245,7 +247,19 @@ void addString(Passage *passage, char *str, int row, int col) {
 	strcpy(token->content, tmpstr);
 	token->length = strlen(token->content);
 	
-	parseLine(passage, row);
+	//calculate the cursor position, a naive algorithm
+	int newRow = parseLine(passage, row);
+	
+	getLine(&(passage->passList), tmpstr, newRow);
+	
+	int nowCol = newRow==row? col : 1;
+	
+	char lastChar = str[strlen(str) - 1];
+	while(tmpstr[col] != lastChar) col++;
+	
+	PosRC posRC = {newRow, col};
+	
+	return posRC;
 }
 
 void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){

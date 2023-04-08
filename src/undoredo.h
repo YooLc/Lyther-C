@@ -12,20 +12,22 @@ typedef enum{
 typedef struct{
 	TraceType type;
 	int rows, cols, rowt, colt; //interval (closed)
+	char content[MAX_LINE_SIZE];
 }Trace;
 
 typedef struct{
 	Passage *passage;
-	Linkedlist undoRedoList;
+	LinkedList undoRedoList;
 	Listptr nowNode;
-	int length;
-}UndoRedoList;
+}UndoRedo;
 
-void Undo(UndoRedoList *list);
+void Undo(UndoRedo *ur);
 
-void Redo(UndoRedoList *list);
+void Redo(UndoRedo *ur);
 
-//when there is a new IO event, then clear the old redo
-void clearRedo(UndoRedoList *list);
+//when there is a new IO event, add this trace in the undoRedoList
+void addTrace(UndoRedo *ur, TraceType type, int rows, int cols, int rowt, int colt, char *content);
+
+void initUndoRedoList(UndoRedo *ur, Passage *passage);
 
 #endif

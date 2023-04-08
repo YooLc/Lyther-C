@@ -6,10 +6,13 @@
 #include "imgui.h"
 #include "textarea.h"
 #include "codeparser.h"
+#include "undoredo.h"
 
 #define REFRESH_TIMER 1
 
 Passage passage;
+UndoRedo undoRedo;
+
 extern PosRC g_cursorPos;
 void Display(void);
 
@@ -47,6 +50,7 @@ void Main()
 	InitConsole(); // For debug use. 
 	InitStyle();
 	initPassage(&passage);
+	initUndoRedoList(&undoRedo, &passage);
     SetFont("Consolas");
     // A simple test case
 	addString(&passage, "#include <stdio.h>\n", 1, 1);
@@ -54,6 +58,8 @@ void Main()
 	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
 	addString(&passage, "}\n", 5, 1);
 	addString(&passage, "this great ", 3, 19);
+	addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
+	Undo(&undoRedo);
     printPassage(&passage);
 	InitGUI();
 	Display();

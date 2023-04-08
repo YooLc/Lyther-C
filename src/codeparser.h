@@ -2,7 +2,7 @@
 #define _CODE_PARSER_H_
 
 #include "doublylinkedlist.h"
-
+#include "textarea.h"
 #define MAX_WORD_SIZE 128
 #define MAX_LINE_SIZE 2048
 #define NEW(T) (T*)malloc(sizeof(T)) 
@@ -82,8 +82,9 @@ void deleteLine(Passage *passage, int row);
 /*
     Function: parseLine(Passage *passage, int row)
     parse line by row
+    return the curpos of the last character
 */ 
-void parseLine(Passage *passage, int row);
+int parseLine(Passage *passage, int row);
 
 /*
     Function: getPos(Passage *p, int row, int col, int *offset)
@@ -98,7 +99,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset);
     which is represented by row and col index.
     If give row is not in the passage, then create a new row in the list.
 */ 
-void addString(Passage *passage, char *str, int row, int col);
+PosRC addString(Passage *passage, char *str, int row, int col);
 
 /*
     Function: deleteString(Passage *p, int rows, int cols, int rowt, int colt)
