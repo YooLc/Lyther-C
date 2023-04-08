@@ -5,10 +5,6 @@
 #include "linkedlist.h"
 #include "codeparser.h"
 
-typedef struct {
-    int r, c;
-} PosRC;
-
 /*
     Struct: Palette
     Storage colors used for each page.
