@@ -47,10 +47,11 @@ void drawCodeLine(Line* line, double x, double y, double w, double h) {
             for (i = 0; i < g_cursorPos.c; i++) strcat(tmpstr, " ");
             strcat(tmpstr, "|");
             SetPenColor("Black");
-            MovePen(x - GetFontAscent() / 6, y + GetFontDescent()); // This is relatively correct, not exact.
+            MovePen(x - GetFontAscent() / 4, y + GetFontDescent()); // This is relatively correct, not exact.
             DrawTextString(tmpstr);
         }
     }
+    
  	while (curToken != NULL) {
  		Token* token = curToken->datptr;
  		tokenWidth = TextStringWidth(token->content);
@@ -71,6 +72,7 @@ void drawTokenBox(Token* token, double x, double y, double w, double h) {
 //    }
 //    else SetPenColor(getColorByTokenType(token->type));
     SetPenColor(getColorByTokenType(token->type));
+    // SetPenColor("Blue");
     MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
 }

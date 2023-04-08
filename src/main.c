@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "graphics.h"
+#include "extgraph.h"
 #include "imgui.h"
 #include "textarea.h"
 #include "codeparser.h"
@@ -45,11 +46,8 @@ void Main()
 	InitGraphics();
 	InitConsole(); // For debug use. 
 	InitStyle();
-	
 	initPassage(&passage);
-	// Same font to the Windows Terminal in Windows 11
-	// which is 29 years later than libgraphics
-    SetFont("Cascadia Mono");
+    SetFont("Consolas");
     // A simple test case
 	addString(&passage, "#include <stdio.h>\n", 1, 1);
 	addString(&passage, "void main() { //test comment\n", 2, 1);
