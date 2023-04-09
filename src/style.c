@@ -25,3 +25,15 @@ string getColorByTokenType(CodeTokenType type)
     }
     return "";
 }
+
+int getStyleByTokenType(CodeTokenType type)
+{
+    switch(type) {
+        case KEYWORD: case DOUBLE_QUOTE: case SINGLE_QUOTE:
+            return Bold;
+        case COMMENT:
+            return Italic;
+        default:
+            return Normal;
+    }
+}

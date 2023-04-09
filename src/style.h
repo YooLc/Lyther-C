@@ -7,5 +7,5 @@
 
 void InitStyle();
 string getColorByTokenType(CodeTokenType type);
-
+int getStyleByTokenType(CodeTokenType type);
 #endif

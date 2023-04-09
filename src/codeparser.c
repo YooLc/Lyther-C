@@ -178,10 +178,14 @@ int parseLine(Passage *passage, int row){
 				setToken(token, tmpWord, STRING);
 		}
 		token->length = strlen(token->content);
+		
+		if (strcmp(token->content, "void") == 0 || strcmp(token->content, "int") == 0) {
+		    token->type = KEYWORD;
+        }
 		// printf("# %s\n", token->content);
 		addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line
-		if(newLine){
+		if(newLine) {
 			line = NEW(Line);
  			initList(&(line->lineList));
  			addNode(&(passage->passList), ++row, line);

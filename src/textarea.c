@@ -71,6 +71,7 @@ void drawTokenBox(Token* token, double x, double y, double w, double h) {
 //        SetPenColor("White");
 //    }
 //    else SetPenColor(getColorByTokenType(token->type));
+    SetStyle(getStyleByTokenType(token->type));
     SetPenColor(getColorByTokenType(token->type));
     // SetPenColor("Blue");
     MovePen(x, y + GetFontDescent());
