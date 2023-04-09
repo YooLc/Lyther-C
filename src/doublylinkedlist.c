@@ -84,7 +84,7 @@ void deleteNode(LinkedList* list, int index){
 }
 
 void deleteNodeByPtr(LinkedList* list, Listptr nowNode){
-	//list->listLen--;
+	list->listLen--;
 //return ;
 	if(nowNode->prev == NULL){
 		list->head = nowNode->next;
@@ -101,6 +101,7 @@ void deleteNodeByPtr(LinkedList* list, Listptr nowNode){
 	}
 	
 	free(nowNode);
+	if(list->listLen == 0) list->head = list->tail = NULL;
 }
 
 void addNode(LinkedList* list, int index, void* datptr){

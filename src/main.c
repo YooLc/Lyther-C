@@ -60,6 +60,7 @@ void Main()
 	addString(&passage, "this great ", 3, 19);
 	addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
 	Undo(&undoRedo);
+	Redo(&undoRedo);
     printPassage(&passage);
 	InitGUI();
 	Display();
