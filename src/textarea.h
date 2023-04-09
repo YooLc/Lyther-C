@@ -3,6 +3,8 @@
 
 #include "doublylinkedlist.h"
 #include "linkedlist.h"
+#include "codeparser.h"
+#include "undoredo.h"
 
 /*
     Struct: Palette
@@ -35,4 +37,10 @@ typedef struct {
 //    linkedlistADT codeList;
 //} Page;
 
+void drawEditorMenu(UndoRedo *ur, double width, double height);
+void drawCodeForm(Passage *passage, double width, double height);
+void drawCodeLine(Line* line, double x, double y, double w, double h);
+void drawTokenBox(Token* token, double x, double y, double w, double h);
+void moveCursor(Passage* passage, int key, int event);
+void addChar(char ch);
 #endif
