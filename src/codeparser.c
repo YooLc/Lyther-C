@@ -47,6 +47,14 @@ static void setToken(Token* token, char *content, CodeTokenType type){
 	token->type = type;
 }
 
+static int isKeyWord(char *src){
+	int i = 0;
+	for(i=0; i<32; i++){
+		if(strcmp(src, KeyWord[i]) == 0) return 1;
+	}
+	return 0;
+}
+
 int parseLine(Passage *passage, int row){
 	
 	char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
@@ -178,10 +186,8 @@ int parseLine(Passage *passage, int row){
 				setToken(token, tmpWord, STRING);
 		}
 		token->length = strlen(token->content);
-		
-		if (strcmp(token->content, "void") == 0 || strcmp(token->content, "int") == 0) {
-		    token->type = KEYWORD;
-        }
+
+        if(isKeyWord(token->content)) token->type = KEYWORD;
 		// printf("# %s\n", token->content);
 		addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line
