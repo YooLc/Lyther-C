@@ -29,11 +29,18 @@ void CharEventProcess(char ch)
     if (ch >= 32 && ch < 127) {
         char tmpstr[MAX_LINE_SIZE] = "";
         sprintf(tmpstr, "%c", ch);
+        addTrace(&undoRedo, ADD, g_cursorPos.r + 1, g_cursorPos.c + 1, g_cursorPos.r + 1, g_cursorPos.c + 1, tmpstr);
         printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
         addString(&passage, tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
         g_cursorPos.c++;
         printPassage(&passage);
     }
+    Display();
+}
+
+void MouseEventProcess(int x, int y, int button, int event)
+{
+    uiGetMouse(x, y, button, event);
     Display();
 }
 
@@ -67,11 +74,12 @@ void Main()
 	startTimer(REFRESH_TIMER, 50);
 	registerKeyboardEvent(KeyboardEventProcess);
 	registerCharEvent(CharEventProcess);
+	registerMouseEvent(MouseEventProcess);
 	registerTimerEvent(TimerEventProcess);
 }
 
 void Display(void)
 {
     DisplayClear();
-    drawCodeForm(&passage);
+    drawEditor(&passage, &undoRedo);
 }

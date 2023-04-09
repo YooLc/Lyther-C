@@ -15,7 +15,7 @@ void Undo(UndoRedo *ur){
 	colt = trace->colt;
 	if(trace->type == ADD){
 		deleteString(ur->passage, rows, cols, rowt, colt);
-	}else if(trace->type == DELETE){
+	}else if(trace->type == DELE){
 		addString(ur->passage, trace->content, rows, cols);
 	}
 	ur->nowNode = ur->nowNode->prev;
@@ -40,7 +40,7 @@ void Redo(UndoRedo *ur){
 	colt = trace->colt;
 	if(trace->type == ADD){
 		addString(ur->passage, trace->content, rows, cols);
-	}else if(trace->type == DELETE){
+	}else if(trace->type == DELE){
 		deleteString(ur->passage, rows, cols, rowt, colt);
 	}
 }

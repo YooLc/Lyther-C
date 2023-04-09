@@ -6,14 +6,14 @@
 
 typedef enum{
 	ADD,
-	DELETE
-}TraceType;
+	DELE
+} TraceType;
 
 typedef struct{
 	TraceType type;
 	int rows, cols, rowt, colt; //interval (closed)
 	char content[MAX_LINE_SIZE];
-}Trace;
+} Trace;
 
 /*
 	Struct of a UndoRedo abstract

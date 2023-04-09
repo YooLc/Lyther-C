@@ -7,14 +7,40 @@
 #include "style.h"
 #include "extgraph.h"
 #include "graphics.h"
+#include "imgui.h"
+#include "undoredo.h"
 
 PosRC g_cursorPos = {0, 0}, g_renderPos;
 
-void drawCodeForm(Passage *passage) {
+void drawEditor(Passage *passage, UndoRedo *ur) {
     double winWidth = GetWindowWidth();
     double winHeight = GetWindowHeight();
+    drawEditorMenu(ur, winWidth, winHeight);
+    drawCodeForm(passage, winWidth, winHeight - GetFontHeight() * 1.5);
+}
+
+void drawEditorMenu(UndoRedo *ur, double width, double height) {
+    static char* menuListEdit[] = {"Edit",
+        "Undo | Ctrl-Z",
+        "Redo | Ctrl-Y"};
+    int selection;
+    double x = 0;
+    double y = height;
+    double h = GetFontHeight() * 1.5;
+    double w = TextStringWidth(menuListEdit[0]) * 2;
+    double wlist = TextStringWidth(menuListEdit[1]) * 2;
+    double xindent = height / 20;
+    drawMenuBar(0, y - h, width, h);
+    selection = menuList(GenUIID(0), 0, y - h, w, wlist, h, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
+    switch(selection) {
+        case 1: Undo(ur); g_cursorPos.c--; break;
+        case 2: Redo(ur); g_cursorPos.c++; break;
+    }
+} 
+
+void drawCodeForm(Passage *passage, double width, double height) {
     double fontHeight = GetFontHeight();
-    double curLinePosY = winHeight - fontHeight;
+    double curLinePosY = height - fontHeight;
     g_renderPos.r = g_renderPos.c = 0;
     // printf("Font Height: %.2f  Width: %.15f\n", fontHeight, fontWidth);
 
@@ -22,7 +48,7 @@ void drawCodeForm(Passage *passage) {
  	Listptr curLine = kthNode(&(passage->passList), 1);
  	while(curLine != NULL) {
         // Traverse line (list of tokens)
- 		drawCodeLine(curLine->datptr, 0, curLinePosY, winWidth, fontHeight);
+ 		drawCodeLine(curLine->datptr, 0, curLinePosY, width, fontHeight);
  		curLine = curLine->next;
         curLinePosY -= fontHeight;
         g_renderPos.r++;
