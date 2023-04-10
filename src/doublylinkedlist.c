@@ -108,7 +108,7 @@ void addNode(LinkedList* list, int index, void* datptr) {
     printf("Called addNode %d %d\n", index, list->listLen);
 	if(index <= 0 || index > list->listLen + 1) return;
 	
-	if(index == 1){
+	if(index == 1) {
 		addNodeToHead(list, datptr);
 		return;
 	}
@@ -120,7 +120,7 @@ void addNode(LinkedList* list, int index, void* datptr) {
 	
 	list->listLen++;
 	
-	Listptr lastNode = kthNode(list, index-1);
+	Listptr lastNode = kthNode(list, index - 1);
 	Listptr nextNode = kthNode(list, index);
 	Listptr newNode = (Listptr)malloc(sizeof(ListNode));
 

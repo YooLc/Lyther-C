@@ -139,12 +139,19 @@ void moveCursor(Passage* passage, int key, int event) {
             if (g_cursorPos.c > 0) {
                 deleteString(passage, g_realPos.r, g_realPos.c, g_realPos.r, g_realPos.c);
                 g_cursorPos.c--;
+            }
+            else if (g_cursorPos.r > 1) {
+                cancelNewline(passage, g_cursorPos.r);
+                preLine = kthNode(&(passage->passList), g_cursorPos.r - 1)->datptr;
+                g_cursorPos.r--;
+                g_cursorPos.c = preLine->length;
             } 
             break;
         case VK_DELETE:
             deleteString(passage, g_realPos.r, g_realPos.c + 1, g_realPos.r, g_realPos.c + 1);
             break;
         case VK_RETURN:
+            printf("VK_RETURN: %d %d", g_realPos.r, g_realPos.c + 1);
             addString(passage, "\n", g_realPos.r, g_realPos.c + 1);
             if (g_cursorPos.r < row) g_cursorPos.r++;
             g_cursorPos.c = 0;

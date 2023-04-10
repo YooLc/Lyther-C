@@ -49,7 +49,7 @@ static void setToken(Token* token, char *content, CodeTokenType type){
 
 static int isKeyWord(char *src){
 	int i = 0;
-	for(i=0; i<32; i++){
+	for(i = 0; i < 32; i++){
 		if(strcmp(src, KeyWord[i]) == 0) return 1;
 	}
 	return 0;
@@ -68,7 +68,11 @@ int parseLine(Passage *passage, int row){
  	deleteLine(passage, row);
  	addNode(&(passage->passList), row, line);
  	printf("Attempt to parse %s (length %d)", tmpLine, totLen);
- 	line->length = totLen - 1; // To avoid '\n'
+ 	
+ 	int length = totLen;
+ 	while (length > 0 && tmpLine[length - 1] == '\n') length--;
+ 	line->length = length;
+ 	
 	while(idx <= totLen) {
 		int cnt = 0;
 		Token *token = NEW(Token);
@@ -283,11 +287,11 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	getLine(passage, tmpLine2, rowt);
 	
 	//store the remaining string in tmpLine1
-	tmpLine1[cols-1] = '\0';
+	tmpLine1[cols - 1] = '\0';
 	strcat(tmpLine1, tmpLine2 + colt);
 	
 	//delete original string
-	for(i=rowt; i>=rows; i--){
+	for(i = rowt; i >= rows; i--){
 		deleteLine(&(passage->passList), i);	
 	}
 	
@@ -302,6 +306,35 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	addNode(&(passage->passList), rows, line);
 
 	parseLine(passage, rows);
+}
+
+void cancelNewline(Passage *passage, int row) {
+    // Validation check
+    if (row <= 1 || row > (passage->passList).listLen) return;
+    
+    // Add current line to previous line, then delete current line
+	char preLine[MAX_LINE_SIZE], curLine[MAX_LINE_SIZE];
+	getLine(passage, preLine, row - 1);
+	getLine(passage, curLine, row);
+	
+	int idx = strlen(preLine) - 1;
+	while (preLine[idx] == '\n') preLine[idx] = '\0';
+	strcat(preLine, curLine);
+	
+	deleteLine(&(passage->passList), row - 1);
+	deleteLine(&(passage->passList), row - 1); // Note that prev line has deleted
+	
+	//initialize and insert the remaining string
+	Line  *line  = NEW(Line);
+	Token *token = NEW(Token);
+	strcpy(token->content, preLine);
+	token->length = strlen(preLine);
+	token->type = STRING;
+	initList(&(line->lineList));
+	addNodeToTail(&(line->lineList), token);
+	addNode(&(passage->passList), row - 1, line);
+
+	parseLine(passage, row - 1);
 }
 
 //for debug use
