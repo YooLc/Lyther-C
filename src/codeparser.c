@@ -119,10 +119,11 @@ int parseLine(Passage *passage, int row){
 				tmpWord[cnt = 0] = '"';
 				while(idx <= totLen){
 					tmpWord[++cnt] = tmpLine[idx-1];
-					if(tmpLine[idx-1] == '"') break;
+					if(tmpLine[idx-1] == '"' || tmpLine[idx-1] == '\n') break;
 					idx++;
 				}
-				idx++;
+				if(tmpWord[cnt] != '\n') idx++;
+            	if(tmpWord[cnt] == '\n') cnt--;
 				tmpWord[cnt+1] = '\0';
 				setToken(token, tmpWord, DOUBLE_QUOTE);
 				break;
@@ -271,10 +272,10 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
 	int nowCol = newRow==row? col : 1;
 	
 	char lastChar = str[strlen(str) - 1];
-	while(tmpstr[col] != lastChar) col++;
+	while(tmpstr[nowCol] != lastChar) nowCol++;
 	
-	PosRC posRC = {newRow, col};
-	
+	PosRC posRC = {newRow-1, nowCol};//to be fixed
+    printf("ADD POS %d %d", posRC.r, posRC.c);
 	return posRC;
 }
 
