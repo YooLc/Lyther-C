@@ -10,7 +10,7 @@
 #include "imgui.h"
 #include "undoredo.h"
 
-PosRC g_cursorPos = {0, 0}, g_renderPos;
+PosRC g_cursorPos = {1, 0}, g_realPos = {1, 0}, g_renderPos;
 
 void drawEditor(Passage *passage, UndoRedo *ur) {
     double winWidth = GetWindowWidth();
@@ -45,6 +45,8 @@ void drawCodeForm(Passage *passage, double width, double height) {
     // printf("Font Height: %.2f  Width: %.15f\n", fontHeight, fontWidth);
 
     // Traverse passage (list of lines)
+    g_renderPos.r = 1;
+    g_renderPos.c = 0;
  	Listptr curLine = kthNode(&(passage->passList), 1);
  	while(curLine != NULL) {
         // Traverse line (list of tokens)
@@ -63,14 +65,14 @@ void drawCodeLine(Line* line, double x, double y, double w, double h) {
     
     double tokenWidth;
  	double curTokenPosX = 0;
- 	if (g_renderPos.r == g_cursorPos.r) {
+ 	if (g_renderPos.r == g_realPos.r) {
  	    SetPenColor("Light Blue");
  		drawRectangle(x, y, w, h, 1);
  		if ((clock() >> 8) & 1) {
  		    char tmpstr[MAX_LINE_SIZE] = "\0"; 
  		    int i;
  		    // Pure Brute Force, wait for better implementation.
-            for (i = 0; i < g_cursorPos.c; i++) strcat(tmpstr, " ");
+            for (i = 0; i < g_realPos.c; i++) strcat(tmpstr, " ");
             strcat(tmpstr, "|");
             SetPenColor("Black");
             MovePen(x - GetFontAscent() / 4, y + GetFontDescent()); // This is relatively correct, not exact.
@@ -106,31 +108,51 @@ void drawTokenBox(Token* token, double x, double y, double w, double h) {
 
 void moveCursor(Passage* passage, int key, int event) {
     if (event != KEY_DOWN) return; 
+    int row = (passage->passList).listLen;
+    Line *curLine, *preLine;
+    curLine = kthNode(&(passage->passList), g_cursorPos.r)->datptr;
     switch(key) {
         case VK_LEFT:
+            g_cursorPos = g_realPos;
             if (g_cursorPos.c > 0) g_cursorPos.c--;
-            else if (g_cursorPos.r > 0) g_cursorPos.r--;
+            else if (g_cursorPos.r > 1) {
+                preLine = kthNode(&(passage->passList), g_cursorPos.r - 1)->datptr;
+                g_cursorPos.r--;
+                g_cursorPos.c = preLine->length;
+            }
             break;
         case VK_RIGHT:
-            g_cursorPos.c++;
+            g_cursorPos = g_realPos;
+            if (g_cursorPos.c < curLine->length) g_cursorPos.c++;
+            else if (g_cursorPos.r < row) {
+                g_cursorPos.r++;
+                g_cursorPos.c = 0;
+            }
             break;
         case VK_UP:
-            if (g_cursorPos.r > 0) g_cursorPos.r--;
+            if (g_cursorPos.r > 1) g_cursorPos.r--;
             break;
         case VK_DOWN:
-            g_cursorPos.r++;
+            if (g_cursorPos.r < row) g_cursorPos.r++;
             break;
         case VK_BACK:
-            deleteString(passage, g_cursorPos.r + 1, g_cursorPos.c, g_cursorPos.r + 1, g_cursorPos.c);
-            g_cursorPos.c--;
+            if (g_cursorPos.c > 0) {
+                deleteString(passage, g_realPos.r, g_realPos.c, g_realPos.r, g_realPos.c);
+                g_cursorPos.c--;
+            } 
             break;
         case VK_DELETE:
-            deleteString(passage, g_cursorPos.r + 1, g_cursorPos.c + 1, g_cursorPos.r + 1, g_cursorPos.c + 1);
+            deleteString(passage, g_realPos.r, g_realPos.c + 1, g_realPos.r, g_realPos.c + 1);
             break;
         case VK_RETURN:
-            addString(passage, "\n", g_cursorPos.r + 1, g_cursorPos.c + 1);
-            g_cursorPos.r++;
+            addString(passage, "\n", g_realPos.r, g_realPos.c + 1);
+            if (g_cursorPos.r < row) g_cursorPos.r++;
+            g_cursorPos.c = 0;
             break;
     }
+    g_realPos.r = g_cursorPos.r;
+    curLine = kthNode(&(passage->passList), g_cursorPos.r)->datptr;
+    g_realPos.c = min(curLine->length, g_cursorPos.c);
+    printf("cursor at (%d, %d), real pos at (%d, %d)\n", g_cursorPos.r, g_cursorPos.c, g_realPos.r, g_realPos.c);
 }
 

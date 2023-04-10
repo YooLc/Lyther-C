@@ -8,8 +8,8 @@
     Function: initPassage
     Initialize doubly linked list for a passage
 */
-void initPassage(Passage *p){
-	initList(&(p->passList));
+void initPassage(Passage *passage){
+	initList(&(passage->passList));
 }
 
 void deleteLine(Passage *passage, int row){
@@ -68,6 +68,7 @@ int parseLine(Passage *passage, int row){
  	deleteLine(passage, row);
  	addNode(&(passage->passList), row, line);
  	printf("Attempt to parse %s (length %d)", tmpLine, totLen);
+ 	line->length = totLen - 1; // To avoid '\n'
 	while(idx <= totLen) {
 		int cnt = 0;
 		Token *token = NEW(Token);
@@ -186,10 +187,11 @@ int parseLine(Passage *passage, int row){
 				setToken(token, tmpWord, STRING);
 		}
 		token->length = strlen(token->content);
-
+             
         if(isKeyWord(token->content)) token->type = KEYWORD;
 		// printf("# %s\n", token->content);
-		addNodeToTail(&(line->lineList), token);
+		// if (token->type != ENTER)
+            addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line
 		if(newLine) {
 			line = NEW(Line);
@@ -207,7 +209,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
 	Line* l = kthNode(&(passage->passList), row)->datptr;
 	
 	Listptr nowNode = kthNode(&(l->lineList), 1);   // get the pointer of the first node of this line
-	Token* token = nowNode->datptr;				    // pointer of the token in the node
+	Token* token = nowNode->datptr;                 // pointer of the token in the node
 	
 	// Find the node which contains the 'col'th column
 	int nowcol = token->length;
@@ -230,7 +232,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
     If give row is not in the passage, then create a new row in the list.
 */ 
 PosRC addString(Passage *passage, char *str, int row, int col) {
-	int addLen = strlen(str), i=0;
+	int addLen = strlen(str), i = 0;
 	// If it is a new row
 	if(passage->passList.listLen == row - 1) {
 		Line  *line  = NEW(Line);
@@ -308,6 +310,7 @@ void printPassage(Passage *p){
  	printf("Total line num: %d\n", p->passList.listLen);
  	while(nowLineNode != NULL){
  		Line* l = nowLineNode->datptr;
+ 		printf("    Line length: %d\n", l->length);
  		printf("    Total Node num: %d\n", l->lineList.listLen);
  		Listptr nowWordNode = kthNode(&(l->lineList), 1);
  		while(nowWordNode != NULL){

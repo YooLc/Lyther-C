@@ -49,6 +49,7 @@ typedef struct{
 */
 typedef struct{
 	LinkedList lineList;
+	int length;
 } Line;
 
 /*

@@ -104,8 +104,8 @@ void deleteNodeByPtr(LinkedList* list, Listptr nowNode){
 	if(list->listLen == 0) list->head = list->tail = NULL;
 }
 
-void addNode(LinkedList* list, int index, void* datptr){
-	
+void addNode(LinkedList* list, int index, void* datptr) {
+    printf("Called addNode %d %d\n", index, list->listLen);
 	if(index <= 0 || index > list->listLen + 1) return;
 	
 	if(index == 1){
@@ -113,7 +113,7 @@ void addNode(LinkedList* list, int index, void* datptr){
 		return;
 	}
 	
-	if(index == list->listLen + 1){
+	if(index == list->listLen + 1) {
 		addNodeToTail(list, datptr);
 		return;
 	}

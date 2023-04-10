@@ -13,7 +13,7 @@
 Passage passage;
 UndoRedo undoRedo;
 
-extern PosRC g_cursorPos;
+extern PosRC g_cursorPos, g_realPos;
 void Display(void);
 
 void KeyboardEventProcess(int key, int event)
@@ -27,12 +27,14 @@ void CharEventProcess(char ch)
 {
     uiGetChar(ch);
     if (ch >= 32 && ch < 127) {
+        g_cursorPos = g_realPos;
         char tmpstr[MAX_LINE_SIZE] = "";
         sprintf(tmpstr, "%c", ch);
-        addTrace(&undoRedo, ADD, g_cursorPos.r + 1, g_cursorPos.c + 1, g_cursorPos.r + 1, g_cursorPos.c + 1, tmpstr);
-        printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
-        addString(&passage, tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
+        addTrace(&undoRedo, ADD, g_cursorPos.r, g_cursorPos.c + 1, g_cursorPos.r, g_cursorPos.c + 1, tmpstr);
+        printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
+        addString(&passage, tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
         g_cursorPos.c++;
+        g_realPos.c++;
         printPassage(&passage);
     }
     Display();
@@ -65,6 +67,7 @@ void Main()
 	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
 	addString(&passage, "}\n", 5, 1);
 	addString(&passage, "this great ", 3, 19);
+	// addString(&passage, " ", 4, 1);
 	addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
 	Undo(&undoRedo);
 	Redo(&undoRedo);
