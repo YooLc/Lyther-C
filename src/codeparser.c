@@ -158,10 +158,14 @@ int parseLine(Passage *passage, int row){
 				break;
 			case '/':
 				if(idx < totLen && tmpLine[idx] == '/'){
-					setToken(token, &tmpLine[idx-1], COMMENT);
-					token->content[token->length-1] = '\0'; //deal with \n
-					token->length--;
-					idx = totLen;
+					cnt = -1;
+					while(idx <= totLen){
+						if(tmpLine[idx-1] == '\n') break;
+						tmpWord[++cnt] = tmpLine[idx-1];
+						idx++;
+					}
+					tmpWord[cnt+1] = '\0';
+					setToken(token, tmpWord, COMMENT);
 				}else if(idx < totLen && tmpLine[idx] == '*'){
 					setToken(token, "/*", LEFT_COMMENT);
 					token->length = 2;
@@ -301,7 +305,7 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	
 	char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE];    //store string in the first and last row
 	char prevLine[MAX_LINE_SIZE], nextLine[MAX_LINE_SIZE];
-	char targetLine[4*MAX_LINE_SIZE];
+	char targetLine[4*MAX_LINE_SIZE] = "\0";
 	
 	if(rows > 1) getLine(passage, prevLine, rows-1);
 	if(rowt < passage->passList.listLen) getLine(passage, nextLine, rowt+1);
