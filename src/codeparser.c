@@ -55,6 +55,25 @@ static int isKeyWord(char *src){
 	return 0;
 }
 
+static void maintainLineLength(Line *line){
+	if(line->lineList.listLen == 0){
+		line->length = 0;
+		return;
+	}
+	
+	line->length = 0;
+	
+	Listptr nowNode = kthNode(&(line->lineList), 1);
+	Token *token = nowNode->datptr;
+	while(1){
+		if(token->type == ENTER && nowNode->next == NULL) break;
+		line->length += token->length;
+		if(nowNode->next == NULL) break;
+		nowNode = nowNode->next;
+		token = nowNode->datptr;
+	}
+}
+
 int parseLine(Passage *passage, int row){
 	
 	char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
@@ -68,10 +87,6 @@ int parseLine(Passage *passage, int row){
  	deleteLine(passage, row);
  	addNode(&(passage->passList), row, line);
  	printf("Attempt to parse %s (length %d)", tmpLine, totLen);
- 	
- 	int length = totLen;
- 	while (length > 0 && tmpLine[length - 1] == '\n') length--;
- 	line->length = length;
  	
 	while(idx <= totLen) {
 		int cnt = 0;
@@ -196,9 +211,10 @@ int parseLine(Passage *passage, int row){
         if(isKeyWord(token->content)) token->type = KEYWORD;
 		// printf("# %s\n", token->content);
 		// if (token->type != ENTER)
-            addNodeToTail(&(line->lineList), token);
+        addNodeToTail(&(line->lineList), token);
 		//If there is \n more than one, add a new line
 		if(newLine) {
+			maintainLineLength(line);
 			line = NEW(Line);
  			initList(&(line->lineList));
  			addNode(&(passage->passList), ++row, line);
@@ -206,6 +222,7 @@ int parseLine(Passage *passage, int row){
 		}
 	}
 	
+	maintainLineLength(line);
 	return row;
 }
 
