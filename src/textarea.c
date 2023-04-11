@@ -1,16 +1,41 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <math.h>
 
 #include "textarea.h"
 #include "codeparser.h"
 #include "style.h"
-#include "extgraph.h"
 #include "graphics.h"
+#include "extgraph.h"
 #include "imgui.h"
 #include "undoredo.h"
 
 PosRC g_cursorPos = {1, 0}, g_realPos = {1, 0}, g_renderPos;
+
+static PosRC pixelToPosRC(Passage *passage, int px, int py, double height) {
+    PosRC pos;
+    double x = ScaleXInches(px);
+    double y = ScaleYInches(py);
+    int row = (passage->passList).listLen;
+    
+    printf("Y: %.2f, height: %.2f", y, height);
+    pos.r = max(1, min(row, floor((height - y) / GetFontHeight())));
+
+    char fullLine[MAX_LINE_SIZE];
+    getLine(passage, fullLine, pos.r);
+    
+    pos.c = strlen(fullLine) - 1;
+    while (fullLine[pos.c] == '\n') pos.c--;
+    while (pos.c >= 0) {
+        printf("pos.c : %d, TmpLine is :%s\n", pos.c, fullLine);
+        if (TextStringWidth(fullLine) < x) break;
+        fullLine[pos.c] = '\0';
+        pos.c--;
+    }
+    pos.c++;
+    return pos;
+} 
 
 void drawEditor(Passage *passage, UndoRedo *ur) {
     double winWidth = GetWindowWidth();
@@ -106,6 +131,13 @@ void drawTokenBox(Token* token, double x, double y, double w, double h) {
     DrawTextString(token->content);
 }
 
+void moveCursorByMouse(Passage* passage, int x, int y, int button, int event) {
+    
+    PosRC newPos = pixelToPosRC(passage, x, y, 6.75);
+    g_cursorPos = g_realPos = newPos;
+    printf("Called move mouse, newPos (%d, %d)\n", newPos.r, newPos.c);
+}
+
 void moveCursor(Passage* passage, int key, int event) {
     if (event != KEY_DOWN) return; 
     int row = (passage->passList).listLen;
@@ -141,8 +173,9 @@ void moveCursor(Passage* passage, int key, int event) {
                 g_cursorPos.c--;
             }
             else if (g_cursorPos.r > 1) {
-                cancelNewline(passage, g_cursorPos.r);
+                // cancelNewline(passage, g_cursorPos.r);
                 preLine = kthNode(&(passage->passList), g_cursorPos.r - 1)->datptr;
+                deleteString(passage, g_cursorPos.r - 1, preLine->length + 1, g_cursorPos.r - 1, preLine->length + 1);
                 g_cursorPos.r--;
                 g_cursorPos.c = preLine->length;
             } 

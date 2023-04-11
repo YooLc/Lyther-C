@@ -44,6 +44,7 @@ void CharEventProcess(char ch)
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
+    // moveCursorByMouse(&passage, x, y, button, event);
     Display();
 }
 
