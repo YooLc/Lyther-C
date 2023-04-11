@@ -300,30 +300,38 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	int i = 0;
 	
 	char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE];    //store string in the first and last row
+	char prevLine[MAX_LINE_SIZE], nextLine[MAX_LINE_SIZE];
+	char targetLine[4*MAX_LINE_SIZE];
 	
+	if(rows > 1) getLine(passage, prevLine, rows-1);
+	if(rowt < passage->passList.listLen) getLine(passage, nextLine, rowt+1);
 	getLine(passage, tmpLine1, rows);
 	getLine(passage, tmpLine2, rowt);
 	
-	//store the remaining string in tmpLine1
-	tmpLine1[cols - 1] = '\0';
-	strcat(tmpLine1, tmpLine2 + colt);
-	
+	if(rows > 1) strcat(targetLine, prevLine);
+	strncat(targetLine, tmpLine1, cols-1);
+	strcat(targetLine, tmpLine2 + colt);
+	if(rowt < passage->passList.listLen) strcat(targetLine, nextLine);
+
+	printf("\n\n **** DELETE STRING : \"%s\"\n", targetLine);
+	if(rowt < passage->passList.listLen) deleteLine(&(passage->passList), rowt+1);
 	//delete original string
 	for(i = rowt; i >= rows; i--){
 		deleteLine(&(passage->passList), i);	
 	}
 	
+	if(rows > 1) deleteLine(&(passage->passList), rows-1);
 	//initialize and insert the remaining string
 	Line  *line  = NEW(Line);
 	Token *token = NEW(Token);
-	strcpy(token->content, tmpLine1);
-	token->length = strlen(tmpLine1);
+	strcpy(token->content, targetLine);
+	token->length = strlen(targetLine);
 	token->type = STRING;
 	initList(&(line->lineList));
 	addNodeToTail(&(line->lineList), token);
-	addNode(&(passage->passList), rows, line);
+	addNode(&(passage->passList), (rows>1)?(rows-1):(rows), line);
 
-	parseLine(passage, rows);
+	parseLine(passage, (rows>1)?(rows-1):rows);
 }
 
 void cancelNewline(Passage *passage, int row) {
