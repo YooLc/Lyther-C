@@ -189,11 +189,20 @@ int parseLine(Passage *passage, int row){
 				}
 				break;
 			case '#':
+				cnt = -1;
+				while(idx <= totLen){
+					if(tmpLine[idx-1] == '\n') break;
+					tmpWord[++cnt] = tmpLine[idx-1];
+					idx++;
+				}
+				tmpWord[cnt+1] = '\0';
+				setToken(token, tmpWord, PREPROCESS);
+				/*
 				setToken(token, &tmpLine[idx-1], PREPROCESS);
 				token->content[token->length-1] = '\0'; //deal with \n
 				token->length--;
 				idx = totLen;
-				break;
+				*/break;
 			default:
 				if(!(tmpLine[idx-1] >= 'a' && tmpLine[idx-1] <= 'z' || tmpLine[idx-1] >= 'A' && tmpLine[idx-1] <= 'Z')){
 					strncpy(token->content, &tmpLine[idx-1], 1);
