@@ -132,8 +132,8 @@ void drawTokenBox(Token* token, double x, double y, double w, double h) {
 }
 
 void moveCursorByMouse(Passage* passage, int x, int y, int button, int event) {
-    
-    PosRC newPos = pixelToPosRC(passage, x, y, 6.75);
+    if (event != BUTTON_DOWN) return;
+    PosRC newPos = pixelToPosRC(passage, x, y, 6.90);
     g_cursorPos = g_realPos = newPos;
     printf("Called move mouse, newPos (%d, %d)\n", newPos.r, newPos.c);
 }
@@ -188,6 +188,10 @@ void moveCursor(Passage* passage, int key, int event) {
             addString(passage, "\n", g_realPos.r, g_realPos.c + 1);
             g_cursorPos.r++;
             g_cursorPos.c = 0;
+            /* Smart indent
+            addString(passage, "\n    ", g_realPos.r, g_realPos.c + 1);
+            g_cursorPos.r++;
+            g_cursorPos.c = 4; */
             break;
     }
     g_realPos.r = g_cursorPos.r;

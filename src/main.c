@@ -43,7 +43,7 @@ void CharEventProcess(char ch)
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
-    // moveCursorByMouse(&passage, x, y, button, event);
+    moveCursorByMouse(&passage, x, y, button, event);
     Display();
 }
 
@@ -63,13 +63,13 @@ void Main()
 	initUndoRedoList(&undoRedo, &passage);
     SetFont("Consolas");
     // A simple test case
-    addString(&passage, "\n", 1, 1);
-//	addString(&passage, "#include <stdio.h>\n", 1, 1);
-//	addString(&passage, "void main() { //test comment\n", 2, 1);
-//	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-//	addString(&passage, "}\n", 5, 1);
-//	addString(&passage, "this great ", 3, 19);
-//	 addString(&passage, " ", 4, 1);
+//    addString(&passage, "\n", 1, 1);
+	addString(&passage, "#include <stdio.h>\n", 1, 1);
+	addString(&passage, "void main() { //test comment\n", 2, 1);
+	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
+	addString(&passage, "}\n", 5, 1);
+	addString(&passage, "this great ", 3, 19);
+	 addString(&passage, " ", 4, 1);
 //	 addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
 //	Undo(&undoRedo);
 //	Redo(&undoRedo);
