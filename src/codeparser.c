@@ -74,6 +74,13 @@ static void maintainLineLength(Line *line){
 	}
 }
 
+static int isCharacter(char ch){
+	if(ch >= 'a' && ch <= 'z') return 1;
+	if(ch >= 'A' && ch <= 'Z') return 1;
+	if(ch < 0) return 1;	//Chinese character
+	return 0;
+}
+
 int parseLine(Passage *passage, int row){
 	
 	char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
@@ -82,8 +89,10 @@ int parseLine(Passage *passage, int row){
 	Line  *line  = NEW(Line);
  	initList(&(line->lineList));
  	
- 	//delete the old line, add a new empty line
+	//store the target line in char array <tmpLine>
  	totLen = getLine(passage, tmpLine, row);
+ 	
+ 	//delete the old line, add a new empty line
  	deleteLine(passage, row);
  	addNode(&(passage->passList), row, line);
  	printf("Attempt to parse %s (length %d)", tmpLine, totLen);
@@ -122,10 +131,11 @@ int parseLine(Passage *passage, int row){
 				tmpWord[cnt = 0] = '\'';
 				while(idx <= totLen){
 					tmpWord[++cnt] = tmpLine[idx-1];
-					if(tmpLine[idx-1] == '\'') break;
+					if(tmpLine[idx-1] == '\'' || tmpLine[idx-1] == '\n') break;
 					idx++;
 				}
-				idx++;
+				if(tmpWord[cnt] != '\n') idx++;
+				if(tmpWord[cnt] == '\n') cnt--;
 				tmpWord[cnt+1] = '\0';
 				setToken(token, tmpWord, SINGLE_QUOTE);
 				break;
@@ -197,14 +207,9 @@ int parseLine(Passage *passage, int row){
 				}
 				tmpWord[cnt+1] = '\0';
 				setToken(token, tmpWord, PREPROCESS);
-				/*
-				setToken(token, &tmpLine[idx-1], PREPROCESS);
-				token->content[token->length-1] = '\0'; //deal with \n
-				token->length--;
-				idx = totLen;
-				*/break;
+				break;
 			default:
-				if(!(tmpLine[idx-1] >= 'a' && tmpLine[idx-1] <= 'z' || tmpLine[idx-1] >= 'A' && tmpLine[idx-1] <= 'Z')){
+				if( !isCharacter(tmpLine[idx-1]) ){
 					strncpy(token->content, &tmpLine[idx-1], 1);
 					token->content[1] = '\0';
 					token->type = OTHER;
@@ -212,30 +217,32 @@ int parseLine(Passage *passage, int row){
 					break;
 				}
 				cnt = 0;
-				while(idx <= totLen && (tmpLine[idx-1] >= 'a' && tmpLine[idx-1] <= 'z' || tmpLine[idx-1] >= 'A' && tmpLine[idx-1] <= 'Z')){
+				while(idx <= totLen && isCharacter(tmpLine[idx-1]) ){
 					tmpWord[cnt++] = tmpLine[idx-1];
 					idx++;
 				}
 				tmpWord[cnt] = '\0';
 				setToken(token, tmpWord, STRING);
 		}
+		
 		token->length = strlen(token->content);
              
         if(isKeyWord(token->content)) token->type = KEYWORD;
-		// printf("# %s\n", token->content);
-		// if (token->type != ENTER)
-        addNodeToTail(&(line->lineList), token);
+
+        addNodeToTail(&(line->lineList), token);    //add this token to the end of the line
+		
 		//If there is \n more than one, add a new line
 		if(newLine) {
-			maintainLineLength(line);
+			maintainLineLength(line);	//maintain the length of the old line
 			line = NEW(Line);
  			initList(&(line->lineList));
  			addNode(&(passage->passList), ++row, line);
  			newLine = 0;
 		}
+		
 	}
 	
-	maintainLineLength(line);
+	maintainLineLength(line);	//maintain the length of the current line
 	return row;
 }
 
@@ -268,6 +275,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
 */ 
 PosRC addString(Passage *passage, char *str, int row, int col) {
 	int addLen = strlen(str), i = 0;
+	PosRC posRC;
 	// If it is a new row
 	if(passage->passList.listLen == row - 1) {
 		Line  *line  = NEW(Line);
@@ -278,8 +286,13 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
 		initList(&(line->lineList));
 		addNodeToTail(&(line->lineList), token);
 		addNodeToTail(&(passage->passList), line);
-		parseLine(passage, row);
-		return;
+		
+		//calculate the cursor position
+		posRC.r = parseLine(passage, row);
+		line = kthNode(&(passage->passList), posRC.r)->datptr;	//get the last row
+		posRC.c = line->length;
+
+		return posRC;
 	}
 
 	int offset = 0;
@@ -302,10 +315,11 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
 	int nowCol = newRow==row? col : 1;
 	
 	char lastChar = str[strlen(str) - 1];
-	while(tmpstr[nowCol] != lastChar) nowCol++;
+	while(tmpstr[nowCol-1] != lastChar) nowCol++;
 	
-	PosRC posRC = {newRow-1, nowCol};//to be fixed
-    printf("ADD POS %d %d", posRC.r, posRC.c);
+	posRC.r = newRow;
+	posRC.c = nowCol;
+
 	return posRC;
 }
 
@@ -346,7 +360,7 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 
 	parseLine(passage, (rows>1)?(rows-1):rows);
 }
-
+/*
 void cancelNewline(Passage *passage, int row) {
     // Validation check
     if (row <= 1 || row > (passage->passList).listLen) return;
@@ -374,6 +388,23 @@ void cancelNewline(Passage *passage, int row) {
 	addNode(&(passage->passList), row - 1, line);
 
 	parseLine(passage, row - 1);
+}
+*/
+PosRC searchForwardByChar(Passage *passage, int row, int col, char ch){ //haven't finished yet
+	int offset = 0, i = 0;
+	PosRC posRC = {-1, -1};
+	char tmpLine1[MAX_LINE_SIZE] = "";
+	Listptr nowNode = getPos(passage, row, col, &offset);
+	Token *token = nowNode->datptr;
+	getLine(passage, tmpLine1, row);
+	for(i=offset; i<token->length; i++){
+		if(token->content[i] == ch){
+			posRC.r = row;
+			posRC.c = col - offset + i;
+			return posRC;
+		}
+	}
+	
 }
 
 //for debug use

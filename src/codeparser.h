@@ -121,6 +121,14 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
 
 void inputString(char *str);
 
+/*
+    Function: searchForwardByChar(Passage *passage, int row, int col, char ch)
+    Search for <ch> start from <(row, col)>
+    Return the position by <posRC>
+    If it is not found, return <{-1, -1}>
+*/ 
+PosRC searchForwardByChar(Passage *passage, int row, int col, char ch);
+
 // debug use
 void printPassage(Passage *p);
 #endif
