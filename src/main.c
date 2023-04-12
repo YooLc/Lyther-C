@@ -26,15 +26,14 @@ void KeyboardEventProcess(int key, int event)
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
-    if (ch >= 32 && ch < 127) {
+    // The top bit of Chinese characters in GB2312 is 1, so ch is negative
+    if ((ch >= 32 && ch < 127) || ch < 0) {
         g_cursorPos = g_realPos;
         char tmpstr[MAX_LINE_SIZE] = "";
         sprintf(tmpstr, "%c", ch);
         addTrace(&undoRedo, ADD, g_cursorPos.r, g_cursorPos.c + 1, g_cursorPos.r, g_cursorPos.c + 1, tmpstr);
         printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
-        addString(&passage, tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
-        g_cursorPos.c++;
-        g_realPos.c++;
+        g_cursorPos = g_realPos = addString(&passage, tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
         //printPassage(&passage);
     }
     printPassage(&passage);
@@ -65,15 +64,15 @@ void Main()
     SetFont("Consolas");
     // A simple test case
     addString(&passage, "\n", 1, 1);
-	addString(&passage, "#include <stdio.h>\n", 1, 1);
-	addString(&passage, "void main() { //test comment\n", 2, 1);
-	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-	addString(&passage, "}\n", 5, 1);
-	addString(&passage, "this great ", 3, 19);
-	 addString(&passage, " ", 4, 1);
-	 addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
-	Undo(&undoRedo);
-	Redo(&undoRedo);
+//	addString(&passage, "#include <stdio.h>\n", 1, 1);
+//	addString(&passage, "void main() { //test comment\n", 2, 1);
+//	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
+//	addString(&passage, "}\n", 5, 1);
+//	addString(&passage, "this great ", 3, 19);
+//	 addString(&passage, " ", 4, 1);
+//	 addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
+//	Undo(&undoRedo);
+//	Redo(&undoRedo);
     printPassage(&passage);
 	InitGUI();
 	Display();
