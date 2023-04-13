@@ -2,6 +2,7 @@
 #include <string.h>
 #include <windows.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "textarea.h"
 #include "codeparser.h"
@@ -11,7 +12,108 @@
 #include "imgui.h"
 #include "undoredo.h"
 
-PosRC g_cursorPos = {1, 0}, g_realPos = {1, 0}, g_renderPos;
+#define NEW(T) (T*)malloc(sizeof(T))
+
+static double winWidth, winHeight, fontHeight;
+
+void initEditor(Editor* editor) {
+    editor->fileCount = 0;
+    editor->curSelect = 0;
+    editor->filePath[0] = NULL;
+    editor->forms[0] = NULL;
+    editor->menuHeight = editor->barHeight = GetFontHeight() * 1.5;
+    
+    winWidth = GetWindowWidth();
+    winHeight = GetWindowHeight();
+    fontHeight = GetFontHeight();
+}
+
+void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
+    EditorForm *form = NEW(EditorForm);
+    editor->fileCount++;
+    editor->curSelect = editor->fileCount;
+    editor->filePath[editor->fileCount] = filePath;
+    editor->forms[editor->fileCount] = form;
+    
+    form->style = 0;
+    form->visible = true;
+    form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 1;
+    form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 0;
+    form->x = form->y = 0;
+    form->w = GetWindowWidth();
+    form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
+    form->urStack = NEW(UndoRedo);
+    if (fp != NULL) { /* Do sth. here */ }
+    else {
+        form->passage = NEW(Passage);
+        addString(form->passage, "\n", 1, 1);
+    }
+}
+
+void drawEditor(Editor* editor) {
+    drawEditorMenu(editor);
+    drawEditorBar(editor);
+    int idx;
+    for (idx = 1; idx <= editor->fileCount; idx++) {
+        if (!editor->forms[idx]->visible) continue;
+        drawEditorForm(editor->forms[idx]);
+    }
+}
+
+static void drawEditorMenu(Editor* editor) {
+    static char* menuListFile[] = {"File",
+        "Open | Ctrl-O",
+        "Save | Ctrl-S",
+        "Exit | Ctrl-E"};
+    static char* menuListEdit[] = {"Edit",
+        "Undo | Ctrl-Z",
+        "Redo | Ctrl-Y"};
+    int selection;
+    double x, y, w, h, wlist, xindent;
+    x = 0; y = winHeight - editor->menuHeight;
+    w = winWidth; h = editor->menuHeight;
+    xindent = h / 20;
+    
+    drawMenuBar(x, y, w, h);
+    // Draw File Menu
+    wlist = TextStringWidth(menuListFile[1]) * 2;
+    selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
+    // Draw Editor Menu
+    x += w;
+    wlist = TextStringWidth(menuListEdit[1]) * 2;
+    selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
+    EditorForm* curForm = editor->forms[editor->curSelect];
+    switch(selection) {
+        case 1: Undo(curForm->urStack); curForm->caretPos.c--; break;
+        case 2: Redo(curForm->urStack); curForm->caretPos.c++; break;
+    }
+} 
+
+static void drawEditorBar(Editor *editor) {
+    return;
+}
+
+static void drawEditorForm(EditorForm *form) {
+    double curLinePosY = form->h - fontHeight;
+    
+    // Set renderPos at origin, rows are 1-based, and cols are 0-based
+    form->renderPos.r = 1;
+    form->renderPos.c = 0;
+    
+    // Traverse passage (list of lines)
+ 	Listptr curLine = kthNode(&(form->passage->passList), 1);
+ 	while(curLine != NULL) {
+        // Traverse line (list of tokens)
+ 		drawCodeLine(form, curLine->datptr, 0, curLinePosY, form->w, fontHeight);
+ 		curLine = curLine->next;
+        curLinePosY -= fontHeight;
+        form->renderPos.r++;
+        form->renderPos.c = 0;
+ 	}
+ 	// printf("%d %d", g_cursorPos.r, g_cursorPos.c);
+    return;
+}
+
 
 static PosRC pixelToPosRC(Passage *passage, int px, int py, double height) {
     PosRC pos;
@@ -37,67 +139,20 @@ static PosRC pixelToPosRC(Passage *passage, int px, int py, double height) {
     return pos;
 } 
 
-void drawEditor(Passage *passage, UndoRedo *ur) {
-    double winWidth = GetWindowWidth();
-    double winHeight = GetWindowHeight();
-    drawEditorMenu(ur, winWidth, winHeight);
-    drawCodeForm(passage, winWidth, winHeight - GetFontHeight() * 1.5);
-}
-
-void drawEditorMenu(UndoRedo *ur, double width, double height) {
-    static char* menuListEdit[] = {"Edit",
-        "Undo | Ctrl-Z",
-        "Redo | Ctrl-Y"};
-    int selection;
-    double x = 0;
-    double y = height;
-    double h = GetFontHeight() * 1.5;
-    double w = TextStringWidth(menuListEdit[0]) * 2;
-    double wlist = TextStringWidth(menuListEdit[1]) * 2;
-    double xindent = height / 20;
-    drawMenuBar(0, y - h, width, h);
-    selection = menuList(GenUIID(0), 0, y - h, w, wlist, h, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
-    switch(selection) {
-        case 1: Undo(ur); g_cursorPos.c--; break;
-        case 2: Redo(ur); g_cursorPos.c++; break;
-    }
-} 
-
-void drawCodeForm(Passage *passage, double width, double height) {
-    double fontHeight = GetFontHeight();
-    double curLinePosY = height - fontHeight;
-    g_renderPos.r = g_renderPos.c = 0;
-    // printf("Font Height: %.2f  Width: %.15f\n", fontHeight, fontWidth);
-
-    // Traverse passage (list of lines)
-    g_renderPos.r = 1;
-    g_renderPos.c = 0;
- 	Listptr curLine = kthNode(&(passage->passList), 1);
- 	while(curLine != NULL) {
-        // Traverse line (list of tokens)
- 		drawCodeLine(curLine->datptr, 0, curLinePosY, width, fontHeight);
- 		curLine = curLine->next;
-        curLinePosY -= fontHeight;
-        g_renderPos.r++;
-        g_renderPos.c = 0;
- 	}
- 	// printf("%d %d", g_cursorPos.r, g_cursorPos.c);
-    return;
-}
-
-void drawCodeLine(Line* line, double x, double y, double w, double h) {
-    Listptr curToken = kthNode(&(line->lineList), 1);
-    
+static void drawCodeLine(EditorForm* form, Line* line, double x, double y, double w, double h) {
     double tokenWidth;
  	double curTokenPosX = 0;
- 	if (g_renderPos.r == g_realPos.r) {
- 	    SetPenColor("Light Blue");
+ 	Listptr curToken = kthNode(&(line->lineList), 1);
+ 	
+ 	// If current line is focused...
+ 	if (form->renderPos.r == form->realCaretPos.r) {
+ 	    SetPenColor("Light Blue"); // Need to use palette
  		drawRectangle(x, y, w, h, 1);
  		if ((clock() >> 8) & 1) {
  		    char tmpstr[MAX_LINE_SIZE] = "\0"; 
  		    int i;
  		    // Pure Brute Force, wait for better implementation.
-            for (i = 0; i < g_realPos.c; i++) strcat(tmpstr, " ");
+            for (i = 0; i < form->realCaretPos.c; i++) strcat(tmpstr, " ");
             strcat(tmpstr, "|");
             SetPenColor("Black");
             MovePen(x - GetFontAscent() / 4, y + GetFontDescent()); // This is relatively correct, not exact.
@@ -105,19 +160,18 @@ void drawCodeLine(Line* line, double x, double y, double w, double h) {
         }
     }
     
+    // Traverse tokens
  	while (curToken != NULL) {
  		Token* token = curToken->datptr;
  		tokenWidth = TextStringWidth(token->content);
- 		//printf("Drawing Token: \'%s\' curTokenPosX: %.4f TokenWidth: %.4f Color: %s\n", token->content, curTokenPosX, tokenWidth, getColorByTokenType(token->type));  
- 		// Easiest way to implement textbox() with no extra functions
-        drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
-        g_renderPos.c += token->length;
-        curToken = curToken->next;	
+ 		drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
+        form->renderPos.c += token->length;
         curTokenPosX += tokenWidth;
+        curToken = curToken->next;
     }
 }
 
-void drawTokenBox(Token* token, double x, double y, double w, double h) {
+static void drawTokenBox(Token* token, double x, double y, double w, double h) {
 //    if (token->selected) {
 //        SetPenColor("Blue");
 //        drawRectangle(x, y, w, h, 1);

@@ -1,46 +1,53 @@
 #ifndef _TEXTAREA_H_
 #define _TEXTAREA_H_
 
+#include <stdbool.h>
 #include "doublylinkedlist.h"
 #include "linkedlist.h"
 #include "codeparser.h"
 #include "undoredo.h"
+#include "style.h"
+
+#define MAX_FILE_COUNT 20
 
 /*
-    Struct: Palette
-    Storage colors used for each page.
-    Colors and styles are defined in style.h.
+    Struct: Editor Form
+    Single form containing single .c file.
+    (x, y) denoted left-bottom point, while (x + w, y + h) is right-top point
 */
 typedef struct {
-    // Colors for background and text(forground).
-    char background[32]; 
-    char foreground[32];
-
-    // Colors for line index part on the left.
-    char lineIndexBackground[32];
-    char lineIndexForeground[32];
-    char lineIndexHighlight[32];
-
-    // Colors for different types of keywords.
-    // To be implemented...
-} Palette;
+    int style;
+    bool visible;
+    double x, y, w, h;
+    PosRC caretPos, realCaretPos, renderPos;
+    UndoRedo *urStack;
+    Passage *passage;
+} EditorForm;
 
 /*
-    Struct: Page
-    Single page in the text area, to display single .c file.
+    Struct: Editor
+    Overall struct of an editor, containing several(probably) forms.
 */
-//typedef struct {
-//    Palette palette;
-//
-//    double width, height; // Border of the page
-//    LinkedList codeStack, undoStack;
-//    linkedlistADT codeList;
-//} Page;
+typedef struct {
+    int fileCount, curSelect;
+    double menuHeight, barHeight;
+    char *filePath[MAX_FILE_COUNT];
+    EditorForm *forms[MAX_FILE_COUNT];
+} Editor;
 
-void drawEditorMenu(UndoRedo *ur, double width, double height);
-void drawCodeForm(Passage *passage, double width, double height);
-void drawCodeLine(Line* line, double x, double y, double w, double h);
-void drawTokenBox(Token* token, double x, double y, double w, double h);
+/*
+    Function: initEditor
+    Not well implemented.
+*/
+void initEditor(Editor* editor);
+static void drawEditorMenu(Editor* editor);
+static void drawEditorBar(Editor* editor);
+static void drawEditorForm(EditorForm* form);
+static void drawCodeLine(EditorForm* form, Line* line, double x, double y, double w, double h);
+static void drawToken(Token* token, double x, double y, double w, double h);
+static void drawTokenBox(Token* token, double x, double y, double w, double h);
+
+void addCodeToEditor(Editor* editor, FILE* fp, char* filePath);
 void moveCursor(Passage* passage, int key, int event);
 void addChar(char ch);
 #endif
