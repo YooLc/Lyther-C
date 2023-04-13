@@ -390,21 +390,73 @@ void cancelNewline(Passage *passage, int row) {
 	parseLine(passage, row - 1);
 }
 */
-PosRC searchForwardByChar(Passage *passage, int row, int col, char ch){ //haven't finished yet
-	int offset = 0, i = 0;
+PosRC searchForwardByChar(Passage *passage, int row, int col, char ch){
+	//Initialize variables
+	int offset = 0, i = 0, len = 0;
 	PosRC posRC = {-1, -1};
 	char tmpLine1[MAX_LINE_SIZE] = "";
 	Listptr nowNode = getPos(passage, row, col, &offset);
 	Token *token = nowNode->datptr;
+
+	//attempt to find <ch> in the first row
 	getLine(passage, tmpLine1, row);
-	for(i=offset; i<token->length; i++){
-		if(token->content[i] == ch){
+	len = strlen(tmpLine1);
+	for(i=col-1; i<len; i++){
+		if(tmpLine1[i] == ch){
 			posRC.r = row;
-			posRC.c = col - offset + i;
+			posRC.c = i+1;
 			return posRC;
 		}
 	}
 	
+	//attempt to find <ch> in the latter rows
+	while(++row <= passage->passList.listLen){
+		getLine(passage, tmpLine1, row);
+		len = strlen(tmpLine1);
+		for(i=0; i<len; i++){
+			if(tmpLine1[i] == ch){
+				posRC.r = row;
+				posRC.c = i+1;
+				return posRC;
+			}
+		}
+	}
+	
+	return posRC;
+}
+
+PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch){
+	//Initialize variables
+	int offset = 0, i = 0, len = 0;
+	PosRC posRC = {-1, -1};
+	char tmpLine1[MAX_LINE_SIZE] = "";
+	Listptr nowNode = getPos(passage, row, col, &offset);
+	Token *token = nowNode->datptr;
+
+	//attempt to find <ch> in the first row
+	getLine(passage, tmpLine1, row);
+	for(i=col-1; i>=0; i--){
+		if(tmpLine1[i] == ch){
+			posRC.r = row;
+			posRC.c = i+1;
+			return posRC;
+		}
+	}
+	
+	//attempt to find <ch> in the previous rows
+	while(--row > 0){
+		getLine(passage, tmpLine1, row);
+		len = strlen(tmpLine1);
+		for(i=len-1; i>=0; i--){
+			if(tmpLine1[i] == ch){
+				posRC.r = row;
+				posRC.c = i+1;
+				return posRC;
+			}
+		}
+	}
+	
+	return posRC;
 }
 
 //for debug use

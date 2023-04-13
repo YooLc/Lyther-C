@@ -128,6 +128,13 @@ void inputString(char *str);
     If it is not found, return <{-1, -1}>
 */ 
 PosRC searchForwardByChar(Passage *passage, int row, int col, char ch);
+/*
+    Function: searchBackwardByChar(Passage *passage, int row, int col, char ch)
+    Search for <ch> before <(row, col)>
+    Return the position by <posRC>
+    If it is not found, return <{-1, -1}>
+*/ 
+PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch);
 
 // debug use
 void printPassage(Passage *p);
