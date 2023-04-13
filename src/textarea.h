@@ -35,6 +35,10 @@ typedef struct {
     EditorForm *forms[MAX_FILE_COUNT];
 } Editor;
 
+typedef enum {
+    UP, DOWN, LEFT, RIGHT
+} CaretAction;
+
 /*
     Function: initEditor
     Not well implemented.
@@ -48,6 +52,8 @@ static void drawToken(Token* token, double x, double y, double w, double h);
 static void drawTokenBox(Token* token, double x, double y, double w, double h);
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath);
-void moveCursor(Passage* passage, int key, int event);
+static void moveCaret(EditorForm* form, CaretAction action);
+void moveCaretByMouse(Editor* editor, int x, int y, int button, int event);
+void moveCaretByKey(Editor* editor, int key, int event);
 void addChar(char ch);
 #endif

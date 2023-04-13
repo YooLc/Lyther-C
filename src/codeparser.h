@@ -5,6 +5,7 @@
 #define MAX_WORD_SIZE 128
 #define MAX_LINE_SIZE 2048
 #define NEW(T) (T*)malloc(sizeof(T)) 
+#define LOG "\033[1m; [__FILE__ -> __FUNCTION__] \033[0m;"
 
 /*
     Enum: TokenType

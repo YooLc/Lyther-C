@@ -14,37 +14,26 @@ Passage passage;
 Editor editor;
 UndoRedo undoRedo;
 
-extern PosRC g_cursorPos, g_realPos;
 void Display(void);
 
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
-    moveCursor(&passage, key, event);
+    handleKeyboardEvent(&editor, key, event);
     Display();
 }
 
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
-    // The top bit of Chinese characters in GB2312 is 1, so ch is negative
-    if ((ch >= 32 && ch < 127) || ch < 0) {
-        g_cursorPos = g_realPos;
-        char tmpstr[MAX_LINE_SIZE] = "";
-        sprintf(tmpstr, "%c", ch);
-        addTrace(&undoRedo, ADD, g_cursorPos.r, g_cursorPos.c + 1, g_cursorPos.r, g_cursorPos.c + 1, tmpstr);
-        printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
-        g_cursorPos = g_realPos = addString(&passage, tmpstr, g_cursorPos.r, g_cursorPos.c + 1);
-        //printPassage(&passage);
-    }
-    printPassage(&passage);
+    handleInputEvent(&editor, ch);
     Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
-    moveCursorByMouse(&passage, x, y, button, event);
+    handleMouseEvent(&editor, x, y, button, event);
     Display();
 }
 
@@ -56,30 +45,29 @@ void TimerEventProcess(int timerID)
 
 void Main() 
 {
-    SetFont("Consolas");
     SetWindowTitle("Light C code editor");
 	InitGraphics();
 	InitConsole(); // For debug use. 
+	SetFont("Consolas");
 	InitStyle();
 	InitGUI();
 	initEditor(&editor);
 	addCodeToEditor(&editor, NULL, "Unamed 1");
-	initPassage(&passage);
-	initUndoRedoList(&undoRedo, &passage);
+//	initUndoRedoList(&undoRedo, &passage);
 	initEditor(&editor);
     
     // A simple test case
 //    addString(&passage, "\n", 1, 1);
-	addString(&passage, "#include <stdio.h>\n", 1, 1);
-	addString(&passage, "void main() { //test comment\n", 2, 1);
-	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-	addString(&passage, "}\n", 5, 1);
-	addString(&passage, "this great ", 3, 19);
-	 addString(&passage, " ", 4, 1);
+//	addString(&passage, "#include <stdio.h>\n", 1, 1);
+//	addString(&passage, "void main() { //test comment\n", 2, 1);
+//	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
+//	addString(&passage, "}\n", 5, 1);
+//	addString(&passage, "this great ", 3, 19);
+//	 addString(&passage, " ", 4, 1);
 //	 addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
 //	Undo(&undoRedo);
 //	Redo(&undoRedo);
-    printPassage(&passage);
+//    printPassage(&passage);
 	startTimer(REFRESH_TIMER, 50);
 	registerCharEvent(CharEventProcess);
 	registerMouseEvent(MouseEventProcess);

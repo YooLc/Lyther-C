@@ -23,12 +23,9 @@ typedef struct {
     // Colors for different types of keywords.
     // To be implemented...
 } Palette;
-Palette palette[] = {
-{"White", "Black", "Gray", "Black", "Light Blue"},
-{"Black", "White", "Black", "White", "Gray"}
-};
 
 void InitStyle();
 string getColorByTokenType(CodeTokenType type);
 int getStyleByTokenType(CodeTokenType type);
+
 #endif

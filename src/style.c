@@ -2,6 +2,11 @@
 #include "extgraph.h"
 #include "codeparser.h"
 
+Palette g_palette[] = {
+    {"White", "Black", "Gray", "Black", "Light Blue"},
+    {"Black", "White", "Black", "White", "Gray"}
+};
+
 void InitStyle()
 {
     DefineColor("Light Blue", .8, 1, 1);

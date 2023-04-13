@@ -42,12 +42,15 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->x = form->y = 0;
     form->w = GetWindowWidth();
     form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
-    form->urStack = NEW(UndoRedo);
+    
     if (fp != NULL) { /* Do sth. here */ }
     else {
         form->passage = NEW(Passage);
+        initPassage(form->passage);
         addString(form->passage, "\n", 1, 1);
     }
+    form->urStack = NEW(UndoRedo);
+    initUndoRedoList(form->urStack, form->passage);
 }
 
 void drawEditor(Editor* editor) {
@@ -185,72 +188,99 @@ static void drawTokenBox(Token* token, double x, double y, double w, double h) {
     DrawTextString(token->content);
 }
 
-void moveCursorByMouse(Passage* passage, int x, int y, int button, int event) {
-    if (event != BUTTON_DOWN) return;
-    PosRC newPos = pixelToPosRC(passage, x, y, 6.90);
-    g_cursorPos = g_realPos = newPos;
-    printf("Called move mouse, newPos (%d, %d)\n", newPos.r, newPos.c);
-}
-
-void moveCursor(Passage* passage, int key, int event) {
-    if (event != KEY_DOWN) return; 
-    int row = (passage->passList).listLen;
+static void moveCaret(EditorForm *form, CaretAction action) {
+    PosRC curPos = form->realCaretPos;
+    
+    // Some essential variables to count new position
+    int row = (form->passage->passList).listLen;
     Line *curLine, *preLine;
-    curLine = kthNode(&(passage->passList), g_cursorPos.r)->datptr;
-    switch(key) {
-        case VK_LEFT:
-            g_cursorPos = g_realPos;
-            if (g_cursorPos.c > 0) g_cursorPos.c--;
-            else if (g_cursorPos.r > 1) {
-                preLine = kthNode(&(passage->passList), g_cursorPos.r - 1)->datptr;
-                g_cursorPos.r--;
-                g_cursorPos.c = preLine->length;
+    curLine = kthNode(&(form->passage->passList), curPos.r)->datptr;
+    if (form->realCaretPos.r > 1)
+        preLine = kthNode(&(form->passage->passList), curPos.r - 1)->datptr;
+    
+    switch(action) {
+        case LEFT:
+            if (curPos.c >= 1) curPos.c--;
+            else if (curPos.r > 1) {
+                curPos.r--; curPos.c = preLine->length;
             }
             break;
-        case VK_RIGHT:
-            g_cursorPos = g_realPos;
-            if (g_cursorPos.c < curLine->length) g_cursorPos.c++;
-            else if (g_cursorPos.r < row) {
-                g_cursorPos.r++;
-                g_cursorPos.c = 0;
+        case RIGHT:
+            if (curPos.c < curLine->length) curPos.c++;
+            else if (curPos.r < row) {
+                curPos.r++; curPos.c = 0;
             }
             break;
-        case VK_UP:
-            if (g_cursorPos.r > 1) g_cursorPos.r--;
+        case UP:
+            if (curPos.r > 1) curPos.r--;
             break;
-        case VK_DOWN:
-            if (g_cursorPos.r < row) g_cursorPos.r++;
-            break;
-        case VK_BACK:
-            g_cursorPos = g_realPos; 
-            if (g_cursorPos.c > 0) {
-                deleteString(passage, g_realPos.r, g_realPos.c, g_realPos.r, g_realPos.c);
-                g_cursorPos.c--;
-            }
-            else if (g_cursorPos.r > 1) {
-                preLine = kthNode(&(passage->passList), g_cursorPos.r - 1)->datptr;
-                deleteString(passage, g_cursorPos.r - 1, preLine->length + 1, g_cursorPos.r - 1, preLine->length + 1);
-                g_cursorPos.r--;
-                g_cursorPos.c = preLine->length;
-            } 
-            break;
-        case VK_DELETE:
-            deleteString(passage, g_realPos.r, g_realPos.c + 1, g_realPos.r, g_realPos.c + 1);
-            break;
-        case VK_RETURN:
-            g_cursorPos = g_realPos; 
-            addString(passage, "\n", g_realPos.r, g_realPos.c + 1);
-            g_cursorPos.r++;
-            g_cursorPos.c = 0;
-            /* Smart indent
-            addString(passage, "\n    ", g_realPos.r, g_realPos.c + 1);
-            g_cursorPos.r++;
-            g_cursorPos.c = 4; */
+        case DOWN:
+            if (curPos.r < row) curPos.r++;
             break;
     }
-    g_realPos.r = g_cursorPos.r;
-    curLine = kthNode(&(passage->passList), g_cursorPos.r)->datptr;
-    g_realPos.c = min(curLine->length, g_cursorPos.c);
-    printf("cursor at (%d, %d), real pos at (%d, %d)\n", g_cursorPos.r, g_cursorPos.c, g_realPos.r, g_realPos.c);
+    
+    // Force update caret position
+    form->caretPos = form->realCaretPos = curPos;
+    return;
+}
+
+static deleteLastChar(EditorForm* form) {
+    PosRC curPos = form->realCaretPos;
+    if (curPos.c > 0) {
+        moveCaret(form, LEFT);
+        deleteString(form->passage, curPos.r, curPos.c, curPos.r, curPos.c);
+    }
+    else if (curPos.r > 1) {
+        Line *preLine = kthNode(&(form->passage->passList), curPos.r - 1)->datptr;
+        moveCaret(form, LEFT);
+        deleteString(form->passage, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1);
+    } 
+}
+
+void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
+//    if (event != BUTTON_DOWN) return;
+//    PosRC newPos = pixelToPosRC(passage, x, y, 6.90);
+//    g_cursorPos = g_realPos = newPos;
+//    printf("Called move mouse, newPos (%d, %d)\n", newPos.r, newPos.c);
+}
+
+void handleInputEvent(Editor* editor, char ch) {
+    // The top bit of Chinese characters in GB2312 is 1, so ch is negative
+    EditorForm *form = editor->forms[editor->curSelect];
+    PosRC curPos = form->realCaretPos;
+    if ((ch >= 32 && ch < 127) || ch < 0) {
+        char tmpstr[MAX_LINE_SIZE] = "";
+        sprintf(tmpstr, "%c", ch);
+        addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
+        printf(LOG "Attempting to add %s\n", tmpstr);
+        form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
+        printPassage(form->passage);
+    }
+    printPassage(form->passage);
+}
+void handleKeyboardEvent(Editor* editor, int key, int event) {
+    if (event != KEY_DOWN) return; 
+    EditorForm *curForm = editor->forms[editor->curSelect];
+    PosRC curPos = curForm->realCaretPos;
+    switch(key) {
+        case VK_LEFT:  moveCaret(curForm, LEFT); break;
+        case VK_RIGHT: moveCaret(curForm, RIGHT); break;
+        case VK_UP:    moveCaret(curForm, UP); break;
+        case VK_DOWN:  moveCaret(curForm, DOWN); break;
+        case VK_BACK:  deleteLastChar(curForm); break;
+        case VK_DELETE:
+            deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
+            break;
+        case VK_RETURN:
+            curPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
+            break;
+    }
+    curForm->caretPos = curForm->realCaretPos = curPos;
+    // Smart Caret Position
+    Line *curLine = kthNode(&(curForm->passage->passList), curPos.r)->datptr;
+    curForm->realCaretPos.c = min(curLine->length, curPos.c);
+    printf(LOG "Caret at (%d, %d), Real Caret at (%d, %d)\n", 
+            curForm->caretPos.r, curForm->caretPos.c, 
+            curForm->realCaretPos.r, curForm->realCaretPos.c);
 }
 
