@@ -11,6 +11,7 @@
 #define REFRESH_TIMER 1
 
 Passage passage;
+Editor editor;
 UndoRedo undoRedo;
 
 extern PosRC g_cursorPos, g_realPos;
@@ -55,13 +56,18 @@ void TimerEventProcess(int timerID)
 
 void Main() 
 {
+    SetFont("Consolas");
     SetWindowTitle("Light C code editor");
 	InitGraphics();
 	InitConsole(); // For debug use. 
 	InitStyle();
+	InitGUI();
+	initEditor(&editor);
+	addCodeToEditor(&editor, NULL, "Unamed 1");
 	initPassage(&passage);
 	initUndoRedoList(&undoRedo, &passage);
-    SetFont("Consolas");
+	initEditor(&editor);
+    
     // A simple test case
 //    addString(&passage, "\n", 1, 1);
 	addString(&passage, "#include <stdio.h>\n", 1, 1);
@@ -74,13 +80,11 @@ void Main()
 //	Undo(&undoRedo);
 //	Redo(&undoRedo);
     printPassage(&passage);
-	InitGUI();
-	Display();
 	startTimer(REFRESH_TIMER, 50);
-	registerKeyboardEvent(KeyboardEventProcess);
 	registerCharEvent(CharEventProcess);
 	registerMouseEvent(MouseEventProcess);
 	registerTimerEvent(TimerEventProcess);
+	registerKeyboardEvent(KeyboardEventProcess);
 }
 
 void Display(void)
