@@ -325,7 +325,7 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
 
 void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	int i = 0;
-	
+
 	char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE];    //store string in the first and last row
 	char prevLine[MAX_LINE_SIZE], nextLine[MAX_LINE_SIZE];
 	char targetLine[4*MAX_LINE_SIZE] = "\0";
