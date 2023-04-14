@@ -38,7 +38,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->style = 0;
     form->visible = true;
     form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 1;
-    form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 0;
+    form->caretPos.c = form->realCaretPos.c = form->renderPos.c = 0;
     form->x = form->y = 0;
     form->w = GetWindowWidth();
     form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
@@ -98,7 +98,7 @@ static void drawEditorBar(Editor *editor) {
 
 static void drawEditorForm(EditorForm *form) {
     double curLinePosY = form->h - fontHeight;
-    
+
     // Set renderPos at origin, rows are 1-based, and cols are 0-based
     form->renderPos.r = 1;
     form->renderPos.c = 0;
@@ -146,7 +146,7 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
     double tokenWidth;
  	double curTokenPosX = 0;
  	Listptr curToken = kthNode(&(line->lineList), 1);
- 	
+
  	// If current line is focused...
  	if (form->renderPos.r == form->realCaretPos.r) {
  	    SetPenColor("Light Blue"); // Need to use palette
