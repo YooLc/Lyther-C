@@ -190,7 +190,7 @@ static void drawTokenBox(Token* token, double x, double y, double w, double h) {
 
 static void moveCaret(EditorForm *form, CaretAction action) {
     PosRC curPos = form->realCaretPos;
-    
+
     // Some essential variables to count new position
     int row = (form->passage->passList).listLen;
     Line *curLine, *preLine;
@@ -218,9 +218,10 @@ static void moveCaret(EditorForm *form, CaretAction action) {
             if (curPos.r < row) curPos.r++;
             break;
     }
-    
+
     // Force update caret position
     form->caretPos = form->realCaretPos = curPos;
+
     return;
 }
 
@@ -272,10 +273,14 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
             deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
             break;
         case VK_RETURN:
-            curPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
+            curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
             break;
     }
-    curForm->caretPos = curForm->realCaretPos = curPos;
+	curPos = curForm->caretPos;	
+	/*Function <moveCaret> updates the caretPos and realCaretPos directly, so we need to update <curPos>.
+	 The original version is wrong here because VK_RETURN use curPos as the intermediate variable,
+	  but LEFT RIGHT change the caretpos directly, does not use curPos as an intermediate variable*/
+	  
     // Smart Caret Position
     Line *curLine = kthNode(&(curForm->passage->passList), curPos.r)->datptr;
     curForm->realCaretPos.c = min(curLine->length, curPos.c);
