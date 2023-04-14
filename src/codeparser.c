@@ -312,10 +312,12 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
 	
 	getLine(&(passage->passList), tmpstr, newRow);
 	
-	int nowCol = newRow==row? col : 1;
+	int nowCol = (newRow == row) ? col : 0;
 	
 	char lastChar = str[strlen(str) - 1];
-	while(tmpstr[nowCol-1] != lastChar) nowCol++;
+	if (lastChar != '\n')
+	    while(tmpstr[nowCol-1] != lastChar) 
+            nowCol++;
 	
 	posRC.r = newRow;
 	posRC.c = nowCol;

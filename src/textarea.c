@@ -60,6 +60,7 @@ void drawEditor(Editor* editor) {
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
         drawEditorForm(editor->forms[idx]);
+        printf(LOG "Drawing %d form\n", idx);
     }
 }
 
@@ -74,16 +75,18 @@ static void drawEditorMenu(Editor* editor) {
     int selection;
     double x, y, w, h, wlist, xindent;
     x = 0; y = winHeight - editor->menuHeight;
-    w = winWidth; h = editor->menuHeight;
+    h = editor->menuHeight;
     xindent = h / 20;
     
     drawMenuBar(x, y, w, h);
     // Draw File Menu
-    wlist = TextStringWidth(menuListFile[1]) * 2;
+    w = TextStringWidth(menuListFile[0]) * 2;
+    wlist = TextStringWidth(menuListFile[1]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
     // Draw Editor Menu
     x += w;
-    wlist = TextStringWidth(menuListEdit[1]) * 2;
+    w = TextStringWidth(menuListEdit[0]) * 2;
+    wlist = TextStringWidth(menuListEdit[1]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
     EditorForm* curForm = editor->forms[editor->curSelect];
     switch(selection) {
