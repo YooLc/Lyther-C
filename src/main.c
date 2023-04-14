@@ -54,7 +54,7 @@ void Main()
 	initEditor(&editor);
 	addCodeToEditor(&editor, NULL, "Unamed 1");
 //	initUndoRedoList(&undoRedo, &passage);
-	initEditor(&editor);
+	//initEditor(&editor);
     
     // A simple test case
 //    addString(&passage, "\n", 1, 1);
@@ -78,5 +78,5 @@ void Main()
 void Display(void)
 {
     DisplayClear();
-    drawEditor(&passage, &undoRedo);
+    drawEditor(&editor);
 }
