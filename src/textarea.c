@@ -60,7 +60,7 @@ void drawEditor(Editor* editor) {
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
         drawEditorForm(editor->forms[idx]);
-        printf(LOG "Drawing %d form\n", idx);
+        //printf(LOG "Drawing %d form\n", idx);
     }
 }
 

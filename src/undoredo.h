@@ -26,10 +26,10 @@ typedef struct{
 }UndoRedo;
 
 //Call this function when there is an Undo event
-void Undo(UndoRedo *ur);
+PosRC Undo(UndoRedo *ur);
 
 //Call this function when there is an Redo event
-void Redo(UndoRedo *ur);
+PosRC Redo(UndoRedo *ur);
 
 /*
 	When there is a new IO event, add this trace in the undoRedoList

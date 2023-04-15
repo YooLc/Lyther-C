@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000000000000
-UnitCount=30
+UnitCount=32
 
 [VersionInfo]
 Major=1
@@ -342,6 +342,26 @@ BuildCmd=
 
 [Unit30]
 FileName=..\src\undoredo.c
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit31]
+FileName=..\src\fileio.h
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit32]
+FileName=..\src\fileio.c
 CompileCpp=0
 Folder=src
 Compile=1

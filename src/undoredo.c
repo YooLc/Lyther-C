@@ -4,9 +4,10 @@
 
 #include <string.h>
 
-void Undo(UndoRedo *ur){
+PosRC Undo(UndoRedo *ur){
 	if(ur->undoRedoList.listLen == 0 || ur->nowNode == NULL) return;
 	
+	PosRC posRC = {0,0};
 	Trace *trace = ur->nowNode->datptr;
 	int rows, cols, rowt, colt;
 	rows = trace->rows;
@@ -15,15 +16,21 @@ void Undo(UndoRedo *ur){
 	colt = trace->colt;
 	if(trace->type == ADD){
 		deleteString(ur->passage, rows, cols, rowt, colt);
+		posRC.r = rows;
+		posRC.c = cols-1;
 	}else if(trace->type == DELE){
-		addString(ur->passage, trace->content, rows, cols);
+		posRC = addString(ur->passage, trace->content, rows, cols);
 	}
 	ur->nowNode = ur->nowNode->prev;
+	
+	printf("NEW POS AFTER UNDO %d %d\n", posRC.r, posRC.c);
+	return posRC;
 }
 
-void Redo(UndoRedo *ur){
+PosRC Redo(UndoRedo *ur){
 	if(ur->undoRedoList.listLen == 0) return;
 	
+	PosRC posRC = {0,0};
 	if(ur->nowNode == NULL){    //If it is before the head of the list
 		ur->nowNode = ur->undoRedoList.head;
 	}else{
@@ -39,10 +46,14 @@ void Redo(UndoRedo *ur){
 	rowt = trace->rowt;
 	colt = trace->colt;
 	if(trace->type == ADD){
-		addString(ur->passage, trace->content, rows, cols);
+		posRC = addString(ur->passage, trace->content, rows, cols);
 	}else if(trace->type == DELE){
 		deleteString(ur->passage, rows, cols, rowt, colt);
+		posRC.r = rows;
+		posRC.c = cols-1;
 	}
+	printf("NEW POS AFTER REDO %d %d\n", posRC.r, posRC.c);
+	return posRC;
 }
 
 static void clearRedo(UndoRedo *ur){
