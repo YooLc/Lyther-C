@@ -43,7 +43,17 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->w = GetWindowWidth();
     form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
     
-    if (fp != NULL) { /* Do sth. here */ }
+    if (fp != NULL) {
+    	form->passage = NEW(Passage);
+        initPassage(form->passage);
+		char buf[50005];
+		int len = 0;
+		while(!feof(fp)){
+			buf[len++] = fgetc(fp);
+		}
+		buf[--len] = '\0';
+		addString(form->passage, buf, 1, 1);
+	}
     else {
         form->passage = NEW(Passage);
         initPassage(form->passage);
@@ -83,7 +93,11 @@ static void drawEditorMenu(Editor* editor) {
     w = TextStringWidth(menuListFile[0]) * 2;
     wlist = TextStringWidth(menuListFile[1]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
-    // Draw Editor Menu
+        switch(selection) {
+        case 1: loadFile(editor); break;
+        case 2: saveFile(editor); break;
+    }
+	// Draw Editor Menu
     x += w;
     w = TextStringWidth(menuListEdit[0]) * 2;
     wlist = TextStringWidth(menuListEdit[1]) * 1.25;
