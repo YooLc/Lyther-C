@@ -46,13 +46,12 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->passage = NEW(Passage);
     initPassage(form->passage);
     if (fp != NULL) {
-		char buf[50005];
-		int len = 0;
-		while(!feof(fp)){
-			buf[len++] = fgetc(fp);
-		}
-		buf[--len] = '\0';
-		addString(form->passage, buf, 1, 1);
+		char buf[MAX_LINE_SIZE];
+		int idx = 1;
+		while(!feof(fp)) {
+		    fgets(buf, MAX_LINE_SIZE, fp);
+		    addString(form->passage, buf, idx++, 1);
+        }	
 	}
     else {
         addString(form->passage, "\n", 1, 1);
