@@ -337,8 +337,12 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	getLine(passage, tmpLine1, rows);
 	getLine(passage, tmpLine2, rowt);
 	
+	// If it is GB2312 character, then delete two characters.
 	if(rows > 1) strcat(targetLine, prevLine);
-	strncat(targetLine, tmpLine1, cols-1);
+	if (tmpLine1[cols - 1] < 0 && cols > 1) 
+        strncat(targetLine, tmpLine1, cols - 2);
+    else
+        strncat(targetLine, tmpLine1, cols - 1);
 	strcat(targetLine, tmpLine2 + colt);
 	if(rowt < passage->passList.listLen) strcat(targetLine, nextLine);
 

@@ -10,7 +10,6 @@
 
 #define REFRESH_TIMER 1
 
-Passage passage;
 Editor editor;
 UndoRedo undoRedo;
 
@@ -57,13 +56,14 @@ void Main()
 	//initEditor(&editor);
     
     // A simple test case
-//    addString(&passage, "\n", 1, 1);
-//	addString(&passage, "#include <stdio.h>\n", 1, 1);
-//	addString(&passage, "void main() { //test comment\n", 2, 1);
-//	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-//	addString(&passage, "}\n", 5, 1);
-//	addString(&passage, "this great ", 3, 19);
-//	 addString(&passage, " ", 4, 1);
+    Passage* passage = editor.forms[1]->passage;
+    addString(passage, "\n", 1, 1);
+	addString(passage, "#include <stdio.h>\n", 1, 1);
+	addString(passage, "void main() { //中文注释\n", 2, 1);
+	addString(passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
+	addString(passage, "}\n", 5, 1);
+	addString(passage, "这个 ", 3, 19);
+	addString(passage, " ", 4, 1);
 //	 addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
 //	Undo(&undoRedo);
 //	Redo(&undoRedo);

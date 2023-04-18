@@ -52,7 +52,7 @@ static void drawToken(Token* token, double x, double y, double w, double h);
 static void drawTokenBox(Token* token, double x, double y, double w, double h);
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath);
-static void moveCaret(EditorForm* form, CaretAction action);
+static void moveCaret(EditorForm *form, CaretAction action, char* curLine, char* preLine);
 void moveCaretByMouse(Editor* editor, int x, int y, int button, int event);
 void moveCaretByKey(Editor* editor, int key, int event);
 void addChar(char ch);

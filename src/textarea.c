@@ -43,9 +43,9 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->w = GetWindowWidth();
     form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
     
+    form->passage = NEW(Passage);
+    initPassage(form->passage);
     if (fp != NULL) {
-    	form->passage = NEW(Passage);
-        initPassage(form->passage);
 		char buf[50005];
 		int len = 0;
 		while(!feof(fp)){
@@ -55,8 +55,6 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
 		addString(form->passage, buf, 1, 1);
 	}
     else {
-        form->passage = NEW(Passage);
-        initPassage(form->passage);
         addString(form->passage, "\n", 1, 1);
     }
     form->urStack = NEW(UndoRedo);
@@ -64,14 +62,15 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
 }
 
 void drawEditor(Editor* editor) {
-    drawEditorMenu(editor);
-    drawEditorBar(editor);
+    // Reversed drawing to avoid overlaping 
     int idx;
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
         drawEditorForm(editor->forms[idx]);
         //printf(LOG "Drawing %d form\n", idx);
     }
+    drawEditorBar(editor);
+    drawEditorMenu(editor);
 }
 
 static void drawEditorMenu(Editor* editor) {
@@ -134,31 +133,6 @@ static void drawEditorForm(EditorForm *form) {
     return;
 }
 
-
-static PosRC pixelToPosRC(Passage *passage, int px, int py, double height) {
-    PosRC pos;
-    double x = ScaleXInches(px);
-    double y = ScaleYInches(py);
-    int row = (passage->passList).listLen;
-    
-    printf("Y: %.2f, height: %.2f", y, height);
-    pos.r = max(1, min(row, floor((height - y) / GetFontHeight())));
-
-    char fullLine[MAX_LINE_SIZE];
-    getLine(passage, fullLine, pos.r);
-    
-    pos.c = strlen(fullLine) - 1;
-    while (fullLine[pos.c] == '\n') pos.c--;
-    while (pos.c >= 0) {
-        printf("pos.c : %d, TmpLine is :%s\n", pos.c, fullLine);
-        if (TextStringWidth(fullLine) < x) break;
-        fullLine[pos.c] = '\0';
-        pos.c--;
-    }
-    pos.c++;
-    return pos;
-} 
-
 static void drawCodeLine(EditorForm* form, Line* line, double x, double y, double w, double h) {
     double tokenWidth;
  	double curTokenPosX = 0;
@@ -205,26 +179,25 @@ static void drawTokenBox(Token* token, double x, double y, double w, double h) {
     DrawTextString(token->content);
 }
 
-static void moveCaret(EditorForm *form, CaretAction action) {
+static void moveCaret(EditorForm *form, CaretAction action, char* curLine, char* preLine) {
     PosRC curPos = form->realCaretPos;
 
     // Some essential variables to count new position
     int row = (form->passage->passList).listLen;
-    Line *curLine, *preLine;
-    curLine = kthNode(&(form->passage->passList), curPos.r)->datptr;
-    if (form->realCaretPos.r > 1)
-        preLine = kthNode(&(form->passage->passList), curPos.r - 1)->datptr;
     
+    // If it is GB2312 character, we advance by two steps
     switch(action) {
         case LEFT:
-            if (curPos.c >= 1) curPos.c--;
+            if (curPos.c >= 1) 
+                curPos.c -= curLine[curPos.c - 1] < 0 ? 2 : 1;
             else if (curPos.r > 1) {
-                curPos.r--; curPos.c = preLine->length;
+                curPos.r--; curPos.c = strlen(preLine);
             }
             break;
         case RIGHT:
-            if (curPos.c < curLine->length) curPos.c++;
-            else if (curPos.r < row) {
+            if (curPos.c < strlen(curLine)) 
+                curPos.c += curLine[curPos.c] < 0 ? 2 : 1;
+            else if (curPos.r < row){
                 curPos.r++; curPos.c = 0;
             }
             break;
@@ -235,31 +208,61 @@ static void moveCaret(EditorForm *form, CaretAction action) {
             if (curPos.r < row) curPos.r++;
             break;
     }
-
+    printf("New curPos (%d, %d)\n", curPos.r, curPos.c);
     // Force update caret position
     form->caretPos = form->realCaretPos = curPos;
-
     return;
 }
 
 static deleteLastChar(EditorForm* form) {
     PosRC curPos = form->realCaretPos;
     if (curPos.c > 0) {
-        moveCaret(form, LEFT);
         deleteString(form->passage, curPos.r, curPos.c, curPos.r, curPos.c);
     }
     else if (curPos.r > 1) {
         Line *preLine = kthNode(&(form->passage->passList), curPos.r - 1)->datptr;
-        moveCaret(form, LEFT);
         deleteString(form->passage, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1);
     } 
 }
 
+static PosRC pixelToPosRC(EditorForm *form, int px, int py, double height) {
+    PosRC pos;
+    double x = ScaleXInches(px);
+    double y = ScaleYInches(py);
+    Passage *passage = form->passage;
+    int row = (passage->passList).listLen;
+    
+    pos.r = max(1, min(row, ceil((height - y) / GetFontHeight())));
+
+    char fullLine[MAX_LINE_SIZE];
+    getLine(passage, fullLine, pos.r);
+    pos.c = strlen(fullLine) - 1;
+    while (fullLine[pos.c] == '\n') pos.c--;
+    
+    double minDistance = winWidth, dist;
+    int col = pos.c;
+    while (col >= 0) {
+        dist = fabs(TextStringWidth(fullLine) - x);
+        if (dist < minDistance) {
+            pos.c = col;
+            minDistance = dist;
+        }
+        else break;
+        if (fullLine[col] < 0)
+            fullLine[col--] = '\0';
+        fullLine[col--] = '\0';
+    }
+    pos.c++;
+    return pos;
+} 
+
 void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
-//    if (event != BUTTON_DOWN) return;
-//    PosRC newPos = pixelToPosRC(passage, x, y, 6.90);
-//    g_cursorPos = g_realPos = newPos;
-//    printf("Called move mouse, newPos (%d, %d)\n", newPos.r, newPos.c);
+    if (event != BUTTON_DOWN) return;
+    
+    EditorForm* curForm = editor->forms[editor->curSelect];
+    double height = winHeight - (editor->menuHeight + editor->barHeight);
+
+    curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y, height);
 }
 
 void handleInputEvent(Editor* editor, char ch) {
@@ -278,14 +281,28 @@ void handleInputEvent(Editor* editor, char ch) {
 }
 void handleKeyboardEvent(Editor* editor, int key, int event) {
     if (event != KEY_DOWN) return; 
+    // Some essential variables as helper to move caret
     EditorForm *curForm = editor->forms[editor->curSelect];
     PosRC curPos = curForm->realCaretPos;
+    char curLine[MAX_LINE_SIZE], preLine[MAX_LINE_SIZE];
+    
+    // Get current and previous line, then trim all '\n'
+    getLine(curForm->passage, curLine, curPos.r);
+    int idx = strlen(curLine) - 1;
+    while (curLine[idx] == '\n') curLine[idx--] = '\0';
+    if (curPos.r > 1) {
+        getLine(curForm->passage, preLine, curPos.r - 1);
+        idx = strlen(preLine) - 1;
+        while (preLine[idx] == '\n') preLine[idx--] = '\0';
+    }
+
     switch(key) {
-        case VK_LEFT:  moveCaret(curForm, LEFT); break;
-        case VK_RIGHT: moveCaret(curForm, RIGHT); break;
-        case VK_UP:    moveCaret(curForm, UP); break;
-        case VK_DOWN:  moveCaret(curForm, DOWN); break;
-        case VK_BACK:  deleteLastChar(curForm); break;
+        case VK_LEFT:  moveCaret(curForm, LEFT,  curLine, preLine); break;
+        case VK_RIGHT: moveCaret(curForm, RIGHT, curLine, preLine); break;
+        case VK_UP:    moveCaret(curForm, UP,    curLine, preLine); break;
+        case VK_DOWN:  moveCaret(curForm, DOWN,  curLine, preLine); break;
+        case VK_BACK:  deleteLastChar(curForm); 
+                       moveCaret(curForm, LEFT,  curLine, preLine); break;
         case VK_DELETE:
             deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
             break;
@@ -298,11 +315,19 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
 	 The original version is wrong here because VK_RETURN use curPos as the intermediate variable,
 	  but LEFT RIGHT change the caretpos directly, does not use curPos as an intermediate variable*/
 	  
-    // Smart Caret Position
-    Line *curLine = kthNode(&(curForm->passage->passList), curPos.r)->datptr;
-    curForm->realCaretPos.c = min(curLine->length, curPos.c);
-    printf(LOG "Caret at (%d, %d), Real Caret at (%d, %d)\n", 
+    // Smart Caret Position, also brute force
+    getLine(curForm->passage, curLine, curPos.r);
+    int i, col = 0, minDistance = MAX_LINE_SIZE, charWidth;
+    for(i = 0; curLine[i]; i += charWidth) {
+        charWidth = curLine[i] < 0 ? 2 : 1;
+        if (abs(curPos.c - i) < minDistance) {
+            col = i;
+            minDistance = abs(curPos.c - i);
+        }
+        else break;
+    }
+    curForm->realCaretPos.c = col;
+    printf("Caret at (%d, %d), Real Caret at (%d, %d)\n", 
             curForm->caretPos.r, curForm->caretPos.c, 
             curForm->realCaretPos.r, curForm->realCaretPos.c);
 }
-
