@@ -1,14 +1,15 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-#define MENUHEIGHT 100
-#define MENUWIDTH 50
+#define MENUHEIGHT 160
+#define MENUWIDTH 100
 
 typedef struct{
 	int menuWidth;
 	int menuHeight;
 	int posx, posy;
 	int activate;
+	int selected;
 }Menu;
 
 Menu menu;
