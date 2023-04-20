@@ -26,7 +26,7 @@ void loadFile(Editor *editor){
 		puts("FAILED TO OPEN FILE");
 		return;
 	}
-	addCodeToEditor(editor, fp, openFile);
+	addCodeToEditor(editor, fp, openFile);	//need to be fixed, malloc char*
 	fclose(fp);
 }
 
@@ -53,7 +53,7 @@ void saveFile(Editor *editor){
 	}else{
 		strcpy(saveFile, editor->filePath[editor->curSelect]);
 	}
-	
+	printf("SAVE %s\n", saveFile);
 	FILE *fp = fopen(saveFile, "w");
 	if(fp == NULL){
 		puts("FAILURE IN SAVE FILE");

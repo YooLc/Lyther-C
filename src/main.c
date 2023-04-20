@@ -7,6 +7,7 @@
 #include "textarea.h"
 #include "codeparser.h"
 #include "undoredo.h"
+#include "menu.h"
 
 #define REFRESH_TIMER 1
 
@@ -32,6 +33,7 @@ void CharEventProcess(char ch)
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
+	menuGetMouse(x, y, button, event);
     handleMouseEvent(&editor, x, y, button, event);
     Display();
 }
@@ -68,6 +70,7 @@ void Main()
 //	Undo(&undoRedo);
 //	Redo(&undoRedo);
 //    printPassage(&passage);
+	initMenu();
 	startTimer(REFRESH_TIMER, 50);
 	registerCharEvent(CharEventProcess);
 	registerMouseEvent(MouseEventProcess);
@@ -79,4 +82,5 @@ void Display(void)
 {
     DisplayClear();
     drawEditor(&editor);
+    displayMenu();
 }
