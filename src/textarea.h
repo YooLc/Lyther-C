@@ -19,7 +19,7 @@ typedef struct {
     int style;
     bool visible;
     double x, y, w, h;
-    PosRC caretPos, realCaretPos, renderPos;
+    PosRC caretPos, realCaretPos, renderPos, selectLeftPos, selectRightPos;
     UndoRedo *urStack;
     Passage *passage;
 } EditorForm;

@@ -26,6 +26,9 @@ void initEditor(Editor* editor) {
     winWidth = GetWindowWidth();
     winHeight = GetWindowHeight();
     fontHeight = GetFontHeight();
+    
+    //color definition
+    DefineColor("SelectedColor", (double)9/256, (double)132/256, (double)227/256);
 }
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
@@ -153,6 +156,20 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
         }
     }
     
+    //If there is selection in this line
+    if(!(form->selectLeftPos.r == form->selectRightPos.r && form->selectLeftPos.c == form->selectRightPos.c)){
+    	if(form->renderPos.r >= form->selectLeftPos.r && form->renderPos.r <= form->selectRightPos.r){
+			SetPenColor("SelectedColor");
+			double yy = y, ww = w;
+			if(form->selectLeftPos.r == form->renderPos.r){
+				yy = form->selectLeftPos.c*TextStringWidth(" ");
+			}else if(form->selectRightPos.r == form->renderPos.r){
+				ww = form->selectRightPos.c*TextStringWidth(" ");
+			}
+ 			drawRectangle(x, yy, ww, h, 1);
+		}
+	}
+    
     // Traverse tokens
  	while (curToken != NULL) {
  		Token* token = curToken->datptr;
@@ -256,12 +273,36 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py, double height) {
 } 
 
 void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
-    if (event != BUTTON_DOWN) return;
-    
+	
+	static int isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
     double height = winHeight - (editor->menuHeight + editor->barHeight);
 
-    curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y, height);
+	switch(event){
+		case BUTTON_DOWN:
+			if(button == LEFT_BUTTON){
+				isLeftButtonDown = 1;
+				curForm->selectLeftPos = curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y, height);
+			}else if(button == RIGHT_BUTTON){
+				isLeftButtonDown = 0;
+			}
+			break;
+		case BUTTON_UP:
+			if(button == LEFT_BUTTON){
+				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
+				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
+				curForm->selectRightPos.r, curForm->selectRightPos.c);
+				isLeftButtonDown = 0;
+			}
+			break;
+		case MOUSEMOVE:
+			if(isLeftButtonDown){
+			curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
+				//printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
+				curForm->selectRightPos.r, curForm->selectRightPos.c);
+			}
+	}
+	drawEditor(editor);
 }
 
 void handleInputEvent(Editor* editor, char ch) {

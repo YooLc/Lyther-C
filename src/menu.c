@@ -8,6 +8,9 @@ void initMenu(){
 	menu.selected = -1;
 	menu.posx = 100;
 	menu.posy = 100;
+	
+	DefineColor("MenuBackground", (double)223/256, (double)230/256, (double)233/256);
+	DefineColor("MenuSelected", (double)178/256, (double)190/256, (double)195/256);
 }
 
 /*
@@ -20,7 +23,7 @@ y
 */
 static int inMenu(int x, int y){
 	if(!menu.activate) return 0;
-	if(x > menu.posx + menu.menuWidth || y > menu.posy + menu.menuHeight || x < menu.posx || y < menu.posy){
+	if(x >= menu.posx + menu.menuWidth || y >= menu.posy + menu.menuHeight || x <= menu.posx || y <= menu.posy){
 		menu.selected = -1;
 		return 0;
 	}
@@ -47,7 +50,8 @@ void menuGetMouse(int x, int y, int button, int event){
 
 void displayMenu(){
 	if(!menu.activate) return;
-	SetPenColor("Light Gray");
+	//Draw menu background
+	SetPenColor("MenuBackground");
 	SetPenSize(1);
 	MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy));
 	StartFilledRegion(1);
@@ -56,8 +60,9 @@ void displayMenu(){
 	DrawLine(-ScaleXInches(menu.menuWidth), 0);
 	DrawLine(0, (double)menu.menuHeight/GetYResolution());
 	EndFilledRegion();
+	//Highlight selected entry
 	if(menu.selected == -1) return;
-	SetPenColor("Gray");
+	SetPenColor("MenuSelected");
 	SetPenSize(1);
 	MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy + menu.selected * 20));
 	StartFilledRegion(1);
