@@ -50,6 +50,7 @@ void Main()
 	InitGraphics();
 	InitConsole(); // For debug use. 
 	SetFont("Consolas");
+	SetPointSize(25);
 	InitStyle();
 	InitGUI();
 	initEditor(&editor);

@@ -22,7 +22,6 @@ void initEditor(Editor* editor) {
     editor->filePath[0] = NULL;
     editor->forms[0] = NULL;
     editor->menuHeight = editor->barHeight = GetFontHeight() * 1.5;
-    
     winWidth = GetWindowWidth();
     winHeight = GetWindowHeight();
     fontHeight = GetFontHeight();
@@ -33,6 +32,9 @@ void initEditor(Editor* editor) {
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     EditorForm *form = NEW(EditorForm);
+    if(editor->fileCount != 0){
+		editor->forms[editor->curSelect]->visible = 0;
+	}
     editor->fileCount++;
     editor->curSelect = editor->fileCount;
     editor->filePath[editor->fileCount] = filePath;
@@ -45,7 +47,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->x = form->y = 0;
     form->w = GetWindowWidth();
     form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
-    
+    form->selectLeftPos.r = form->selectLeftPos.c = form->selectRightPos.r = form->selectRightPos.c = 0;
     form->passage = NEW(Passage);
     initPassage(form->passage);
     if (fp != NULL) {
@@ -69,10 +71,67 @@ void drawEditor(Editor* editor) {
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
         drawEditorForm(editor->forms[idx]);
+        drawEditorSelection(editor->forms[idx]);
         //printf(LOG "Drawing %d form\n", idx);
     }
     drawEditorBar(editor);
     drawEditorMenu(editor);
+
+}
+
+static void drawEditorSelection(EditorForm* form){
+
+	if(form->selectLeftPos.r == form->selectRightPos.r && form->selectLeftPos.c == form->selectRightPos.c) return;
+	
+	PosRC lRC = form->selectLeftPos, rRC = form->selectRightPos;
+	
+	if(form->selectLeftPos.r > form->selectRightPos.r || \
+				
+		(form->selectLeftPos.r == form->selectRightPos.r && \ 
+		form->selectLeftPos.c > form->selectRightPos.c)
+					
+	){
+		PosRC tmpRC = lRC;	
+		lRC = rRC;
+		rRC = tmpRC;
+	}
+
+	if(lRC.r == 0) return;
+	
+	int nowRol = lRC.r;
+	char tmpLine[MAX_LINE_SIZE], targetLine[MAX_LINE_SIZE];
+
+    while(nowRol <= rRC.r){
+    	//Draw background
+		SetPenColor("SelectedColor");
+		double x = 0, y = form->h - fontHeight*nowRol, w = form->w, h = fontHeight;
+		if(lRC.r == nowRol && rRC.r == nowRol){
+			x = lRC.c*TextStringWidth(" ");
+			w = (rRC.c - lRC.c)*TextStringWidth(" ");
+		}else if(lRC.r == nowRol){
+			x = lRC.c*TextStringWidth(" ");
+		}else if(rRC.r == nowRol){
+			w = rRC.c*TextStringWidth(" ");
+		}
+ 		drawRectangle(x, y, w, h, 1);
+ 		//Redraw text
+ 		SetPenColor("White");
+ 		getLine(form->passage, tmpLine, nowRol);
+ 		strcpy(targetLine, tmpLine);
+ 		if(lRC.r == rRC.r){
+			strncpy(targetLine, tmpLine+lRC.c, rRC.c-lRC.c);
+			targetLine[rRC.c-lRC.c] = '\0';
+		}else if(lRC.r == nowRol){
+			strcpy(targetLine, tmpLine + lRC.c);
+		}else if(rRC.r == nowRol){
+			strncpy(targetLine, tmpLine, rRC.c);
+			targetLine[rRC.c] = '\0';
+		}
+ 		MovePen(x,y+GetFontDescent());
+ 		DrawTextString(targetLine);
+ 		nowRol++;
+	}
+	
 }
 
 static void drawEditorMenu(Editor* editor) {
@@ -155,21 +214,7 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
             DrawTextString(tmpstr);
         }
     }
-    
-    //If there is selection in this line
-    if(!(form->selectLeftPos.r == form->selectRightPos.r && form->selectLeftPos.c == form->selectRightPos.c)){
-    	if(form->renderPos.r >= form->selectLeftPos.r && form->renderPos.r <= form->selectRightPos.r){
-			SetPenColor("SelectedColor");
-			double yy = y, ww = w;
-			if(form->selectLeftPos.r == form->renderPos.r){
-				yy = form->selectLeftPos.c*TextStringWidth(" ");
-			}else if(form->selectRightPos.r == form->renderPos.r){
-				ww = form->selectRightPos.c*TextStringWidth(" ");
-			}
- 			drawRectangle(x, yy, ww, h, 1);
-		}
-	}
-    
+
     // Traverse tokens
  	while (curToken != NULL) {
  		Token* token = curToken->datptr;
@@ -292,17 +337,42 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
 				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
 				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
 				curForm->selectRightPos.r, curForm->selectRightPos.c);
+				/*
+				if(curForm->selectLeftPos.r > curForm->selectRightPos.r || \
+				
+					(curForm->selectLeftPos.r == curForm->selectRightPos.r && \ 
+					curForm->selectLeftPos.c > curForm->selectRightPos.c)
+					
+				){
+					PosRC tmpRC = curForm->selectLeftPos;
+					curForm->selectLeftPos = curForm->selectRightPos;
+					curForm->selectRightPos = tmpRC;
+				}
+				*/
 				isLeftButtonDown = 0;
 			}
 			break;
 		case MOUSEMOVE:
 			if(isLeftButtonDown){
-			curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
+				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
+				/*
+				if(curForm->selectLeftPos.r > curForm->selectRightPos.r || \
+				
+					(curForm->selectLeftPos.r == curForm->selectRightPos.r && \ 
+					curForm->selectLeftPos.c > curForm->selectRightPos.c)
+					
+				){
+					PosRC tmpRC = curForm->selectLeftPos;
+					curForm->selectLeftPos = curForm->selectRightPos;
+					curForm->selectRightPos = tmpRC;
+				}
+				*/
 				//printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
 				curForm->selectRightPos.r, curForm->selectRightPos.c);
+				drawEditorSelection(editor->forms[editor->curSelect]);
 			}
 	}
-	drawEditor(editor);
+
 }
 
 void handleInputEvent(Editor* editor, char ch) {

@@ -28,6 +28,8 @@ int getLine(Passage *passage, char *dst, int row){
 	int totLen = 0;
 	strcpy(dst, "");
 	
+	if(passage->passList.listLen == 0) return 0;
+	
 	Line* l = kthNode(&(passage->passList), row)->datptr;
 	Listptr nowWordNode = kthNode(&(l->lineList), 1);
 	
