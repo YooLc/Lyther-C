@@ -32,3 +32,23 @@ void mySetClipBoard(char *str){
     SetClipboardData(CF_TEXT, hglbCopy); 
     CloseClipboard();
 }
+
+void myGetClipBoard(char* dst){
+
+    if (!IsClipboardFormatAvailable(CF_TEXT)) return; 
+    if (!OpenClipboard(NULL)) return; 
+    
+    HGLOBAL hglb;
+    char *src;
+
+    hglb = GetClipboardData(CF_TEXT); 
+    if (hglb != NULL){ 
+        src = GlobalLock(hglb); 
+        if(src == NULL){
+            dst[0] = '\0';
+        }else{
+            strcpy(dst, src);
+        }
+        CloseClipboard(); 
+    }
+}

@@ -1,9 +1,12 @@
 #include "menu.h"
 #include "extgraph.h"
+#include "undoredo.h"
 
 void initMenu(){
 	menu.activate = 0;
-	menu.menuHeight = MENUHEIGHT;
+	menu.entryMargin = 0.03;
+	menu.entryHeight = GetFontHeight() + 2*menu.entryMargin + GetFontDescent();
+	menu.menuHeight = MENUENTRY*menu.entryHeight;
 	menu.menuWidth = MENUWIDTH;
 	menu.selected = -1;
 	menu.posx = 100;
@@ -13,21 +16,13 @@ void initMenu(){
 	DefineColor("MenuSelected", (double)178/256, (double)190/256, (double)195/256);
 }
 
-/*
------>x
-'
-'
-'
-v
-y
-*/
 static int inMenu(int x, int y){
 	if(!menu.activate) return 0;
-	if(x >= menu.posx + menu.menuWidth || y >= menu.posy + menu.menuHeight || x <= menu.posx || y <= menu.posy){
+	if(x >= menu.posx + menu.menuWidth*GetXResolution() || y >= menu.posy + menu.menuHeight*GetYResolution() || x <= menu.posx || y <= menu.posy){
 		menu.selected = -1;
 		return 0;
 	}
-	int entry = (y - menu.posy)/20;
+	int entry = (y - menu.posy)/(menu.entryHeight*GetYResolution());
 	menu.selected = entry;
 	return 1;
 }
@@ -41,7 +36,10 @@ void menuGetMouse(int x, int y, int button, int event){
 				menu.posx = x;
 				menu.posy = y;
 			}else if(button == LEFT_BUTTON && menu.selected != -1){
-				/*do something here...*/
+				menu.activate = 0;
+				switch(menu.selected){
+					/*do something here*/
+				}
 			}else{
 				menu.activate = 0;
 			}
@@ -50,25 +48,44 @@ void menuGetMouse(int x, int y, int button, int event){
 
 void displayMenu(){
 	if(!menu.activate) return;
+	int i = 0;
+	
 	//Draw menu background
 	SetPenColor("MenuBackground");
 	SetPenSize(1);
+	
 	MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy));
 	StartFilledRegion(1);
-	DrawLine(ScaleXInches(menu.menuWidth), 0);
-	DrawLine(0, -(double)menu.menuHeight/GetYResolution());
-	DrawLine(-ScaleXInches(menu.menuWidth), 0);
-	DrawLine(0, (double)menu.menuHeight/GetYResolution());
+	DrawLine(menu.menuWidth, 0);
+	DrawLine(0, -menu.menuHeight);
+	DrawLine(-menu.menuWidth, 0);
+	DrawLine(0, menu.menuHeight);
 	EndFilledRegion();
+	SetPenColor("Black");
+	DrawLine(menu.menuWidth, 0);
+	DrawLine(0, -menu.menuHeight);
+	DrawLine(-menu.menuWidth, 0);
+	DrawLine(0, menu.menuHeight);
+	SetPenColor("Black");
+	for(i=0; i<MENUENTRY; i++){
+		MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy) - (i+1)*menu.entryHeight + GetFontDescent() + menu.entryMargin);
+		DrawTextString(Entrys[i]);
+	}
+
 	//Highlight selected entry
 	if(menu.selected == -1) return;
 	SetPenColor("MenuSelected");
 	SetPenSize(1);
-	MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy + menu.selected * 20));
+	
+	MovePen(ScaleXInches(menu.posx) + menu.entryMargin, ScaleYInches(menu.posy) - menu.selected*menu.entryHeight - menu.entryMargin);
 	StartFilledRegion(1);
-	DrawLine(ScaleXInches(menu.menuWidth), 0);
-	DrawLine(0, -(double)20/GetYResolution());
-	DrawLine(-ScaleXInches(menu.menuWidth), 0);
-	DrawLine(0, (double)20/GetYResolution());
+	DrawLine(menu.menuWidth-menu.entryMargin*2, 0);
+	DrawLine(0, -(menu.entryHeight-menu.entryMargin*2));
+	DrawLine(-menu.menuWidth+menu.entryMargin*2, 0);
+	DrawLine(0, menu.entryHeight-menu.entryMargin*2);
 	EndFilledRegion();
+	
+	SetPenColor("White");
+	MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy) - (menu.selected+1)*menu.entryHeight + GetFontDescent() + menu.entryMargin);
+	DrawTextString(Entrys[menu.selected]);
 }

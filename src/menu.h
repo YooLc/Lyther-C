@@ -1,18 +1,21 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-#define MENUHEIGHT 160
-#define MENUWIDTH 100
+#define MENUENTRY 3
+#define MENUWIDTH 2.5
 
 typedef struct{
-	int menuWidth;
-	int menuHeight;
+	double menuWidth;
+	double menuHeight;
+	double entryHeight, entryMargin;
 	int posx, posy;
 	int activate;
 	int selected;
 }Menu;
 
 Menu menu;
+
+static char* Entrys[] = {" Copy | (C)"," Undo | (Z)", " Redo | (Y)"};
 
 void initMenu();
 
