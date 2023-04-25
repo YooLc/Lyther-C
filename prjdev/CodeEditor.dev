@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000000000000
-UnitCount=34
+UnitCount=36
 
 [VersionInfo]
 Major=1
@@ -382,6 +382,26 @@ BuildCmd=
 
 [Unit34]
 FileName=..\src\menu.c
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit35]
+FileName=..\src\clipboard.h
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit36]
+FileName=..\src\clipboard.c
 CompileCpp=0
 Folder=src
 Compile=1

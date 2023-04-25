@@ -8,6 +8,7 @@
 #include "codeparser.h"
 #include "undoredo.h"
 #include "menu.h"
+#include "clipboard.h"
 
 #define REFRESH_TIMER 1
 

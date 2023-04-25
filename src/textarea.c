@@ -327,7 +327,7 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
 		case BUTTON_DOWN:
 			if(button == LEFT_BUTTON){
 				isLeftButtonDown = 1;
-				curForm->selectLeftPos = curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y, height);
+				curForm->selectLeftPos = curForm->selectRightPos = curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y, height);
 			}else if(button == RIGHT_BUTTON){
 				isLeftButtonDown = 0;
 			}
@@ -337,38 +337,12 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
 				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
 				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
 				curForm->selectRightPos.r, curForm->selectRightPos.c);
-				/*
-				if(curForm->selectLeftPos.r > curForm->selectRightPos.r || \
-				
-					(curForm->selectLeftPos.r == curForm->selectRightPos.r && \ 
-					curForm->selectLeftPos.c > curForm->selectRightPos.c)
-					
-				){
-					PosRC tmpRC = curForm->selectLeftPos;
-					curForm->selectLeftPos = curForm->selectRightPos;
-					curForm->selectRightPos = tmpRC;
-				}
-				*/
 				isLeftButtonDown = 0;
 			}
 			break;
 		case MOUSEMOVE:
 			if(isLeftButtonDown){
 				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
-				/*
-				if(curForm->selectLeftPos.r > curForm->selectRightPos.r || \
-				
-					(curForm->selectLeftPos.r == curForm->selectRightPos.r && \ 
-					curForm->selectLeftPos.c > curForm->selectRightPos.c)
-					
-				){
-					PosRC tmpRC = curForm->selectLeftPos;
-					curForm->selectLeftPos = curForm->selectRightPos;
-					curForm->selectRightPos = tmpRC;
-				}
-				*/
-				//printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
-				curForm->selectRightPos.r, curForm->selectRightPos.c);
 				drawEditorSelection(editor->forms[editor->curSelect]);
 			}
 	}
