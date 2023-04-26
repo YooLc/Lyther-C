@@ -17,26 +17,36 @@ UndoRedo undoRedo;
 
 void Display(void);
 
+// To reduce lag, Display() are commented in each event handler
 void KeyboardEventProcess(int key, int event)
 {
+    editor.drawLock = true;
     uiGetKeyboard(key, event);
     handleKeyboardEvent(&editor, key, event);
-    Display();
+    editor.updated = true;
+    editor.drawLock = false;
+    // Display();
 }
 
 void CharEventProcess(char ch)
 {
+    editor.drawLock = true;
     uiGetChar(ch);
     handleInputEvent(&editor, ch);
-    Display();
+    editor.updated = true;
+    editor.drawLock = false;
+    // Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
 {
+    editor.drawLock = true;
     uiGetMouse(x, y, button, event);
 	menuGetMouse(x, y, button, event);
     handleMouseEvent(&editor, x, y, button, event);
-    Display();
+    editor.updated = true;
+    editor.drawLock = false;
+    // Display();
 }
 
 void TimerEventProcess(int timerID)
@@ -49,7 +59,7 @@ void Main()
 {
     SetWindowTitle("Light C code editor");
 	InitGraphics();
-	InitConsole(); // For debug use. 
+	InitConsole(); // For debug use.
 	SetFont("Consolas");
 	SetPointSize(25);
 	InitStyle();
@@ -73,7 +83,7 @@ void Main()
 //	Redo(&undoRedo);
 //    printPassage(&passage);
 	initMenu();
-	startTimer(REFRESH_TIMER, 50);
+	startTimer(REFRESH_TIMER, 17); // 60 Hz
 	registerCharEvent(CharEventProcess);
 	registerMouseEvent(MouseEventProcess);
 	registerTimerEvent(TimerEventProcess);
@@ -82,7 +92,10 @@ void Main()
 
 void Display(void)
 {
-    DisplayClear();
-    drawEditor(&editor);
-    displayMenu();
+    //if (!editor.drawLock && editor.updated) {
+        DisplayClear();
+        drawEditor(&editor);
+        displayMenu();
+        editor.updated = false;
+    //}
 }

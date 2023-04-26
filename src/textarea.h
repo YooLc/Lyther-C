@@ -9,6 +9,8 @@
 #include "style.h"
 
 #define MAX_FILE_COUNT 20
+#define LINE_INDEX_WIDTH .45
+#define SCROLL_DIST (fontHeight*3)
 
 /*
     Struct: Editor Form
@@ -27,10 +29,16 @@ typedef struct {
 /*
     Struct: Editor
     Overall struct of an editor, containing several(probably) forms.
+    curSelect(int): Number of working form, 1-based
+    drawLock(bool): Every updated event should change status of drawLock
+                    to avoid calling Display() when things are being updated
+    updated(bool): Display() shall check, if there's no update, then do nothing
+                   this means we need to separate the caret display to another function
 */
 typedef struct {
     int fileCount, curSelect;
     double menuHeight, barHeight;
+    bool drawLock, updated;
     char *filePath[MAX_FILE_COUNT];
     EditorForm *forms[MAX_FILE_COUNT];
 } Editor;

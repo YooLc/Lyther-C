@@ -22,6 +22,11 @@ void initEditor(Editor* editor) {
     editor->filePath[0] = NULL;
     editor->forms[0] = NULL;
     editor->menuHeight = editor->barHeight = GetFontHeight() * 1.5;
+    
+    // Test properties
+    editor->drawLock = false;
+    editor->updated = true;
+    
     winWidth = GetWindowWidth();
     winHeight = GetWindowHeight();
     fontHeight = GetFontHeight();
@@ -85,9 +90,9 @@ static void drawEditorSelection(EditorForm* form){
 	
 	PosRC lRC = form->selectLeftPos, rRC = form->selectRightPos;
 	
-	if(form->selectLeftPos.r > form->selectRightPos.r || \
+	if(form->selectLeftPos.r > form->selectRightPos.r ||
 				
-		(form->selectLeftPos.r == form->selectRightPos.r && \ 
+		(form->selectLeftPos.r == form->selectRightPos.r && 
 		form->selectLeftPos.c > form->selectRightPos.c)
 					
 	){
@@ -102,14 +107,14 @@ static void drawEditorSelection(EditorForm* form){
 	char tmpLine[MAX_LINE_SIZE], targetLine[MAX_LINE_SIZE];
 
     while(nowRol <= rRC.r){
+        double x = form->x + LINE_INDEX_WIDTH, y = form->h - fontHeight * nowRol, w = form->w, h = fontHeight;
     	//Draw background
 		SetPenColor("SelectedColor");
-		double x = 0, y = form->h - fontHeight*nowRol, w = form->w, h = fontHeight;
 		if(lRC.r == nowRol && rRC.r == nowRol){
-			x = lRC.c*TextStringWidth(" ");
+			x += lRC.c*TextStringWidth(" ");
 			w = (rRC.c - lRC.c)*TextStringWidth(" ");
 		}else if(lRC.r == nowRol){
-			x = lRC.c*TextStringWidth(" ");
+			x += lRC.c*TextStringWidth(" ");
 		}else if(rRC.r == nowRol){
 			w = rRC.c*TextStringWidth(" ");
 		}
@@ -127,7 +132,7 @@ static void drawEditorSelection(EditorForm* form){
 			strncpy(targetLine, tmpLine, rRC.c);
 			targetLine[rRC.c] = '\0';
 		}
- 		MovePen(x,y+GetFontDescent());
+ 		MovePen(x, y + GetFontDescent());
  		DrawTextString(targetLine);
  		nowRol++;
 	}
@@ -175,6 +180,8 @@ static void drawEditorBar(Editor *editor) {
 
 static void drawEditorForm(EditorForm *form) {
     double curLinePosY = form->h - fontHeight;
+    int curLineIndex = 1;
+    char lineIndex[10] = "";
 
     // Set renderPos at origin, rows are 1-based, and cols are 0-based
     form->renderPos.r = 1;
@@ -183,10 +190,22 @@ static void drawEditorForm(EditorForm *form) {
     // Traverse passage (list of lines)
  	Listptr curLine = kthNode(&(form->passage->passList), 1);
  	while(curLine != NULL) {
-        // Traverse line (list of tokens)
- 		drawCodeLine(form, curLine->datptr, 0, curLinePosY, form->w, fontHeight);
- 		curLine = curLine->next;
+ 	    // Draw if and only if it's visible
+ 	    if (curLinePosY <= winHeight && curLinePosY >= 0) {
+ 	        // Draw line index
+            SetPenColor("Light Gray");
+            drawRectangle(form->x, curLinePosY, LINE_INDEX_WIDTH, fontHeight, 1);
+            sprintf(lineIndex, "%3d", curLineIndex);
+            SetPenColor("Black");
+            MovePen(form->x + LINE_INDEX_WIDTH - TextStringWidth(lineIndex), curLinePosY + GetFontDescent());
+            DrawTextString(lineIndex);
+        
+            // Traverse line (list of tokens)
+            drawCodeLine(form, curLine->datptr, form->x + LINE_INDEX_WIDTH, curLinePosY, form->w, fontHeight);
+        }
+        curLine = curLine->next;
         curLinePosY -= fontHeight;
+        curLineIndex++;
         form->renderPos.r++;
         form->renderPos.c = 0;
  	}
@@ -196,9 +215,8 @@ static void drawEditorForm(EditorForm *form) {
 
 static void drawCodeLine(EditorForm* form, Line* line, double x, double y, double w, double h) {
     double tokenWidth;
- 	double curTokenPosX = 0;
+ 	double curTokenPosX = x;
  	Listptr curToken = kthNode(&(line->lineList), 1);
-
  	// If current line is focused...
  	if (form->renderPos.r == form->realCaretPos.r) {
  	    SetPenColor("Light Blue"); // Need to use palette
@@ -286,29 +304,34 @@ static deleteLastChar(EditorForm* form) {
     } 
 }
 
-static PosRC pixelToPosRC(EditorForm *form, int px, int py, double height) {
-    PosRC pos;
+static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
     double x = ScaleXInches(px);
     double y = ScaleYInches(py);
     Passage *passage = form->passage;
     int row = (passage->passList).listLen;
-    
-    pos.r = max(1, min(row, ceil((height - y) / GetFontHeight())));
-
     char fullLine[MAX_LINE_SIZE];
+    
+    
+    PosRC pos;
+    pos.r = max(1, min(row, ceil((form->h - y) / fontHeight)));
     getLine(passage, fullLine, pos.r);
     pos.c = strlen(fullLine) - 1;
-    while (fullLine[pos.c] == '\n') pos.c--;
-    
+
     double minDistance = winWidth, dist;
     int col = pos.c;
-    while (col >= 0) {
-        dist = fabs(TextStringWidth(fullLine) - x);
+    
+    // Trim CRLF
+    while (fullLine[col] == '\r' || fullLine[col] == '\n')
+        fullLine[col--] = '\0';
+    
+    while (col >= -1) {
+        dist = fabs(form->x + LINE_INDEX_WIDTH + TextStringWidth(fullLine) - x);
         if (dist < minDistance) {
             pos.c = col;
             minDistance = dist;
         }
         else break;
+        if (col < 0) break;
         if (fullLine[col] < 0)
             fullLine[col--] = '\0';
         fullLine[col--] = '\0';
@@ -321,30 +344,37 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
 	
 	static int isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
-    double height = winHeight - (editor->menuHeight + editor->barHeight);
 
 	switch(event){
 		case BUTTON_DOWN:
-			if(button == LEFT_BUTTON){
+			if(button == LEFT_BUTTON) {
 				isLeftButtonDown = 1;
-				curForm->selectLeftPos = curForm->selectRightPos = curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y, height);
-			}else if(button == RIGHT_BUTTON){
+				curForm->selectLeftPos = curForm->selectRightPos = 
+                curForm->caretPos = curForm->realCaretPos = pixelToPosRC(curForm, x, y);
+			} else if(button == RIGHT_BUTTON) {
 				isLeftButtonDown = 0;
 			}
 			break;
 		case BUTTON_UP:
 			if(button == LEFT_BUTTON){
-				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
-				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, \
+				curForm->selectRightPos = pixelToPosRC(curForm, x, y);
+				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, 
 				curForm->selectRightPos.r, curForm->selectRightPos.c);
 				isLeftButtonDown = 0;
 			}
 			break;
 		case MOUSEMOVE:
 			if(isLeftButtonDown){
-				curForm->selectRightPos = pixelToPosRC(curForm, x, y, height);
+				curForm->selectRightPos = pixelToPosRC(curForm, x, y);
 				drawEditorSelection(editor->forms[editor->curSelect]);
 			}
+			break;
+		case ROLL_DOWN:
+		    curForm->h += SCROLL_DIST;
+		    break;
+		case ROLL_UP:
+		    curForm->h -= SCROLL_DIST;
+		    break;
 	}
 
 }
@@ -357,12 +387,13 @@ void handleInputEvent(Editor* editor, char ch) {
         char tmpstr[MAX_LINE_SIZE] = "";
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
-        printf(LOG "Attempting to add %s\n", tmpstr);
+        LOG("Attempting to add %s\n", tmpstr);
         form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
         printPassage(form->passage);
     }
     printPassage(form->passage);
 }
+
 void handleKeyboardEvent(Editor* editor, int key, int event) {
     if (event != KEY_DOWN) return; 
     // Some essential variables as helper to move caret
