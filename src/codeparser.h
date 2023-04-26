@@ -14,24 +14,24 @@
     Currently they are STRING by default
 */
 typedef enum{
-	STRING,
-	COMMENT,
-	LEFT_COMMENT,
-	RIGHT_COMMENT,
-	PREPROCESS,
-	KEYWORD,
-	LEFT_PARENTHESES,
-	RIGHT_PARENTHESES,
-	LEFT_BRACKETS,
-	RIGHT_BRACKETS,
-	LEFT_BRACE,
-	RIGHT_BRACE,
-	SINGLE_QUOTE,
-	DOUBLE_QUOTE,
+    STRING,
+    COMMENT,
+    LEFT_COMMENT,
+    RIGHT_COMMENT,
+    PREPROCESS,
+    KEYWORD,
+    LEFT_PARENTHESES,
+    RIGHT_PARENTHESES,
+    LEFT_BRACKETS,
+    RIGHT_BRACKETS,
+    LEFT_BRACE,
+    RIGHT_BRACE,
+    SINGLE_QUOTE,
+    DOUBLE_QUOTE,
     SEMI_COLON,
     ENTER,
-	SPACE,
-	OTHER
+    SPACE,
+    OTHER
 } CodeTokenType;
 
 /*
@@ -40,9 +40,9 @@ typedef enum{
     parsed from code parser
 */
 typedef struct{
-	char content[MAX_WORD_SIZE];
-	int length;//, selected;
-	CodeTokenType type;
+    char content[MAX_WORD_SIZE];
+    int length;//, selected;
+    CodeTokenType type;
 } Token;
 
 /*
@@ -50,8 +50,8 @@ typedef struct{
     Each line is a doubly linked list of tokens
 */
 typedef struct{
-	LinkedList lineList;
-	int length;
+    LinkedList lineList;
+    int length;
 } Line;
 
 /*
@@ -59,7 +59,7 @@ typedef struct{
     Each passage is a doubly linked list of lines
 */
 typedef struct{
-	LinkedList passList;
+    LinkedList passList;
 } Passage;
 
 typedef struct {
@@ -67,9 +67,9 @@ typedef struct {
 } PosRC;
 
 static char* KeyWord[32] = {"auto","break","case","char","const","continue","default","do",\
-					"double","else","enum","extern","float","for","goto","if",\
-					"int","long","register","return","short","signed","sizeof","static",\
-					"struct","switch","typedef","union","unsigned","void","volatile","while"};
+                    "double","else","enum","extern","float","for","goto","if",\
+                    "int","long","register","return","short","signed","sizeof","static",\
+                    "struct","switch","typedef","union","unsigned","void","volatile","while"};
 /*
     Function: initPassage
     Initialize doubly linked list for a passage
@@ -117,7 +117,7 @@ PosRC addString(Passage *passage, char *str, int row, int col);
     Delete string in the passage at given range, (closed interval)
     which is represented by row and col index.
     If want to delete the empty line(contaning only \n) at i colomn, need to call:
-		deleteString(passage, i-1, (i-1).length, i, 1)
+        deleteString(passage, i-1, (i-1).length, i, 1)
 */ 
 void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
 

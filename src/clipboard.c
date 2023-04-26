@@ -5,11 +5,11 @@
 #include "clipboard.h"
 
 void mySetClipBoard(char *str){
-	
-	char *dst;
-	HGLOBAL hglbCopy;
-	
-	// Open the clipboard, and empty it. 
+    
+    char *dst;
+    HGLOBAL hglbCopy;
+    
+    // Open the clipboard, and empty it. 
     if (!OpenClipboard(NULL)) return;
     EmptyClipboard(); 
     
@@ -26,7 +26,7 @@ void mySetClipBoard(char *str){
     // Copy str to dst
     memcpy(dst, str, (strlen(str)+1) * sizeof(char));
     
-	GlobalUnlock(hglbCopy); 
+    GlobalUnlock(hglbCopy); 
  
     // Place the handle on the clipboard.
     SetClipboardData(CF_TEXT, hglbCopy); 

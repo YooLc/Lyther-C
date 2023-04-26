@@ -157,13 +157,13 @@ typedef enum
     BUTTON_UP,
     ROLL_UP,
     ROLL_DOWN,
-    MOUSEMOVE	
+    MOUSEMOVE    
 } ACL_Mouse_Event;
 
 typedef enum 
 {
-	KEY_DOWN,
-	KEY_UP
+    KEY_DOWN,
+    KEY_UP
 } ACL_Keyboard_Event;
 
 typedef void (*KeyboardEventCallback) (int key,int event);
