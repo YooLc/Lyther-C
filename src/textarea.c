@@ -110,12 +110,12 @@ static void drawEditorSelection(EditorForm* form){
     	//Draw background
 		SetPenColor("SelectedColor");
 		if(lRC.r == nowRol && rRC.r == nowRol){
-			x += lRC.c*TextStringWidth(" ");
-			w = (rRC.c - lRC.c)*TextStringWidth(" ");
+			x += lRC.c*TextStringWidth("a");
+			w = (rRC.c - lRC.c)*TextStringWidth("a");
 		}else if(lRC.r == nowRol){
-			x += lRC.c*TextStringWidth(" ");
+			x += lRC.c*TextStringWidth("a");
 		}else if(rRC.r == nowRol){
-			w = rRC.c*TextStringWidth(" ");
+			w = rRC.c*TextStringWidth("a");
 		}
  		drawRectangle(x, y, w, h, 1);
  		//Redraw text
@@ -250,7 +250,7 @@ static void drawTokenBox(Token* token, double x, double y, double w, double h) {
 static void drawCaret(EditorForm *form)
 {
     int idx;
-    double x, y, indent = TextStringWidth("|") / 2;
+    double x, y, indent = TextStringWidth("|") / 1.95;
     char fullLine[MAX_LINE_SIZE] = "";
     if ((clock() >> 8) & 1) {
      	getLine(form->passage, fullLine, form->realCaretPos.r);
@@ -286,10 +286,18 @@ static void moveCaret(EditorForm *form, CaretAction action, char* curLine, char*
             }
             break;
         case UP:
-            if (curPos.r > 1) curPos.r--;
+            if (curPos.r > 1) {
+                curPos.r--;
+                if (form->h - fontHeight * curPos.r >= winHeight)
+                    form->h -= fontHeight;
+            }
             break;
         case DOWN:
-            if (curPos.r < row) curPos.r++;
+            if (curPos.r < row) {
+                curPos.r++;
+                if (form->h - fontHeight * curPos.r <= 0)
+                    form->h += fontHeight;
+            }
             break;
     }
     printf("New curPos (%d, %d)\n", curPos.r, curPos.c);
