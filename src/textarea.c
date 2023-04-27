@@ -77,11 +77,10 @@ void drawEditor(Editor* editor) {
         if (!editor->forms[idx]->visible) continue;
         drawEditorForm(editor->forms[idx]);
         drawEditorSelection(editor->forms[idx]);
-        //printf(LOG "Drawing %d form\n", idx);
+        drawCaret(editor->forms[idx]);
     }
     drawEditorBar(editor);
     drawEditorMenu(editor);
-
 }
 
 static void drawEditorSelection(EditorForm* form){
@@ -191,7 +190,7 @@ static void drawEditorForm(EditorForm *form) {
  	Listptr curLine = kthNode(&(form->passage->passList), 1);
  	while(curLine != NULL) {
  	    // Draw if and only if it's visible
- 	    if (curLinePosY <= winHeight && curLinePosY >= 0) {
+ 	    if (curLinePosY - fontHeight <= winHeight && curLinePosY + fontHeight >= 0) {
  	        // Draw line index
             SetPenColor("Light Gray");
             drawRectangle(form->x, curLinePosY, LINE_INDEX_WIDTH, fontHeight, 1);
@@ -221,16 +220,6 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
  	if (form->renderPos.r == form->realCaretPos.r) {
  	    SetPenColor("Light Blue"); // Need to use palette
  		drawRectangle(x, y, w, h, 1);
- 		if ((clock() >> 8) & 1) {
- 		    char tmpstr[MAX_LINE_SIZE] = "\0"; 
- 		    int i;
- 		    // Pure Brute Force, wait for better implementation.
-            for (i = 0; i < form->realCaretPos.c; i++) strcat(tmpstr, " ");
-            strcat(tmpstr, "|");
-            SetPenColor("Black");
-            MovePen(x - GetFontAscent() / 4, y + GetFontDescent()); // This is relatively correct, not exact.
-            DrawTextString(tmpstr);
-        }
     }
 
     // Traverse tokens
@@ -256,6 +245,22 @@ static void drawTokenBox(Token* token, double x, double y, double w, double h) {
     // SetPenColor("Blue");
     MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
+}
+
+static void drawCaret(EditorForm *form)
+{
+    int idx;
+    double x, y, indent = TextStringWidth("|") / 2;
+    char fullLine[MAX_LINE_SIZE] = "";
+    if ((clock() >> 8) & 1) {
+     	getLine(form->passage, fullLine, form->realCaretPos.r);
+     	fullLine[form->realCaretPos.c] = '\0';
+        SetPenColor("Black");
+        x = form->x + LINE_INDEX_WIDTH + TextStringWidth(fullLine) - indent;
+        y = form->h - fontHeight * form->realCaretPos.r;
+        MovePen(x, y + GetFontDescent()); // This is relatively correct, not exact.
+        DrawTextString("|");
+    }
 }
 
 static void moveCaret(EditorForm *form, CaretAction action, char* curLine, char* preLine) {

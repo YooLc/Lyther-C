@@ -35,7 +35,7 @@ void CharEventProcess(char ch)
     handleInputEvent(&editor, ch);
     editor.updated = true;
     editor.drawLock = false;
-    // Display();
+    Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
@@ -51,8 +51,9 @@ void MouseEventProcess(int x, int y, int button, int event)
 
 void TimerEventProcess(int timerID)
 {
-    if (timerID == REFRESH_TIMER)
+    if (timerID == REFRESH_TIMER) {
         Display();
+    }
 }
 
 void Main() 
@@ -83,7 +84,7 @@ void Main()
 //	Redo(&undoRedo);
 //    printPassage(&passage);
 	initMenu();
-	startTimer(REFRESH_TIMER, 17); // 60 Hz
+	startTimer(REFRESH_TIMER, 20);
 	registerCharEvent(CharEventProcess);
 	registerMouseEvent(MouseEventProcess);
 	registerTimerEvent(TimerEventProcess);
@@ -92,10 +93,7 @@ void Main()
 
 void Display(void)
 {
-    //if (!editor.drawLock && editor.updated) {
-        DisplayClear();
-        drawEditor(&editor);
-        displayMenu();
-        editor.updated = false;
-    //}
+    DisplayClear();
+    drawEditor(&editor);
+    displayMenu();
 }
