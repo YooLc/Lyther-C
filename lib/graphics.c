@@ -603,7 +603,7 @@ void SetPenSize(int size)
 
 int GetPenSize(void)
 {
-     return penSize;
+ 	return penSize;
 }
 
 void SetEraseMode(bool mode)
@@ -854,8 +854,8 @@ static void InitDisplay(void)
     style = WS_OVERLAPPEDWINDOW & ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
     
     g_keyboard = NULL;
-    g_mouse = NULL;
-    g_timer = NULL;
+	g_mouse = NULL;
+	g_timer = NULL;
     
     wndcls.cbClsExtra = 0;
     wndcls.cbWndExtra = 0;
@@ -1072,94 +1072,94 @@ static LONG FAR PASCAL GraphicsEventProc(HWND hwnd, UINT msg,
 {
     switch(msg)
     {
-        // ���¹���ʹ����double buffer, �ֶ�������
-        //         ���Բ���������Ϣ��������˸
-        //         ��л18��ʯ��ͬѧ���ṩ����������ˢ����˸����
-        case WM_ERASEBKGND: 
-            return 0; 
+		// ���¹���ʹ����double buffer, �ֶ�������
+		//         ���Բ���������Ϣ��������˸
+		//         ��л18��ʯ��ͬѧ���ṩ����������ˢ����˸����
+		case WM_ERASEBKGND: 
+			return 0; 
 
         case WM_PAINT:
              DoUpdate();
              return 0;
 
         case WM_CHAR:
-            if (g_char != NULL)
-                g_char((char) wParam);
-            return 0;
+    		if (g_char != NULL)
+    			g_char((char) wParam);
+    		return 0;
 
-        case WM_KEYDOWN:
-            if (g_keyboard != NULL)
-                g_keyboard((int) wParam,KEY_DOWN);
-            return 0;
+    	case WM_KEYDOWN:
+    		if (g_keyboard != NULL)
+    			g_keyboard((int) wParam,KEY_DOWN);
+    		return 0;
     
-        case WM_KEYUP:
-            if(g_keyboard != NULL)
-                g_keyboard((int) wParam,KEY_UP);
-            return 0;
+    	case WM_KEYUP:
+    		if(g_keyboard != NULL)
+    			g_keyboard((int) wParam,KEY_UP);
+    		return 0;
     
-        case WM_LBUTTONDOWN:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), LEFT_BUTTON, BUTTON_DOWN);
-            return 0;
+    	case WM_LBUTTONDOWN:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), LEFT_BUTTON, BUTTON_DOWN);
+    		return 0;
     
-        case WM_LBUTTONUP:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), LEFT_BUTTON, BUTTON_UP);
-            return 0;
+    	case WM_LBUTTONUP:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), LEFT_BUTTON, BUTTON_UP);
+    		return 0;
     
-        case WM_LBUTTONDBLCLK:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), LEFT_BUTTON, BUTTON_DOUBLECLICK);
-            return 0;
+    	case WM_LBUTTONDBLCLK:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), LEFT_BUTTON, BUTTON_DOUBLECLICK);
+    		return 0;
     
-        case WM_MBUTTONDOWN:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MIDDLE_BUTTON, BUTTON_DOWN);
-            return 0;
+    	case WM_MBUTTONDOWN:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MIDDLE_BUTTON, BUTTON_DOWN);
+    		return 0;
     
-        case WM_MBUTTONUP:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MIDDLE_BUTTON, BUTTON_UP);
-            return 0;
+    	case WM_MBUTTONUP:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MIDDLE_BUTTON, BUTTON_UP);
+    		return 0;
     
-        case WM_MBUTTONDBLCLK:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MIDDLE_BUTTON, BUTTON_DOUBLECLICK);
-            return 0;
+    	case WM_MBUTTONDBLCLK:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MIDDLE_BUTTON, BUTTON_DOUBLECLICK);
+    		return 0;
     
-        case WM_RBUTTONDOWN:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), RIGHT_BUTTON, BUTTON_DOWN);
-            return 0;
+    	case WM_RBUTTONDOWN:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), RIGHT_BUTTON, BUTTON_DOWN);
+    		return 0;
     
-        case WM_RBUTTONUP:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), RIGHT_BUTTON, BUTTON_UP);
-            return 0;
+    	case WM_RBUTTONUP:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), RIGHT_BUTTON, BUTTON_UP);
+    		return 0;
     
-        case WM_RBUTTONDBLCLK:
-            if (g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), RIGHT_BUTTON, BUTTON_DOUBLECLICK);
-            return 0;
+    	case WM_RBUTTONDBLCLK:
+    		if (g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), RIGHT_BUTTON, BUTTON_DOUBLECLICK);
+    		return 0;
     
-        case WM_MOUSEMOVE:
-            if(g_mouse != NULL)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MOUSEMOVE, MOUSEMOVE);
-            return 0;
+    	case WM_MOUSEMOVE:
+    		if(g_mouse != NULL)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam), MOUSEMOVE, MOUSEMOVE);
+    		return 0;
     
-        case WM_MOUSEWHEEL:
-            if(g_mouse == NULL)
-                return 0;
-            if(HIWORD(wParam) == 120)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam),MIDDLE_BUTTON,ROLL_UP);
-            else if(HIWORD(wParam)==65416)
-                g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam),MIDDLE_BUTTON,ROLL_DOWN);
-            return 0;
+    	case WM_MOUSEWHEEL:
+    		if(g_mouse == NULL)
+    			return 0;
+    		if(HIWORD(wParam) == 120)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam),MIDDLE_BUTTON,ROLL_UP);
+    		else if(HIWORD(wParam)==65416)
+    			g_mouse((int) LOWORD(lParam), (int) HIWORD(lParam),MIDDLE_BUTTON,ROLL_DOWN);
+    		return 0;
     
-        case WM_TIMER:
-            if (g_timer != NULL)
-                g_timer(wParam);
-            return 0;
+    	case WM_TIMER:
+    		if (g_timer != NULL)
+    			g_timer(wParam);
+    		return 0;
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;   
@@ -1270,7 +1270,7 @@ static void PrepareToDraw(void)
             previousColor = penColor;
         }
         DeleteObject(drawPen);
-        drawPen = (HPEN) CreatePen(PS_SOLID, penSize, drawColor);
+		drawPen = (HPEN) CreatePen(PS_SOLID, penSize, drawColor);
         (void) SelectObject(osdc, drawPen);
         (void) SetTextColor(osdc, drawColor);
     }
@@ -1946,22 +1946,22 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 
 void registerKeyboardEvent(KeyboardEventCallback callback)
 {
-    g_keyboard = callback;
+	g_keyboard = callback;
 }
 
 void registerCharEvent(CharEventCallback callback)
 {
-    g_char = callback;
+	g_char = callback;
 }
 
 void registerMouseEvent(MouseEventCallback callback)
 {
-    g_mouse = callback;
+	g_mouse = callback;
 }
 
 void registerTimerEvent(TimerEventCallback callback)
 {
-    g_timer = callback;
+	g_timer = callback;
 }
 
 void cancelKeyboardEvent()
@@ -1986,20 +1986,20 @@ void cancelTimerEvent()
 
 void startTimer(int id,int timeinterval)
 {
-    SetTimer(graphicsWindow, id, timeinterval, NULL);
+	SetTimer(graphicsWindow, id, timeinterval, NULL);
 }
 
 void cancelTimer(int id)
 {
-    KillTimer(graphicsWindow, id);
+	KillTimer(graphicsWindow, id);
 }
 
 double ScaleXInches(int x) /*x coordinate from pixels to inches*/
 {
-       return (double)x/GetXResolution();
+ 	  return (double)x/GetXResolution();
 }
-       
+	   
 double ScaleYInches(int y)/*y coordinate from pixels to inches*/
 {
-       return GetWindowHeight()-(double)y/GetYResolution();
-}        
+ 	  return GetWindowHeight()-(double)y/GetYResolution();
+} 	   

@@ -45,7 +45,7 @@
 //
 //===========================================================================
 
-/* 函数名：    InitGUI
+/* 函数名：	InitGUI
  *
  * 功能：初始化工作
  *
@@ -53,31 +53,31 @@
  */
 void InitGUI();
 
-/* 函数名：    uiGetMouse
- *            uiGetKeyboard
- *            uiGetChar
+/* 函数名：	uiGetMouse
+ *			uiGetKeyboard
+ *			uiGetChar
  *
  * 功能：获得用户的鼠标/键盘/文本的输入
  *
  * 用法：在鼠标/键盘/文本输入的回调函数中使用 
  *
- *        void MouseEventProcess(int x, int y, int button, int event)
- *        {
- *            uiGetMouse(x,y,button,event); 
- *            ...其他代码...
- *        }
+ *		void MouseEventProcess(int x, int y, int button, int event)
+ *		{
+ *			uiGetMouse(x,y,button,event); 
+ *			...其他代码...
+ *		}
  *
- *        void KeyboardEventProcess(int key, int event)
- *        {
- *            uiGetKeyboard(key,event); 
- *            ...其他代码...
- *        }
+ *		void KeyboardEventProcess(int key, int event)
+ *		{
+ *			uiGetKeyboard(key,event); 
+ *			...其他代码...
+ *		}
  *
- *        void CharEventProcess(char ch)
- *        {
- *            uiGetChar(ch); 
- *            ...其他代码...
- *        }
+ *		void CharEventProcess(char ch)
+ *		{
+ *			uiGetChar(ch); 
+ *			...其他代码...
+ *		}
  */
 void uiGetMouse(int x, int y, int button, int event);
 void uiGetKeyboard(int key, int event);
@@ -125,17 +125,17 @@ int button(int id, double x, double y, double w, double h, char *label);
  *
  * 应用举例：
 
-    char * menuListFile[] = {"File",  
-        "Open  | Ctrl-O",  // 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
-        "Close",           
-        "Exit   | Ctrl-E"};// 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
+	char * menuListFile[] = {"File",  
+		"Open  | Ctrl-O",  // 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
+		"Close",           
+		"Exit   | Ctrl-E"};// 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
 
-    int selection;
+	int selection;
 
-    selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile)/sizeof(menuListFile[0]));
+	selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile)/sizeof(menuListFile[0]));
 
-    if( selection==3 )
-        exit(-1); // user choose to exit
+	if( selection==3 )
+		exit(-1); // user choose to exit
 
  */
 int  menuList(int id, double x, double y, double w, double wlist, double h, char *labels[], int n);
@@ -200,7 +200,7 @@ void drawRectangle(double x, double y, double w, double h, int fillflag);
  * 
  * xalignment - 标签和矩形的对齐方式
  *              'L' - 靠左
- *                'R' - 靠右
+ *			    'R' - 靠右
  *              其他- 居中
  *
  * fillflag - 1 填充
