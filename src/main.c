@@ -61,8 +61,8 @@ void Main()
     SetWindowTitle("Light C code editor");
 	InitGraphics();
 	InitConsole(); // For debug use.
-	SetFont("Consolas");
-	SetPointSize(25);
+	SetFont("Cascadia Code");
+	SetPointSize(22); // This fix werid offset when drawing text. Note that this value varies to different fonts
 	InitStyle();
 	InitGUI();
 	initEditor(&editor);
