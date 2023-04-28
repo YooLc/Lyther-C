@@ -468,8 +468,7 @@ PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch){
 }
 
 //for debug use
-void printPassage(Passage *p){
-    return; 
+void printPassage(Passage *p){ 
  	Listptr nowLineNode = kthNode(&(p->passList), 1);
  	printf("Total line num: %d\n", p->passList.listLen);
  	while(nowLineNode != NULL){

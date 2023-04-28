@@ -5,27 +5,44 @@
 #include "graphics.h"
 #include "codeparser.h"
 
+#define MAX_NAME_LEN 20
+
 /*
     Struct: Palette
     Storage colors used for each page.
     Colors and styles are defined in style.h.
 */
 typedef struct {
+    char name[MAX_NAME_LEN];
+    
     // Colors for background and text(forground).
-    char background[32]; 
-    char foreground[32];
+    char background[MAX_NAME_LEN]; 
+    char foreground[MAX_NAME_LEN];
 
     // Colors for line index part on the left.
-    char lineIndexBackground[32];
-    char lineIndexForeground[32];
-    char lineIndexHighlight[32];
+    char lineIndexBackground[MAX_NAME_LEN];
+    char lineIndexForeground[MAX_NAME_LEN];
 
     // Colors for different types of keywords.
-    // To be implemented...
+    char preprocess[MAX_NAME_LEN];
+    char bracket[3][MAX_NAME_LEN];
+    char quote[MAX_NAME_LEN];
+    char comment[MAX_NAME_LEN];
+
+    // Colors for selection and line highlight
+    char selection[MAX_NAME_LEN];
+    char highlight[MAX_NAME_LEN];
 } Palette;
 
 void InitStyle();
-string getColorByTokenType(CodeTokenType type);
+string getColorByTokenType(CodeTokenType type, int degree);
 int getStyleByTokenType(CodeTokenType type);
+
+/*
+    Function: defineColorRGB
+    Usage: defineColorRGB("Tianyi Blue", "66CCFF");
+    Note: It's not case-sensitive.
+*/
+void defineColorRGB(string name, string color);
 
 #endif

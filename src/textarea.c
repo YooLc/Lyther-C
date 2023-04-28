@@ -15,6 +15,7 @@
 #define NEW(T) (T*)malloc(sizeof(T))
 
 static double winWidth, winHeight, fontHeight;
+static int g_bracketDegree;
 
 void initEditor(Editor* editor) {
     editor->fileCount = 0;
@@ -30,9 +31,6 @@ void initEditor(Editor* editor) {
     winWidth = GetWindowWidth();
     winHeight = GetWindowHeight();
     fontHeight = GetFontHeight();
-    
-    //color definition
-    DefineColor("SelectedColor", (double)9/256, (double)132/256, (double)227/256);
 }
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
@@ -68,6 +66,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     }
     form->urStack = NEW(UndoRedo);
     initUndoRedoList(form->urStack, form->passage);
+    printPassage(form->passage);
 }
 
 void drawEditor(Editor* editor) {
@@ -181,7 +180,11 @@ static void drawEditorForm(EditorForm *form) {
     double curLinePosY = form->h - fontHeight;
     int curLineIndex = 1;
     char lineIndex[10] = "";
+    g_bracketDegree = 0;
 
+    SetPenColor(getBackgroundColor());
+    drawRectangle(form->x, form->y, form->w, form->h, 1);
+    
     // Set renderPos at origin, rows are 1-based, and cols are 0-based
     form->renderPos.r = 1;
     form->renderPos.c = 0;
@@ -234,14 +237,15 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
 }
 
 static void drawTokenBox(Token* token, double x, double y, double w, double h) {
-//    if (token->selected) {
-//        SetPenColor("Blue");
-//        drawRectangle(x, y, w, h, 1);
-//        SetPenColor("White");
-//    }
-//    else SetPenColor(getColorByTokenType(token->type));
     SetStyle(getStyleByTokenType(token->type));
-    SetPenColor(getColorByTokenType(token->type));
+    switch(token->type) {
+        case LEFT_BRACKETS: case LEFT_PARENTHESES: case LEFT_BRACE:
+            SetPenColor(getColorByTokenType(token->type, ++g_bracketDegree)); break;
+        case RIGHT_BRACKETS: case RIGHT_PARENTHESES: case RIGHT_BRACE:
+            SetPenColor(getColorByTokenType(token->type, g_bracketDegree--)); break;
+        default:
+            SetPenColor(getColorByTokenType(token->type, 0)); break;
+    }
     // SetPenColor("Blue");
     MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
