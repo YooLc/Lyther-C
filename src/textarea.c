@@ -415,11 +415,14 @@ void handleInputEvent(Editor* editor, char ch) {
 }
 
 void handleKeyboardEvent(Editor* editor, int key, int event) {
-    if (event != KEY_DOWN) return; 
+
     // Some essential variables as helper to move caret
     EditorForm *curForm = editor->forms[editor->curSelect];
     PosRC curPos = curForm->realCaretPos;
     char curLine[MAX_LINE_SIZE], preLine[MAX_LINE_SIZE];
+    
+    //Some status variable
+    static isControlDown = 0;
     
     // Get current and previous line, then trim all '\n'
     getLine(curForm->passage, curLine, curPos.r);
@@ -430,21 +433,43 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
         idx = strlen(preLine) - 1;
         while (preLine[idx] == '\n') preLine[idx--] = '\0';
     }
-
-    switch(key) {
-        case VK_LEFT:  moveCaret(curForm, LEFT,  curLine, preLine); break;
-        case VK_RIGHT: moveCaret(curForm, RIGHT, curLine, preLine); break;
-        case VK_UP:    moveCaret(curForm, UP,    curLine, preLine); break;
-        case VK_DOWN:  moveCaret(curForm, DOWN,  curLine, preLine); break;
-        case VK_BACK:  deleteLastChar(curForm); 
-                       moveCaret(curForm, LEFT,  curLine, preLine); break;
-        case VK_DELETE:
-            deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
-            break;
-        case VK_RETURN:
-            curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
-            break;
-    }
+	if(event == KEY_DOWN){
+	    switch(key) {
+	        case VK_LEFT:  moveCaret(curForm, LEFT,  curLine, preLine); break;
+	        case VK_RIGHT: moveCaret(curForm, RIGHT, curLine, preLine); break;
+	        case VK_UP:    moveCaret(curForm, UP,    curLine, preLine); break;
+	        case VK_DOWN:  moveCaret(curForm, DOWN,  curLine, preLine); break;
+	        case VK_BACK:  deleteLastChar(curForm); 
+	                       moveCaret(curForm, LEFT,  curLine, preLine); break;
+	        case VK_DELETE:
+	        	if(curPos.c == strlen(curLine)) curLine[curPos.c] = '\n';
+	        	curLine[curPos.c+1] = '\0';
+	        	addTrace(curForm->urStack, DELE, curPos.r, curPos.c+1, curPos.r, curPos.c+1, curLine+curPos.c);
+	            deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
+	            break;
+	        case VK_RETURN:
+	        	addTrace(curForm->urStack, ADD, curPos.r, curPos.c+1, curPos.r, curPos.c+1, "\n");
+	            curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
+	            break;
+	        case VK_CONTROL:
+	        	isControlDown = 1;
+	        	break;
+	        case 90://Z
+	        	LOG("%s", "CALL UNDO BY KEYBOARD");
+	        	curForm->caretPos = Undo(curForm->urStack);
+	        	break;
+	        case 89://Y
+	        	curForm->caretPos = Redo(curForm->urStack);
+	        	break;
+		}
+    }else if(event == KEY_UP){
+		switch(key){
+			case VK_CONTROL:
+				isControlDown = 0;
+				break;
+		}
+	}
+	
 	curPos = curForm->caretPos;	
 	/*Function <moveCaret> updates the caretPos and realCaretPos directly, so we need to update <curPos>.
 	 The original version is wrong here because VK_RETURN use curPos as the intermediate variable,
