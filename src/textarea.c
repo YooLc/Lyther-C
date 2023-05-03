@@ -141,6 +141,7 @@ static void drawEditorMenu(Editor* editor) {
     static char* menuListFile[] = {"File",
         "Open | Ctrl-O",
         "Save | Ctrl-S",
+        "Save As...",
         "Exit | Ctrl-E"};
     static char* menuListEdit[] = {"Edit",
         "Undo | Ctrl-Z",
@@ -159,6 +160,8 @@ static void drawEditorMenu(Editor* editor) {
         switch(selection) {
         case 1: loadFile(editor); break;
         case 2: saveFile(editor); break;
+        case 3: saveAs(editor); break;
+        case 4: exit(1);
     }
 	// Draw Editor Menu
     x += w;

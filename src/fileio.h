@@ -11,9 +11,11 @@
 void loadFile(Editor *editor);
 
 /*
-	function saveFile(Editor *editor, char *fileName)
+	function saveAs(Editor *editor)
 	Save <curselect> in editor as <fileName>
 */
+void saveAs(Editor *editor);
+
 void saveFile(Editor *editor);
 
 #endif
