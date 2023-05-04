@@ -47,6 +47,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     
     form->style = 0;
     form->visible = true;
+    form->inSelectionMode = false;
     form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 1;
     form->caretPos.c = form->realCaretPos.c = form->renderPos.c = 0;
     form->x = form->y = 0;
@@ -398,8 +399,17 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
 		case BUTTON_UP:
 			if(button == LEFT_BUTTON){
 				curForm->selectRightPos = pixelToPosRC(curForm, x, y);
-				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c, 
+				printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c,\
 				curForm->selectRightPos.r, curForm->selectRightPos.c);
+				if( !(
+					curForm->selectRightPos.r == curForm->selectLeftPos.r\
+					&&
+					curForm->selectRightPos.c == curForm->selectLeftPos.c
+				)){
+					curForm->inSelectionMode = true;
+				}else{
+					curForm->inSelectionMode = false;
+				}
 				isLeftButtonDown = 0;
 			}
 			break;
@@ -472,8 +482,17 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
 	        case VK_RIGHT: moveCaret(curForm, RIGHT, curLine, preLine); break;
 	        case VK_UP:    moveCaret(curForm, UP,    curLine, preLine); break;
 	        case VK_DOWN:  moveCaret(curForm, DOWN,  curLine, preLine); break;
-	        case VK_BACK:  deleteLastChar(curForm); 
-	                       moveCaret(curForm, LEFT,  curLine, preLine); break;
+	        case VK_BACK:  
+				if(curForm->inSelectionMode == false){
+					deleteLastChar(curForm); 
+	                moveCaret(curForm, LEFT,  curLine, preLine); 
+				}else{
+					deleteString(curForm->passage, curForm->selectLeftPos.r,\
+					curForm->selectLeftPos.c+1,\
+					curForm->selectRightPos.r,\
+					curForm->selectRightPos.c);
+				}
+				break;
 	        case VK_DELETE:
 	        	if(curPos.c == strlen(curLine)) curLine[curPos.c] = '\n';
 	        	curLine[curPos.c+1] = '\0';

@@ -335,6 +335,15 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
 	char prevLine[MAX_LINE_SIZE], nextLine[MAX_LINE_SIZE];
 	char targetLine[4*MAX_LINE_SIZE] = "\0";
 	
+	if(rows > rowt || (rows == rowt && cols > colt)){
+		i = rows;
+		rows = rowt;
+		rowt = i;
+		i = cols;
+		cols = colt;
+		colt = i;
+	}
+	
 	if(rows > 1) getLine(passage, prevLine, rows-1);
 	if(rowt < passage->passList.listLen) getLine(passage, nextLine, rowt+1);
 	getLine(passage, tmpLine1, rows);

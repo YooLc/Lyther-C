@@ -19,7 +19,7 @@
 */
 typedef struct {
     int style;
-    bool visible;
+    bool visible, inSelectionMode;
     double x, y, w, h;
     PosRC caretPos, realCaretPos, renderPos, selectLeftPos, selectRightPos;
     UndoRedo *urStack;
