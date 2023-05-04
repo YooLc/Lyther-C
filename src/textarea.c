@@ -467,13 +467,6 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
 	        case VK_CONTROL:
 	        	isControlDown = 1;
 	        	break;
-	        case 90://Z
-	        	LOG("%s", "CALL UNDO BY KEYBOARD");
-	        	curForm->caretPos = Undo(curForm->urStack);
-	        	break;
-	        case 89://Y
-	        	curForm->caretPos = Redo(curForm->urStack);
-	        	break;
 		}
     }else if(event == KEY_UP){
 		switch(key){
