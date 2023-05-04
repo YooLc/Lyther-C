@@ -3,9 +3,14 @@
 
 #include "textarea.h"
 
+/*
+	function newFile(Editor *editor)
+	Creat a new C file, named as <Unamed 1>
+*/
+void newFile(Editor *editor);
 
 /*
-	function loadFile(Editor *editor, char *fileName)
+	function loadFile(Editor *editor)
 	load <filename> into editor, and rewind the <curselect> to this file
 */
 void loadFile(Editor *editor);

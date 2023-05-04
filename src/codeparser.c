@@ -4,6 +4,7 @@
 
 #include "codeparser.h"
 #include "textarea.h"
+
 /*
     Function: initPassage
     Initialize doubly linked list for a passage

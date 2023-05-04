@@ -15,6 +15,8 @@
 #define NEW(T) (T*)malloc(sizeof(T))
 
 static double winWidth, winHeight, fontHeight;
+char g_messageString[250];
+
 static int g_bracketDegree;
 
 void initEditor(Editor* editor) {
@@ -77,6 +79,7 @@ void drawEditor(Editor* editor) {
         drawEditorForm(editor->forms[idx]);
         drawEditorSelection(editor->forms[idx]);
         drawCaret(editor->forms[idx]);
+        //drawMessageBar();
     }
     drawEditorBar(editor);
     drawEditorMenu(editor);
@@ -139,9 +142,11 @@ static void drawEditorSelection(EditorForm* form){
 
 static void drawEditorMenu(Editor* editor) {
     static char* menuListFile[] = {"File",
+    	"New | Ctrl-N",
         "Open | Ctrl-O",
         "Save | Ctrl-S",
         "Save As...",
+        "Switch windows | Ctrl-M",
         "Exit | Ctrl-E"};
     static char* menuListEdit[] = {"Edit",
         "Undo | Ctrl-Z",
@@ -158,10 +163,17 @@ static void drawEditorMenu(Editor* editor) {
     wlist = TextStringWidth(menuListFile[1]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
         switch(selection) {
-        case 1: loadFile(editor); break;
-        case 2: saveFile(editor); break;
-        case 3: saveAs(editor); break;
-        case 4: exit(1);
+        case 1: newFile(editor); break;
+        case 2: loadFile(editor); break;
+        case 3: saveFile(editor); break;
+        case 4: saveAs(editor); break;
+        case 5: 
+        	editor->forms[editor->curSelect]->visible = 0;
+			editor->curSelect = (editor->curSelect)%editor->fileCount+1;
+			editor->forms[editor->curSelect]->visible = 1;
+			drawEditor(editor);
+			break;
+        case 6: exit(0); break;
     }
 	// Draw Editor Menu
     x += w;
@@ -252,6 +264,14 @@ static void drawTokenBox(Token* token, double x, double y, double w, double h) {
     // SetPenColor("Blue");
     MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
+}
+
+void drawMessageBar(){
+	SetPointSize(15);
+	MovePen(winWidth-2, winHeight-GetFontHeight());
+	SetPenColor("Black");
+    DrawTextString(g_messageString);
+	SetPointSize(22);
 }
 
 static void drawCaret(EditorForm *form)

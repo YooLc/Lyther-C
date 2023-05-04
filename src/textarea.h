@@ -59,6 +59,7 @@ static void drawEditorSelection(EditorForm* from);
 static void drawCodeLine(EditorForm* form, Line* line, double x, double y, double w, double h);
 static void drawToken(Token* token, double x, double y, double w, double h);
 static void drawTokenBox(Token* token, double x, double y, double w, double h);
+void drawMessageBar();
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath);
 static void drawCaret(EditorForm* form);

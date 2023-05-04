@@ -30,6 +30,10 @@ void loadFile(Editor *editor){
 	fclose(fp);
 }
 
+void newFile(Editor *editor){
+	addCodeToEditor(editor, NULL, "Unamed 1");
+}
+
 void saveFile(Editor *editor){
 	
 	if(strcmp(editor->filePath[editor->curSelect], "Unamed 1") == 0){
