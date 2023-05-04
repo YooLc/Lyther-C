@@ -9,11 +9,13 @@ PosRC Undo(UndoRedo *ur){
 	
 	PosRC posRC = {0,0};
 	Trace *trace = ur->nowNode->datptr;
+	printf("UNDO STRING %s\n", trace->content);
 	int rows, cols, rowt, colt;
 	rows = trace->rows;
 	cols = trace->cols;
 	rowt = trace->rowt;
 	colt = trace->colt;
+	printf("UNDO RANGE %d %d %d %d\n",rows, cols, rowt, colt);
 	if(trace->type == ADD){
 		deleteString(ur->passage, rows, cols, rowt, colt);
 		posRC.r = rows;

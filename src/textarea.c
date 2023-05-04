@@ -403,8 +403,21 @@ void handleInputEvent(Editor* editor, char ch) {
     // The top bit of Chinese characters in GB2312 is 1, so ch is negative
     EditorForm *form = editor->forms[editor->curSelect];
     PosRC curPos = form->realCaretPos;
-    if ((ch >= 32 && ch < 127) || ch < 0) {
-        char tmpstr[MAX_LINE_SIZE] = "";
+    static char lastCn = 0;//track the last Chinese character, if is not, this var is 0
+    char tmpstr[MAX_LINE_SIZE] = "";
+    
+	if(ch < 0){
+		if(lastCn == 0){
+			lastCn = ch;
+		}else{
+			sprintf(tmpstr, "%c%c\0", lastCn, ch);
+			addTrace(form->urStack, ADD, curPos.r, curPos.c+1, curPos.r, curPos.c+2, tmpstr);
+			LOG("Attempting to add %s\n", tmpstr);
+        	form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c+1);
+			lastCn = 0;
+		}
+	}
+    if (ch >= 32 && ch < 127) {
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
         LOG("Attempting to add %s\n", tmpstr);
