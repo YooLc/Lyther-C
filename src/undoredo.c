@@ -69,7 +69,7 @@ static void clearRedo(UndoRedo *ur){
 	}
 	
 	while(ur->nowNode->next != NULL){
-		deleteNodeByPtr(&(ur->undoRedoList), ur->nowNode);
+		deleteNodeByPtr(&(ur->undoRedoList), ur->nowNode->next);
 	}
 }
 
