@@ -162,7 +162,7 @@ static void drawEditorMenu(Editor* editor) {
     h = editor->menuHeight;
     xindent = h / 20;
     
-    drawMenuBar(x, y, w, h);
+    drawMenuBar(x, y, winWidth, h);
     // Draw File Menu
     w = TextStringWidth(menuListFile[0]) * 2;
     wlist = TextStringWidth(menuListFile[1]) * 1.25;
