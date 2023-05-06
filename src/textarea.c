@@ -89,6 +89,7 @@ void drawEditor(Editor* editor) {
 static void drawEditorSelection(EditorForm* form){
 
 	if(form->selectLeftPos.r == form->selectRightPos.r && form->selectLeftPos.c == form->selectRightPos.c) return;
+	if(form->inSelectionMode == false) return;
 	
 	PosRC lRC = form->selectLeftPos, rRC = form->selectRightPos;
 	
@@ -151,7 +152,10 @@ static void drawEditorMenu(Editor* editor) {
         "Exit | Ctrl-E"};
     static char* menuListEdit[] = {"Edit",
         "Undo | Ctrl-Z",
-        "Redo | Ctrl-Y"};
+        "Redo | Ctrl-Y",
+		"Copy | Ctrl-C",
+		"Cut  | Ctrl-X",
+		"Paste| Ctrl-V"};
     int selection;
     double x, y, w, h, wlist, xindent;
     x = 0; y = winHeight - editor->menuHeight;
@@ -183,8 +187,11 @@ static void drawEditorMenu(Editor* editor) {
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
     EditorForm* curForm = editor->forms[editor->curSelect];
     switch(selection) {
-        case 1: Undo(curForm->urStack); curForm->caretPos.c--; break;
-        case 2: Redo(curForm->urStack); curForm->caretPos.c++; break;
+        case 1: curForm->caretPos = Undo(curForm->urStack); break;
+        case 2: curForm->caretPos = Redo(curForm->urStack); break;
+        case 3: if(curForm->inSelectionMode) Copy(curForm); break;
+        case 4: if(curForm->inSelectionMode) Cut(curForm); break;
+        case 5: Paste(curForm); break;
     }
 } 
 
@@ -487,10 +494,21 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
 					deleteLastChar(curForm); 
 	                moveCaret(curForm, LEFT,  curLine, preLine); 
 				}else{
-					deleteString(curForm->passage, curForm->selectLeftPos.r,\
-					curForm->selectLeftPos.c+1,\
-					curForm->selectRightPos.r,\
-					curForm->selectRightPos.c);
+					PosRC posl = curForm->selectLeftPos, posr = curForm->selectRightPos;
+					if(posl.r > posr.r || \
+						(posl.r == posr.r && posl.c > posr.c)	
+					){
+						PosRC tmp = posl;
+						posl = posr;
+						posr = tmp;
+					}
+					char *tmpstr = getString(curForm->passage, posl.r, posl.c+1, posr.r, posr.c);
+					addTrace(curForm->urStack, DELE, posl.r, posl.c+1, posr.r, posr.c, tmpstr);
+					deleteString(curForm->passage,
+								posl.r, posl.c+1,\
+								posr.r, posr.c);
+					free(tmpstr);
+					curForm->inSelectionMode = false;
 				}
 				break;
 	        case VK_DELETE:

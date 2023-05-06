@@ -1,11 +1,13 @@
 #ifndef _CLIPBOARD_H_
 #define _CLIPBOARD_H_
 
+#include "codeparser.h"
+#include "textarea.h"
 /*
 	function mySetClipBoard(char *str)
 	set <str> to the clipboard
 */
-void mySetClipBoard(char *str);
+static void mySetClipBoard(char *str);
 
 /*
 	function myGetClipBoard(char *str)
@@ -13,5 +15,12 @@ void mySetClipBoard(char *str);
 	*if there is nothing or not text-type data in the clipboard,
 	 <dst[0]> will be set as the terminal character '\0'  
 */
-void myGetClipBoard(char* dst);
+static void myGetClipBoard(char* dst);
+
+void Copy(EditorForm *form);
+
+void Cut(EditorForm *form);
+
+void Paste(EditorForm *form);
+
 #endif

@@ -408,6 +408,33 @@ void cancelNewline(Passage *passage, int row) {
 	parseLine(passage, row - 1);
 }
 */
+
+char *getString(Passage *passage, int rows, int cols, int rowt, int colt){
+	char *dst = (char*)malloc(sizeof(char)*MAX_LINE_SIZE*(rowt-rows+1));
+	char tmpLine[MAX_LINE_SIZE], targetLine[MAX_LINE_SIZE];
+	int nowRow = rows;
+	dst[0] = '\0';
+	
+	while(nowRow <= rowt){
+		getLine(passage, tmpLine, nowRow);
+		strcpy(targetLine, tmpLine);
+		if(rows == rowt){
+			strncpy(targetLine, tmpLine+cols-1, colt-cols+1);
+			targetLine[colt-cols+1] = '\0';
+		}else if(nowRow == rows){
+			strcpy(targetLine, tmpLine+cols-1);
+		}else if(nowRow == rowt){
+			strncpy(targetLine, tmpLine, colt);
+			targetLine[colt] = '\0';
+		}
+		nowRow++;
+		strcat(dst, targetLine);
+		printf("Target content \"%s\"",targetLine);
+	}
+	printf("Range content \"%s\"",dst);
+	return dst;
+}
+
 PosRC searchForwardByChar(Passage *passage, int row, int col, char ch){
 	//Initialize variables
 	int offset = 0, i = 0, len = 0;

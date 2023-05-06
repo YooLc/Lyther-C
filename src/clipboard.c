@@ -3,8 +3,11 @@
 
 #include "string.h"
 #include "clipboard.h"
+#include "codeparser.h"
+#include "textarea.h"
+#include "undoredo.h"
 
-void mySetClipBoard(char *str){
+static void mySetClipBoard(char *str){
 	
 	char *dst;
 	HGLOBAL hglbCopy;
@@ -33,7 +36,7 @@ void mySetClipBoard(char *str){
     CloseClipboard();
 }
 
-void myGetClipBoard(char* dst){
+static void myGetClipBoard(char* dst){
 
     if (!IsClipboardFormatAvailable(CF_TEXT)) return; 
     if (!OpenClipboard(NULL)) return; 
@@ -51,4 +54,48 @@ void myGetClipBoard(char* dst){
         }
         CloseClipboard(); 
     }
+}
+
+void Copy(EditorForm *form){
+	PosRC posl = form->selectLeftPos, posr = form->selectRightPos;
+	if(posl.r > posr.r || \
+		(posl.r == posr.r && posl.c > posr.c)	
+	){
+		PosRC tmp = posl;
+		posl = posr;
+		posr = tmp;
+	}
+	char *dst = getString(form->passage, posl.r, posl.c+1, posr.r, posr.c);
+	mySetClipBoard(dst);
+	form->inSelectionMode = false;
+	free(dst);
+}
+
+void Cut(EditorForm *form){
+	PosRC posl = form->selectLeftPos, posr = form->selectRightPos;
+	if(posl.r > posr.r || \
+		(posl.r == posr.r && posl.c > posr.c)	
+	){
+		PosRC tmp = posl;
+		posl = posr;
+		posr = tmp;
+	}
+	char *dst = getString(form->passage, posl.r, posl.c+1, posr.r, posr.c);
+	mySetClipBoard(dst);
+	deleteString(form->passage, posl.r, posl.c+1, posr.r, posr.c);
+	addTrace(form->urStack, DELE, posl.r, posl.c+1, posr.r, posr.c, dst);
+	form->inSelectionMode = false;
+	free(dst);
+}
+
+void Paste(EditorForm *form){
+	char *dst = (char*)malloc(sizeof(char)*MAX_LINE_SIZE*10); //overflow danger
+	PosRC newRC;
+	
+	myGetClipBoard(dst);
+	if(dst[0] == '\0') return;
+	newRC = addString(form->passage, dst, form->caretPos.r, form->caretPos.c+1);
+	addTrace(form->urStack, ADD, form->caretPos.r, form->caretPos.c+1, newRC.r, newRC.c, dst);
+	form->caretPos = form->realCaretPos = newRC;
+	free(dst);
 }

@@ -121,6 +121,13 @@ PosRC addString(Passage *passage, char *str, int row, int col);
 */ 
 void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
 
+/*
+	Function: getString(Passage *passage, int rows, int cols, int rowt, int colt)
+	Return the pointer to a string in range <(rows,cols),(rowt,colt)>
+	**Caller have the duty to free the allocated space
+*/
+char *getString(Passage *passage, int rows, int cols, int rowt, int colt);
+
 void inputString(char *str);
 
 /*
