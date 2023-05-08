@@ -7,12 +7,12 @@
 #include "textarea.h"
 
 typedef struct{
-	double menuWidth;
-	double menuHeight;
-	double entryHeight, entryMargin;
-	int posx, posy;
-	int activate;
-	int selected;
+    double menuWidth;
+    double menuHeight;
+    double entryHeight, entryMargin;
+    int posx, posy;
+    int activate;
+    int selected;
 }Menu;
 
 Menu menu;

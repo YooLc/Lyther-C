@@ -28,10 +28,18 @@ typedef struct {
     char bracket[3][MAX_NAME_LEN];
     char quote[MAX_NAME_LEN];
     char comment[MAX_NAME_LEN];
+    char keyword[MAX_NAME_LEN];
 
     // Colors for selection and line highlight
     char selection[MAX_NAME_LEN];
     char highlight[MAX_NAME_LEN];
+    
+    // Colors for UI
+    char caret[MAX_NAME_LEN];
+    char frame[MAX_NAME_LEN];
+    char label[MAX_NAME_LEN];
+    char hotFrame[MAX_NAME_LEN];
+    char hotLabel[MAX_NAME_LEN];
 } Palette;
 
 void InitStyle();

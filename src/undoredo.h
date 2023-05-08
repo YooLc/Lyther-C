@@ -5,24 +5,24 @@
 #include "codeparser.h"
 
 typedef enum{
-	ADD,
-	DELE
+    ADD,
+    DELE
 } TraceType;
 
 typedef struct{
-	TraceType type;
-	int rows, cols, rowt, colt; //interval (closed)
-	char content[MAX_LINE_SIZE];
+    TraceType type;
+    int rows, cols, rowt, colt; //interval (closed)
+    char content[MAX_LINE_SIZE];
 } Trace;
 
 /*
-	Struct of a UndoRedo abstract
-	Creat a Instance of this struct for every passage
+    Struct of a UndoRedo abstract
+    Creat a Instance of this struct for every passage
 */
 typedef struct{
-	Passage *passage;
-	LinkedList undoRedoList;
-	Listptr nowNode;
+    Passage *passage;
+    LinkedList undoRedoList;
+    Listptr nowNode;
 }UndoRedo;
 
 //Call this function when there is an Undo event
@@ -32,8 +32,8 @@ PosRC Undo(UndoRedo *ur);
 PosRC Redo(UndoRedo *ur);
 
 /*
-	When there is a new IO event, add this trace in the undoRedoList
-	This function will automatically delete all the nodes after this new node
+    When there is a new IO event, add this trace in the undoRedoList
+    This function will automatically delete all the nodes after this new node
 */
 void addTrace(UndoRedo *ur, TraceType type, int rows, int cols, int rowt, int colt, char *content);
 

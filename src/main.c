@@ -58,36 +58,37 @@ void TimerEventProcess(int timerID)
 void Main() 
 {
     SetWindowTitle("Light C code editor");
-	InitGraphics();
-	InitConsole(); // For debug use.
-	SetFont("Cascadia Code");
-	SetPointSize(22); // This fix werid offset when drawing text. Note that this value varies to different fonts
-	InitStyle();
-	InitGUI();
-	initEditor(&editor);
-	addCodeToEditor(&editor, NULL, "Unamed 1");
-//	initUndoRedoList(&undoRedo, &passage);
-	//initEditor(&editor);
+    InitGraphics();
+    InitConsole(); // For debug use.
+    SetFont("Cascadia Code");
+    SetPointSize(22); // This fix werid offset when drawing text. Note that this value varies to different fonts
+    InitStyle();
+    InitGUI();
+    initEditor(&editor);
+    addCodeToEditor(&editor, NULL, "Unamed 1.c");
+    addCodeToEditor(&editor, NULL, "Unamed 2.c");
+//    initUndoRedoList(&undoRedo, &passage);
+    //initEditor(&editor);
     
     // A simple test case
 //    Passage* passage = editor.forms[1]->passage;
 //    addString(passage, "\n", 1, 1);
-//	addString(passage, "#include <stdio.h>\n", 1, 1);
-//	addString(passage, "void main() { //ÖÐÎÄ×¢ÊÍ\n", 2, 1);
-//	addString(passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-//	addString(passage, "}\n", 5, 1);
-//	addString(passage, "Õâ¸ö ", 3, 19);
-//	addString(passage, " ", 4, 1);
-//	 addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
-//	Undo(&undoRedo);
-//	Redo(&undoRedo);
+//    addString(passage, "#include <stdio.h>\n", 1, 1);
+//    addString(passage, "void main() { //ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½\n", 2, 1);
+//    addString(passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
+//    addString(passage, "}\n", 5, 1);
+//    addString(passage, "ï¿½ï¿½ï¿½ ", 3, 19);
+//    addString(passage, " ", 4, 1);
+//     addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
+//    Undo(&undoRedo);
+//    Redo(&undoRedo);
 //    printPassage(&passage);
-	initMenu();
-	startTimer(REFRESH_TIMER, 20);
-	registerCharEvent(CharEventProcess);
-	registerMouseEvent(MouseEventProcess);
-	registerTimerEvent(TimerEventProcess);
-	registerKeyboardEvent(KeyboardEventProcess);
+    initMenu();
+    startTimer(REFRESH_TIMER, 20);
+    registerCharEvent(CharEventProcess);
+    registerMouseEvent(MouseEventProcess);
+    registerTimerEvent(TimerEventProcess);
+    registerKeyboardEvent(KeyboardEventProcess);
 }
 
 void Display(void)

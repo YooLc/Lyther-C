@@ -9,8 +9,8 @@
 #include "style.h"
 
 #define MAX_FILE_COUNT 20
-#define LINE_INDEX_WIDTH .45
-#define SCROLL_DIST (fontHeight*3)
+#define LINE_INDEX_WIDTH .5
+#define SCROLL_DIST (textFontHeight * 3)
 
 /*
     Struct: Editor Form
@@ -39,7 +39,7 @@ typedef struct {
     int fileCount, curSelect;
     double menuHeight, barHeight;
     bool drawLock, updated;
-    char *filePath[MAX_FILE_COUNT];
+    char *filePath[MAX_FILE_COUNT], *fileName[MAX_FILE_COUNT];
     EditorForm *forms[MAX_FILE_COUNT];
 } Editor;
 

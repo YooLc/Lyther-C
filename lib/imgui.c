@@ -42,26 +42,7 @@
 
 #include "imgui.h"
 
-
-#define KMOD_SHIFT 0x01
-#define KMOD_CTRL  0x02
-
-
-/* 鼠标和空间状态 */
-typedef struct {
-	double mousex;
-	double mousey;
-	int    mousedown;
-	int    clickedItem;// item that was clicked
-	int    actingMenu; // acting menu list 
-	int    kbdItem;    // item that takes keyboard
-	int    lastItem;   // item that had focus just before
-	int    keyPress;   // input key
-	int    charInput;  // input char
-	int    keyModifiers;  //  key modifier (shift, ctrl)
-} UIState;
-
-static UIState gs_UIState;
+UIState gs_UIState;
 static double  gs_menuRect[4];
 
 /* 测试：坐标点(x,y)是否位于包围和 [x1,x2] X [y1,y2] 内部 */
@@ -111,13 +92,7 @@ void mySetPenColor(char *color)
 /* 
  *  菜单颜色
  */
-static struct {
-	char frame[32];
-	char label[32];
-	char hotFrame[32];
-	char hotLabel[32];
-	int  fillflag;
-} gs_predefined_colors[] = {
+MenuPalette gs_predefined_colors[] = {
 	{"Blue",      "Blue",	"Red",	    "Red",   0 }, // 
 	{"Orange",    "Black", "Green",    "Blue",  0 }, // 
 	{"Orange",    "White", "Green",    "Blue",  1 }, // 填充
