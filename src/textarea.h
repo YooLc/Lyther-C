@@ -56,6 +56,7 @@ static void drawEditorMenu(Editor* editor);
 static void drawEditorBar(Editor* editor);
 static void drawEditorForm(EditorForm* form);
 static void drawEditorSelection(EditorForm* from);
+static void drawSymbolMatch(EditorForm *form);
 static void drawCodeLine(EditorForm* form, Line* line, double x, double y, double w, double h);
 static void drawToken(Token* token, double x, double y, double w, double h);
 static void drawTokenBox(Token* token, double x, double y, double w, double h);

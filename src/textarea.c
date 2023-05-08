@@ -79,6 +79,7 @@ void drawEditor(Editor* editor) {
         if (!editor->forms[idx]->visible) continue;
         drawEditorForm(editor->forms[idx]);
         drawEditorSelection(editor->forms[idx]);
+        drawSymbolMatch(editor->forms[idx]);
         drawCaret(editor->forms[idx]);
         //drawMessageBar();
     }
@@ -140,6 +141,59 @@ static void drawEditorSelection(EditorForm* form){
  		nowRol++;
 	}
 	
+}
+
+static drawCharWithBackground(double x, double y, char* ch){
+	SetPenColor("Red");
+	drawRectangle(x, y, TextStringWidth("a"), fontHeight, 1);
+	MovePen(x,y + GetFontDescent());
+	SetPenColor("White");
+	DrawTextString(ch);
+}
+
+static void drawSymbolMatch(EditorForm *form){
+	int offset = 0;
+	double x1 = form->x + LINE_INDEX_WIDTH + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*fontHeight;
+	double x2 = form->x + LINE_INDEX_WIDTH, y2 = form->h;
+	PosRC matchPos;
+	Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
+	if(token->type == LEFT_PARENTHESES){
+		matchPos = searchForwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, ')');
+		x2 += (matchPos.c-1)*TextStringWidth("a");
+		y2 -= matchPos.r*fontHeight;
+		drawCharWithBackground(x1, y1, "(");
+		drawCharWithBackground(x2, y2, ")");
+	}else if(token->type == RIGHT_PARENTHESES){
+		matchPos = searchBackwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '(');
+		x2 += (matchPos.c-1)*TextStringWidth("a");
+		y2 -= matchPos.r*fontHeight;
+		drawCharWithBackground(x1, y1, ")");
+		drawCharWithBackground(x2, y2, "(");
+	}else if(token->type == LEFT_BRACKETS){
+		matchPos = searchForwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, ']');
+		x2 += (matchPos.c-1)*TextStringWidth("a");
+		y2 -= matchPos.r*fontHeight;
+		drawCharWithBackground(x1, y1, "[");
+		drawCharWithBackground(x2, y2, "]");
+	}else if(token->type == RIGHT_BRACKETS){
+		matchPos = searchBackwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '[');
+		x2 += (matchPos.c-1)*TextStringWidth("a");
+		y2 -= matchPos.r*fontHeight;
+		drawCharWithBackground(x1, y1, "]");
+		drawCharWithBackground(x2, y2, "[");
+	}else if(token->type == LEFT_BRACE){
+		matchPos = searchForwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '}');
+		x2 += (matchPos.c-1)*TextStringWidth("a");
+		y2 -= matchPos.r*fontHeight;
+		drawCharWithBackground(x1, y1, "{");
+		drawCharWithBackground(x2, y2, "}");
+	}else if(token->type == RIGHT_BRACE){
+		matchPos = searchBackwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '{');
+		x2 += (matchPos.c-1)*TextStringWidth("a");
+		y2 -= matchPos.r*fontHeight;
+		drawCharWithBackground(x1, y1, "}");
+		drawCharWithBackground(x2, y2, "{");
+	}
 }
 
 static void drawEditorMenu(Editor* editor) {
