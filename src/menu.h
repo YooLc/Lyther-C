@@ -1,8 +1,10 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-#define MENUENTRY 3
+#define MENUENTRY 5
 #define MENUWIDTH 2.5
+
+#include "textarea.h"
 
 typedef struct{
 	double menuWidth;
@@ -15,11 +17,11 @@ typedef struct{
 
 Menu menu;
 
-static char* Entrys[] = {" Copy | (C)"," Undo | (Z)", " Redo | (Y)"};
+static char* Entrys[] = {" Copy | (C)", " Cut | (X)", " Paste | (V)", " Undo | (Z)", " Redo | (Y)"};
 
 void initMenu();
 
-void menuGetMouse(int x, int y, int button, int event);
+void menuGetMouse(EditorForm *form, int x, int y, int button, int event);
 
 void displayMenu();
 

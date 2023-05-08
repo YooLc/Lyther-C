@@ -42,7 +42,6 @@ void MouseEventProcess(int x, int y, int button, int event)
 {
     editor.drawLock = true;
     uiGetMouse(x, y, button, event);
-	menuGetMouse(x, y, button, event);
     handleMouseEvent(&editor, x, y, button, event);
     editor.updated = true;
     editor.drawLock = false;

@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "extgraph.h"
 #include "undoredo.h"
+#include "clipboard.h"
 
 void initMenu(){
 	menu.activate = 0;
@@ -27,8 +28,9 @@ static int inMenu(int x, int y){
 	return 1;
 }
 
-void menuGetMouse(int x, int y, int button, int event){
+void menuGetMouse(EditorForm *form, int x, int y, int button, int event){
 	inMenu(x,y);
+
 	switch(event){
 		case BUTTON_DOWN:
 			if(button == RIGHT_BUTTON){
@@ -38,8 +40,24 @@ void menuGetMouse(int x, int y, int button, int event){
 			}else if(button == LEFT_BUTTON && menu.selected != -1){
 				menu.activate = 0;
 				switch(menu.selected){
-					/*do something here*/
+					case 0:
+						if(form->inSelectionMode) Copy(form);
+						break;
+					case 1:
+						if(form->inSelectionMode) Cut(form);
+						break;
+					case 2:
+						Paste(form);
+						break;
+					case 3:
+						Undo(form->urStack);
+						break;
+					case 4:
+						Redo(form->urStack);
+						break;
 				}
+				//printf("%d %d %d %d\n", form->selectLeftPos.r, form->selectLeftPos.c, form->selectRightPos.r, form->selectRightPos.c);
+				menu.selected = -1;
 			}else{
 				menu.activate = 0;
 			}

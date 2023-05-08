@@ -393,6 +393,7 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
 	static int isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
 
+	menuGetMouse(curForm, x, y, button, event);
 	switch(event){
 		case BUTTON_DOWN:
 			if(button == LEFT_BUTTON) {
