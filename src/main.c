@@ -15,7 +15,6 @@
 Editor editor;
 UndoRedo undoRedo;
 
-extern PosRC g_cursorPos;
 void Display(void);
 
 // To reduce lag, Display() are commented in each event handler
