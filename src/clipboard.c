@@ -85,6 +85,7 @@ void Cut(EditorForm *form){
     deleteString(form->passage, posl.r, posl.c+1, posr.r, posr.c);
     addTrace(form->urStack, DELE, posl.r, posl.c+1, posr.r, posr.c, dst);
     form->inSelectionMode = false;
+    form->caretPos = form->realCaretPos = posl;
     free(dst);
 }
 
