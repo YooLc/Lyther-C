@@ -20,32 +20,6 @@
 #ifndef ____ui_button_h______
 #define ____ui_button_h______
 
-#define KMOD_SHIFT 0x01
-#define KMOD_CTRL  0x02
-
-
-/* 鼠标和空间状态 */
-typedef struct {
-	double mousex;
-	double mousey;
-	int    mousedown;
-	int    clickedItem;// item that was clicked
-	int    actingMenu; // acting menu list 
-	int    kbdItem;    // item that takes keyboard
-	int    lastItem;   // item that had focus just before
-	int    keyPress;   // input key
-	int    charInput;  // input char
-	int    keyModifiers;  //  key modifier (shift, ctrl)
-} UIState;
-
-/* 菜单颜色 */
-typedef struct {
-	char frame[32];
-	char label[32];
-	char hotFrame[32];
-	char hotLabel[32];
-	int  fillflag;
-} MenuPalette;
 
 //===========================================================================
 //
