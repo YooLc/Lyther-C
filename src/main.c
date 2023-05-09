@@ -7,79 +7,93 @@
 #include "textarea.h"
 #include "codeparser.h"
 #include "undoredo.h"
+#include "menu.h"
+#include "clipboard.h"
 
 #define REFRESH_TIMER 1
 
-Passage passage;
+Editor editor;
 UndoRedo undoRedo;
 
-extern PosRC g_cursorPos;
 void Display(void);
 
+// To reduce lag, Display() are commented in each event handler
 void KeyboardEventProcess(int key, int event)
 {
+    editor.drawLock = true;
     uiGetKeyboard(key, event);
-    moveCursor(&passage, key, event);
-    Display();
+    handleKeyboardEvent(&editor, key, event);
+    editor.updated = true;
+    editor.drawLock = false;
+    // Display();
 }
 
 void CharEventProcess(char ch)
 {
+    editor.drawLock = true;
     uiGetChar(ch);
-    if (ch >= 32 && ch < 127) {
-        char tmpstr[MAX_LINE_SIZE] = "";
-        sprintf(tmpstr, "%c", ch);
-        addTrace(&undoRedo, ADD, g_cursorPos.r + 1, g_cursorPos.c + 1, g_cursorPos.r + 1, g_cursorPos.c + 1, tmpstr);
-        printf("Attempting to add %s at (%d, %d)\n", tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
-        addString(&passage, tmpstr, g_cursorPos.r + 1, g_cursorPos.c + 1);
-        g_cursorPos.c++;
-        printPassage(&passage);
-    }
+    handleInputEvent(&editor, ch);
+    editor.updated = true;
+    editor.drawLock = false;
     Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
 {
+    editor.drawLock = true;
     uiGetMouse(x, y, button, event);
-    Display();
+    handleMouseEvent(&editor, x, y, button, event);
+    editor.updated = true;
+    editor.drawLock = false;
+    // Display();
 }
 
 void TimerEventProcess(int timerID)
 {
-    if (timerID == REFRESH_TIMER)
+    if (timerID == REFRESH_TIMER) {
         Display();
+    }
 }
 
 void Main() 
 {
     SetWindowTitle("Light C code editor");
-	InitGraphics();
-	InitConsole(); // For debug use. 
-	InitStyle();
-	initPassage(&passage);
-	initUndoRedoList(&undoRedo, &passage);
-    SetFont("Consolas");
+    InitGraphics();
+    InitConsole(); // For debug use.
+    SetFont("Cascadia Code");
+    SetPointSize(22); // This fix werid offset when drawing text. Note that this value varies to different fonts
+    InitStyle();
+    InitGUI();
+    initEditor(&editor);
+    addCodeToEditor(&editor, NULL, "Unamed 1.c");
+    addCodeToEditor(&editor, NULL, "Unamed 2.c");
+//    initUndoRedoList(&undoRedo, &passage);
+    //initEditor(&editor);
+    
     // A simple test case
-	addString(&passage, "#include <stdio.h>\n", 1, 1);
-	addString(&passage, "void main() { //test comment\n", 2, 1);
-	addString(&passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-	addString(&passage, "}\n", 5, 1);
-	addString(&passage, "this great ", 3, 19);
-	addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
-	Undo(&undoRedo);
-	Redo(&undoRedo);
-    printPassage(&passage);
-	InitGUI();
-	Display();
-	startTimer(REFRESH_TIMER, 50);
-	registerKeyboardEvent(KeyboardEventProcess);
-	registerCharEvent(CharEventProcess);
-	registerMouseEvent(MouseEventProcess);
-	registerTimerEvent(TimerEventProcess);
+//    Passage* passage = editor.forms[1]->passage;
+//    addString(passage, "\n", 1, 1);
+//    addString(passage, "#include <stdio.h>\n", 1, 1);
+//    addString(passage, "void main() { //����ע��\n", 2, 1);
+//    addString(passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
+//    addString(passage, "}\n", 5, 1);
+//    addString(passage, "��� ", 3, 19);
+//    addString(passage, " ", 4, 1);
+//     addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
+//    Undo(&undoRedo);
+//    Redo(&undoRedo);
+//    printPassage(&passage);
+    initMenu();
+    startTimer(REFRESH_TIMER, 20);
+    registerCharEvent(CharEventProcess);
+    registerMouseEvent(MouseEventProcess);
+    registerTimerEvent(TimerEventProcess);
+    registerKeyboardEvent(KeyboardEventProcess);
 }
 
 void Display(void)
 {
     DisplayClear();
-    drawEditor(&passage, &undoRedo);
+    drawEditor(&editor);
+    displayMenu();
 }
