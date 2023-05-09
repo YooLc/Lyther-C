@@ -452,7 +452,7 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
     int row = (passage->passList).listLen;
     char fullLine[MAX_LINE_SIZE];
     
-    
+    SetPointSize(textPointSize);	//Restore the font size
     PosRC pos;
     pos.r = max(1, min(row, ceil((form->h - y) / textFontHeight)));
     getLine(passage, fullLine, pos.r);
