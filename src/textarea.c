@@ -177,49 +177,76 @@ static drawCharWithBackground(double x, double y, char* ch){
     DrawTextString(ch);
 }
 
+static int isPosLess(PosRC posx, PosRC posy){
+	if(posx.r == posy.r){
+		return posx.c < posy.c;
+	}
+	return posx.r < posy.r;
+}
+
+static PosRC matchCharForward(Passage *passage, int rows, int cols, char thisChar, char targetChar){
+	PosRC matchTarget = searchForwardByChar(passage, rows, cols, targetChar);
+	PosRC matchThis = searchForwardByChar(passage, rows, cols+1, thisChar);
+	int degree = 1, i = 0;
+	if(matchTarget.r == -1 || matchThis.r == -1) return matchTarget;
+	if(isPosLess(matchTarget, matchThis)) return matchTarget;
+	matchThis = searchForwardByChar(passage, matchThis.r, matchThis.c+1, thisChar);
+	while(isPosLess(matchThis, matchTarget) && matchThis.r != -1){
+		degree++;
+		matchThis = searchForwardByChar(passage, matchThis.r, matchThis.c+1, thisChar);
+		if(matchThis.r == -1) break;
+	}
+	for(i=0; i<degree; i++){
+		matchTarget = searchForwardByChar(passage, matchTarget.r, matchTarget.c+1, targetChar);
+		if(matchTarget.r == -1) break;
+	}
+	return matchTarget;
+}
+
+static PosRC matchCharBackward(Passage *passage, int rows, int cols, char thisChar, char targetChar){
+	PosRC matchTarget = searchBackwardByChar(passage, rows, cols, targetChar);
+	PosRC matchThis = searchBackwardByChar(passage, rows, cols-1, thisChar);
+	int degree = 1, i = 0;
+	if(matchTarget.r == -1 || matchThis.r == -1) return matchTarget;
+	if(!isPosLess(matchTarget, matchThis)) return matchTarget;
+	matchThis = searchBackwardByChar(passage, matchThis.r, matchThis.c-1, thisChar);
+	while(!isPosLess(matchThis, matchTarget) && matchThis.r != -1){
+		degree++;
+		matchThis = searchBackwardByChar(passage, matchThis.r, matchThis.c-1, thisChar);
+		if(matchThis.r == -1) break;
+	}
+	for(i=0; i<degree; i++){
+		matchTarget = searchBackwardByChar(passage, matchTarget.r, matchTarget.c-1, targetChar);
+		if(matchTarget.r == -1) break;
+	}
+	return matchTarget;
+}
+
 static void drawSymbolMatch(EditorForm *form){
     int offset = 0;
     double x1 = form->x + LINE_INDEX_WIDTH + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
     double x2 = form->x + LINE_INDEX_WIDTH, y2 = form->h;
     PosRC matchPos;
     Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
-    if(token->type == LEFT_PARENTHESES){
-        matchPos = searchForwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, ')');
-        x2 += (matchPos.c-1)*TextStringWidth("a");
+    
+    if(token->type < LEFT_PARENTHESES || token->type > RIGHT_BRACE) return;
+    
+    char *typeTable[10] = {"","","","","","","(",")","[","]","{","}"};
+    
+    if(token->type == LEFT_PARENTHESES || token->type == LEFT_BRACKETS || token->type == LEFT_BRACE){
+		matchPos = matchCharForward(form->passage, form->realCaretPos.r, form->realCaretPos.c, *typeTable[token->type], *typeTable[token->type+1]);
+		x2 += (matchPos.c-1)*TextStringWidth("a");
         y2 -= matchPos.r*textFontHeight;
-        drawCharWithBackground(x1, y1, "(");
-        drawCharWithBackground(x2, y2, ")");
-    }else if(token->type == RIGHT_PARENTHESES){
-        matchPos = searchBackwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '(');
-        x2 += (matchPos.c-1)*TextStringWidth("a");
+		drawCharWithBackground(x1, y1, typeTable[token->type]);
+        drawCharWithBackground(x2, y2, typeTable[token->type+1]);
+	}else{
+		matchPos = matchCharBackward(form->passage, form->realCaretPos.r, form->realCaretPos.c, *typeTable[token->type], *typeTable[token->type-1]);
+		x2 += (matchPos.c-1)*TextStringWidth("a");
         y2 -= matchPos.r*textFontHeight;
-        drawCharWithBackground(x1, y1, ")");
-        drawCharWithBackground(x2, y2, "(");
-    }else if(token->type == LEFT_BRACKETS){
-        matchPos = searchForwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, ']');
-        x2 += (matchPos.c-1)*TextStringWidth("a");
-        y2 -= matchPos.r*textFontHeight;
-        drawCharWithBackground(x1, y1, "[");
-        drawCharWithBackground(x2, y2, "]");
-    }else if(token->type == RIGHT_BRACKETS){
-        matchPos = searchBackwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '[');
-        x2 += (matchPos.c-1)*TextStringWidth("a");
-        y2 -= matchPos.r*textFontHeight;
-        drawCharWithBackground(x1, y1, "]");
-        drawCharWithBackground(x2, y2, "[");
-    }else if(token->type == LEFT_BRACE){
-        matchPos = searchForwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '}');
-        x2 += (matchPos.c-1)*TextStringWidth("a");
-        y2 -= matchPos.r*textFontHeight;
-        drawCharWithBackground(x1, y1, "{");
-        drawCharWithBackground(x2, y2, "}");
-    }else if(token->type == RIGHT_BRACE){
-        matchPos = searchBackwardByChar(form->passage, form->realCaretPos.r, form->realCaretPos.c, '{');
-        x2 += (matchPos.c-1)*TextStringWidth("a");
-        y2 -= matchPos.r*textFontHeight;
-        drawCharWithBackground(x1, y1, "}");
-        drawCharWithBackground(x2, y2, "{");
-    }
+        drawCharWithBackground(x1, y1, typeTable[token->type]);
+        drawCharWithBackground(x2, y2, typeTable[token->type-1]);
+	}
+
 }
 
 static void drawEditorMenu(Editor* editor) {
