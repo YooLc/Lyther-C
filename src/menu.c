@@ -4,6 +4,7 @@
 #include "clipboard.h"
 
 void initMenu(){
+	SetPointSize(15);
     menu.activate = 0;
     menu.entryMargin = 0.03;
     menu.entryHeight = GetFontHeight() + 2*menu.entryMargin + GetFontDescent();
@@ -39,6 +40,7 @@ void menuGetMouse(EditorForm *form, int x, int y, int button, int event){
                 menu.posy = y;
             }else if(button == LEFT_BUTTON && menu.selected != -1){
                 menu.activate = 0;
+                PosRC newPos;
                 switch(menu.selected){
                     case 0:
                         if(form->inSelectionMode) Copy(form);
@@ -50,10 +52,12 @@ void menuGetMouse(EditorForm *form, int x, int y, int button, int event){
                         Paste(form);
                         break;
                     case 3:
-                        Undo(form->urStack);
+                        newPos = Undo(form->urStack);
+                        if(newPos.r != -1) form->caretPos = form->realCaretPos = newPos;
                         break;
                     case 4:
-                        Redo(form->urStack);
+                        newPos = Redo(form->urStack);
+                        if(newPos.r != -1) form->caretPos = form->realCaretPos = newPos;
                         break;
                 }
                 //printf("%d %d %d %d\n", form->selectLeftPos.r, form->selectLeftPos.c, form->selectRightPos.r, form->selectRightPos.c);

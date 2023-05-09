@@ -5,9 +5,9 @@
 #include <string.h>
 
 PosRC Undo(UndoRedo *ur){
-    if(ur->undoRedoList.listLen == 0 || ur->nowNode == NULL) return;
+	PosRC posRC = {-1,-1};
+    if(ur->undoRedoList.listLen == 0 || ur->nowNode == NULL) return posRC;
     
-    PosRC posRC = {0,0};
     Trace *trace = ur->nowNode->datptr;
     printf("UNDO STRING %s\n", trace->content);
     int rows, cols, rowt, colt;
@@ -30,9 +30,9 @@ PosRC Undo(UndoRedo *ur){
 }
 
 PosRC Redo(UndoRedo *ur){
-    if(ur->undoRedoList.listLen == 0) return;
+	PosRC posRC = {-1,-1};
+    if(ur->undoRedoList.listLen == 0) return posRC;
     
-    PosRC posRC = {0,0};
     if(ur->nowNode == NULL){    //If it is before the head of the list
         ur->nowNode = ur->undoRedoList.head;
     }else{

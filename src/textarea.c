@@ -231,7 +231,7 @@ static void drawSymbolMatch(EditorForm *form){
     
     if(token->type < LEFT_PARENTHESES || token->type > RIGHT_BRACE) return;
     
-    char *typeTable[10] = {"","","","","","","(",")","[","]","{","}"};
+    char *typeTable[15] = {"","","","","","","(",")","[","]","{","}"};
     
     if(token->type == LEFT_PARENTHESES || token->type == LEFT_BRACKETS || token->type == LEFT_BRACE){
 		matchPos = matchCharForward(form->passage, form->realCaretPos.r, form->realCaretPos.c, *typeTable[token->type], *typeTable[token->type+1]);
@@ -295,9 +295,17 @@ static void drawEditorMenu(Editor* editor) {
     wlist = TextStringWidth(menuListEdit[1]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListEdit, sizeof(menuListEdit) / sizeof(menuListEdit[0]));
     EditorForm* curForm = editor->forms[editor->curSelect];
+    
+    PosRC newPos;
     switch(selection) {
-        case 1: curForm->caretPos = Undo(curForm->urStack); break;
-        case 2: curForm->caretPos = Redo(curForm->urStack); break;
+        case 1: 
+			newPos = Undo(curForm->urStack);
+			if(newPos.r != -1) curForm->caretPos = curForm->realCaretPos = newPos;
+			break;
+        case 2: 
+			newPos = Redo(curForm->urStack);
+			if(newPos.r != -1) curForm->caretPos = curForm->realCaretPos = newPos;
+			break;
         case 3: if(curForm->inSelectionMode) Copy(curForm); break;
         case 4: if(curForm->inSelectionMode) Cut(curForm); break;
         case 5: Paste(curForm); break;
