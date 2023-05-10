@@ -475,13 +475,27 @@ static void moveCaret(EditorForm *form, CaretAction action, char* curLine, char*
 
 static deleteLastChar(EditorForm* form) {
     PosRC curPos = form->realCaretPos;
+    char tmpLine[MAX_LINE_SIZE], target[5];
+    getLine(form->passage, tmpLine, curPos.r);
+
     if (curPos.c > 0) {
-        deleteString(form->passage, curPos.r, curPos.c, curPos.r, curPos.c);
+    	if(tmpLine[curPos.c-1] < 0){
+    		strncpy(target, tmpLine+curPos.c-2, 2);
+    		target[2] = '\0';
+			deleteString(form->passage, curPos.r, curPos.c-1, curPos.r, curPos.c);
+			addTrace(form->urStack, DELE, curPos.r, curPos.c-1, curPos.r, curPos.c, target);
+		}else{
+			target[0] = tmpLine[curPos.c-1];
+			target[1] = '\0';
+			deleteString(form->passage, curPos.r, curPos.c, curPos.r, curPos.c);
+			addTrace(form->urStack, DELE, curPos.r, curPos.c, curPos.r, curPos.c, target);
+		}
     }
     else if (curPos.r > 1) {
         Line *preLine = kthNode(&(form->passage->passList), curPos.r - 1)->datptr;
+    	addTrace(form->urStack, DELE, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1, "\n");
         deleteString(form->passage, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1);
-    } 
+	} 
 }
 
 static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
@@ -556,6 +570,15 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
         case MOUSEMOVE:
             if(isLeftButtonDown){
                 curForm->selectRightPos = pixelToPosRC(curForm, x, y);
+                if( !(
+                    curForm->selectRightPos.r == curForm->selectLeftPos.r\
+                    &&
+                    curForm->selectRightPos.c == curForm->selectLeftPos.c
+                )){
+                    curForm->inSelectionMode = true;
+                }else{
+                    curForm->inSelectionMode = false;
+                }
                 drawEditorSelection(editor->forms[editor->curSelect]);
             }
             break;
