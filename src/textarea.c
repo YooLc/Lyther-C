@@ -223,6 +223,8 @@ static PosRC matchCharBackward(Passage *passage, int rows, int cols, char thisCh
 }
 
 static void drawSymbolMatch(EditorForm *form){
+    // We just match brackets before the caret
+    if (form->realCaretPos.c == 0) return;
     int offset = 0;
     double x1 = form->x + LINE_INDEX_WIDTH + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
     double x2 = form->x + LINE_INDEX_WIDTH, y2 = form->h;
@@ -235,12 +237,14 @@ static void drawSymbolMatch(EditorForm *form){
     
     if(token->type == LEFT_PARENTHESES || token->type == LEFT_BRACKETS || token->type == LEFT_BRACE){
 		matchPos = matchCharForward(form->passage, form->realCaretPos.r, form->realCaretPos.c, *typeTable[token->type], *typeTable[token->type+1]);
+		// printf("matchPos F %d %d\n", matchPos.r, matchPos.c);
 		x2 += (matchPos.c-1)*TextStringWidth("a");
         y2 -= matchPos.r*textFontHeight;
 		drawCharWithBackground(x1, y1, typeTable[token->type]);
         drawCharWithBackground(x2, y2, typeTable[token->type+1]);
 	}else{
 		matchPos = matchCharBackward(form->passage, form->realCaretPos.r, form->realCaretPos.c, *typeTable[token->type], *typeTable[token->type-1]);
+		// printf("matchPos B %d %d\n", matchPos.r, matchPos.c);
 		x2 += (matchPos.c-1)*TextStringWidth("a");
         y2 -= matchPos.r*textFontHeight;
         drawCharWithBackground(x1, y1, typeTable[token->type]);
@@ -350,7 +354,7 @@ static void drawEditorForm(EditorForm *form) {
             drawRectangle(form->x, curLinePosY, LINE_INDEX_WIDTH, textFontHeight, 1);
             sprintf(lineIndex, "%3d", curLineIndex);
             SetPenColor(g_palette[g_selection].lineIndexForeground);
-            SetStyle(Bold);
+            if (curLineIndex == form->realCaretPos.r) SetStyle(Bold);
             MovePen(form->x + LINE_INDEX_WIDTH - TextStringWidth(lineIndex) - .1, curLinePosY + GetFontDescent());
             DrawTextString(lineIndex);
         
@@ -570,6 +574,7 @@ void handleInputEvent(Editor* editor, char ch) {
     EditorForm *form = editor->forms[editor->curSelect];
     PosRC curPos = form->realCaretPos;
     static char lastCn = 0;//track the last Chinese character, if is not, this var is 0
+    static bool completed = false;
     char tmpstr[MAX_LINE_SIZE] = "";
     
     if(ch < 0){
@@ -583,12 +588,48 @@ void handleInputEvent(Editor* editor, char ch) {
             lastCn = 0;
         }
     }
-    if (ch >= 32 && ch < 127) {
+    else if (ch >= 32 && ch < 127) {
+        switch(ch) {
+            case '}': case ']': case ')':
+            case '>': case '\"': case '\'':
+                if (completed) {
+                    completed = false;
+                    return;
+                }
+        }
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
         LOG("Attempting to add %s\n", tmpstr);
         form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
-        printPassage(form->passage);
+        curPos = form->realCaretPos;
+        
+        // Easy version of auto complete
+        char ac = 0;
+        switch(ch) {
+            case '{': ac = '}'; break;
+            case '[': ac = ']'; break;
+            case '(': ac = ')'; break;
+            case '<': ac = '>'; break;
+            case '\"': ac = '\"'; break;
+            case '\'': ac = '\''; break;
+        }
+        if (ac) {
+            sprintf(tmpstr, "%c", ac);
+            addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
+            LOG("Attempting to complete by adding %s\n", tmpstr);
+            addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
+            completed = true;
+        } else completed = false;
+    } else if (ch == '\t') {
+        // Due to the calculation in addString(), we must use a loop to finish this
+        int i;
+        for (i = 0; i < INDENT_LENGTH; i++) {
+            sprintf(tmpstr, " ");
+            addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
+            LOG("Attempting to add [%s]\n", tmpstr);
+            form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
+            curPos = form->realCaretPos;
+        }
     }
     printPassage(form->passage);
 }
