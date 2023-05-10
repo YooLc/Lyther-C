@@ -17,7 +17,8 @@
 static double winWidth, winHeight;
 
 static int textPointSize, uiPointSize;
-static double textFontHeight, uiFontHeight;
+static int isControlDown = 0;
+static double textFontHeight, uiFontHeight, indexLength;
 char g_messageString[250];
 
 static int g_bracketDegree;
@@ -28,6 +29,8 @@ extern int g_selection;
 void initEditor(Editor* editor) {
     textPointSize = 22;
     uiPointSize = 15;
+    indexLength = 0.5;
+    
     winWidth = GetWindowWidth();
     winHeight = GetWindowHeight();
     
@@ -97,7 +100,16 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
 }
 
 void drawEditor(Editor* editor) {
+    // Setup essential constants
+    winWidth = GetWindowWidth();
+    winHeight = GetWindowHeight();
+    
+    SetPointSize(uiPointSize);
+    uiFontHeight = GetFontHeight();
     SetPointSize(textPointSize);
+    textFontHeight = GetFontHeight();
+    indexLength = 0.5 + (textPointSize - 22) / 50.0;
+    
     // Reversed drawing to avoid overlaping 
     int idx;
     for (idx = 1; idx <= editor->fileCount; idx++) {
@@ -137,7 +149,7 @@ static void drawEditorSelection(EditorForm* form){
     char tmpLine[MAX_LINE_SIZE], targetLine[MAX_LINE_SIZE];
 
     while(nowRol <= rRC.r){
-        double x = form->x + LINE_INDEX_WIDTH, y = form->h - textFontHeight * nowRol, w = form->w, h = textFontHeight;
+        double x = form->x + indexLength, y = form->h - textFontHeight * nowRol, w = form->w, h = textFontHeight;
         //Draw background
         SetPenColor("SelectedColor");
         if(lRC.r == nowRol && rRC.r == nowRol){
@@ -226,8 +238,8 @@ static void drawSymbolMatch(EditorForm *form){
     // We just match brackets before the caret
     if (form->realCaretPos.c == 0) return;
     int offset = 0;
-    double x1 = form->x + LINE_INDEX_WIDTH + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
-    double x2 = form->x + LINE_INDEX_WIDTH, y2 = form->h;
+    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
+    double x2 = form->x + indexLength, y2 = form->h;
     PosRC matchPos;
     Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
     
@@ -351,15 +363,15 @@ static void drawEditorForm(EditorForm *form) {
          if (curLinePosY - textFontHeight <= winHeight && curLinePosY + textFontHeight >= 0) {
              // Draw line index
             SetPenColor(g_palette[g_selection].lineIndexBackground);
-            drawRectangle(form->x, curLinePosY, LINE_INDEX_WIDTH, textFontHeight, 1);
+            drawRectangle(form->x, curLinePosY, indexLength, textFontHeight, 1);
             sprintf(lineIndex, "%3d", curLineIndex);
             SetPenColor(g_palette[g_selection].lineIndexForeground);
             if (curLineIndex == form->realCaretPos.r) SetStyle(Bold);
-            MovePen(form->x + LINE_INDEX_WIDTH - TextStringWidth(lineIndex) - .1, curLinePosY + GetFontDescent());
+            MovePen(form->x + indexLength - TextStringWidth(lineIndex) - .1, curLinePosY + GetFontDescent());
             DrawTextString(lineIndex);
         
             // Traverse line (list of tokens)
-            drawCodeLine(form, curLine->datptr, form->x + LINE_INDEX_WIDTH, curLinePosY, form->w, textFontHeight);
+            drawCodeLine(form, curLine->datptr, form->x + indexLength, curLinePosY, form->w, textFontHeight);
         }
         curLine = curLine->next;
         curLinePosY -= textFontHeight;
@@ -423,7 +435,7 @@ static void drawCaret(EditorForm *form)
          getLine(form->passage, fullLine, form->realCaretPos.r);
          fullLine[form->realCaretPos.c] = '\0';
         SetPenColor(g_palette[g_selection].caret);
-        x = form->x + LINE_INDEX_WIDTH + TextStringWidth(fullLine) - indent;
+        x = form->x + indexLength + TextStringWidth(fullLine) - indent;
         y = form->h - textFontHeight * form->realCaretPos.r;
         MovePen(x, y + GetFontDescent());
         DrawTextString("|");
@@ -519,7 +531,7 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
         fullLine[col--] = '\0';
     
     while (col >= -1) {
-        dist = fabs(form->x + LINE_INDEX_WIDTH + TextStringWidth(fullLine) - x);
+        dist = fabs(form->x + indexLength + TextStringWidth(fullLine) - x);
         if (dist < minDistance) {
             pos.c = col;
             minDistance = dist;
@@ -583,10 +595,12 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
             }
             break;
         case ROLL_DOWN:
-            curForm->h += SCROLL_DIST;
+            if (!isControlDown) curForm->h += SCROLL_DIST;
+            else textPointSize -= 2;
             break;
         case ROLL_UP:
-            curForm->h -= SCROLL_DIST;
+            if (!isControlDown) curForm->h -= SCROLL_DIST;
+            else textPointSize += 2;
             break;
     }
 
@@ -663,10 +677,7 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
     EditorForm *curForm = editor->forms[editor->curSelect];
     PosRC curPos = curForm->realCaretPos;
     char curLine[MAX_LINE_SIZE], preLine[MAX_LINE_SIZE];
-    
-    //Some status variable
-    static isControlDown = 0;
-    
+
     // Get current and previous line, then trim all '\n'
     getLine(curForm->passage, curLine, curPos.r);
     int idx = strlen(curLine) - 1;

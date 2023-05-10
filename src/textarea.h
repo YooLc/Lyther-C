@@ -9,7 +9,6 @@
 #include "style.h"
 
 #define MAX_FILE_COUNT 20
-#define LINE_INDEX_WIDTH .5
 #define INDENT_LENGTH 4
 #define SCROLL_DIST (textFontHeight * 3)
 
