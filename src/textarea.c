@@ -47,8 +47,8 @@ void initEditor(Editor* editor) {
     editor->menuHeight = editor->barHeight = uiFontHeight * 1.5;
     
     // Test properties
-    editor->drawLock = false;
-    editor->updated = true;
+    //editor->drawLock = false;
+    //editor->updated = true;
 }
 
 static char* getFileName(char* filePath) {

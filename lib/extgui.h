@@ -8,4 +8,5 @@
 
 int selectBar(int id, double x, double y, double w, double h, char *labels[], int count, int curSelect);
 
+int vertivalScrollBar(int id, double x, double y, double w, double h, int s, int t, int is, int it);
 #endif
