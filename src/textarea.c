@@ -73,6 +73,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     editor->forms[editor->fileCount] = form;
     
     form->style = 0;
+    form->startLine = 1;
     form->visible = true;
     form->inSelectionMode = false;
     form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 1;
@@ -127,16 +128,15 @@ void drawEditor(Editor* editor) {
 
 static void drawEditorSelection(EditorForm* form){
 
+    // If selected range is empty or not in selection mode
     if(form->selectLeftPos.r == form->selectRightPos.r && form->selectLeftPos.c == form->selectRightPos.c) return;
     if(form->inSelectionMode == false) return;
     
     PosRC lRC = form->selectLeftPos, rRC = form->selectRightPos;
     
     if(form->selectLeftPos.r > form->selectRightPos.r ||
-                
         (form->selectLeftPos.r == form->selectRightPos.r && 
-        form->selectLeftPos.c > form->selectRightPos.c)
-                    
+        form->selectLeftPos.c > form->selectRightPos.c)            
     ){
         PosRC tmpRC = lRC;    
         lRC = rRC;
@@ -149,7 +149,7 @@ static void drawEditorSelection(EditorForm* form){
     char tmpLine[MAX_LINE_SIZE], targetLine[MAX_LINE_SIZE];
 
     while(nowRol <= rRC.r){
-        double x = form->x + indexLength, y = form->h - textFontHeight * nowRol, w = form->w, h = textFontHeight;
+        double x = form->x + indexLength, y = form->h - textFontHeight * (nowRol - form->startLine + 1), w = form->w, h = textFontHeight;
         //Draw background
         SetPenColor("SelectedColor");
         if(lRC.r == nowRol && rRC.r == nowRol){
@@ -360,21 +360,21 @@ static void drawEditorForm(EditorForm *form) {
      Listptr curLine = kthNode(&(form->passage->passList), 1);
      while(curLine != NULL) {
          // Draw if and only if it's visible
-         if (curLinePosY - textFontHeight <= winHeight && curLinePosY + textFontHeight >= 0) {
+         if (curLineIndex >= form->startLine && curLinePosY + textFontHeight >= 0) {
              // Draw line index
             SetPenColor(g_palette[g_selection].lineIndexBackground);
             drawRectangle(form->x, curLinePosY, indexLength, textFontHeight, 1);
             sprintf(lineIndex, "%3d", curLineIndex);
             SetPenColor(g_palette[g_selection].lineIndexForeground);
             if (curLineIndex == form->realCaretPos.r) SetStyle(Bold);
-            MovePen(form->x + indexLength - TextStringWidth(lineIndex) - .1, curLinePosY + GetFontDescent());
+            MovePen(form->x + indexLength - TextStringWidth(lineIndex) - 0.1, curLinePosY + GetFontDescent());
             DrawTextString(lineIndex);
         
             // Traverse line (list of tokens)
             drawCodeLine(form, curLine->datptr, form->x + indexLength, curLinePosY, form->w, textFontHeight);
+            curLinePosY -= textFontHeight;
         }
         curLine = curLine->next;
-        curLinePosY -= textFontHeight;
         curLineIndex++;
         form->renderPos.r++;
         form->renderPos.c = 0;
@@ -426,17 +426,28 @@ void drawMessageBar(){
     SetPointSize(22);
 }
 
+static bool isCaretVisible(EditorForm *form)
+{
+    PosRC pos = form->realCaretPos;
+    if (pos.r < form->startLine || pos.r > form->startLine + ceil(form->h / textFontHeight))
+        return false;
+    return true;
+} 
+ 
 static void drawCaret(EditorForm *form)
 {
+    // Only draw Caret when it's visible
+    if (!isCaretVisible(form)) return;
+    
     int idx;
     double x, y, indent = TextStringWidth("|") / 1.95;
     char fullLine[MAX_LINE_SIZE] = "";
     if ((clock() >> 8) & 1) {
-         getLine(form->passage, fullLine, form->realCaretPos.r);
-         fullLine[form->realCaretPos.c] = '\0';
+        getLine(form->passage, fullLine, form->realCaretPos.r);
+        fullLine[form->realCaretPos.c] = '\0';
         SetPenColor(g_palette[g_selection].caret);
         x = form->x + indexLength + TextStringWidth(fullLine) - indent;
-        y = form->h - textFontHeight * form->realCaretPos.r;
+        y = form->h - (form->realCaretPos.r - form->startLine + 1) * textFontHeight;
         MovePen(x, y + GetFontDescent());
         DrawTextString("|");
     }
@@ -518,8 +529,9 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
     char fullLine[MAX_LINE_SIZE];
     
     SetPointSize(textPointSize);	//Restore the font size
+    textFontHeight = GetFontHeight();
     PosRC pos;
-    pos.r = max(1, min(row, ceil((form->h - y) / textFontHeight)));
+    pos.r = max(1, form->startLine + (form->h - y) / textFontHeight);
     getLine(passage, fullLine, pos.r);
     pos.c = strlen(fullLine) - 1;
 
@@ -595,11 +607,13 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
             }
             break;
         case ROLL_DOWN:
-            if (!isControlDown) curForm->h += SCROLL_DIST;
+            if (!isControlDown) 
+                curForm->startLine = min(curForm->passage->passList.listLen, curForm->startLine + SCROLL_DIST);
             else textPointSize -= 2;
             break;
         case ROLL_UP:
-            if (!isControlDown) curForm->h -= SCROLL_DIST;
+            if (!isControlDown) 
+                curForm->startLine = max(1, curForm->startLine - SCROLL_DIST);
             else textPointSize += 2;
             break;
     }

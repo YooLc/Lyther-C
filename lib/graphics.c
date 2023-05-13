@@ -2003,3 +2003,4 @@ double ScaleYInches(int y)/*y coordinate from pixels to inches*/
 {
  	  return GetWindowHeight()-(double)y/GetYResolution();
 } 	   
+

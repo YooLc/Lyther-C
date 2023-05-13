@@ -10,7 +10,7 @@
 
 #define MAX_FILE_COUNT 20
 #define INDENT_LENGTH 4
-#define SCROLL_DIST (textFontHeight * 3)
+#define SCROLL_DIST 3
 
 /*
     Struct: Editor Form
@@ -18,7 +18,7 @@
     (x, y) denoted left-bottom point, while (x + w, y + h) is right-top point
 */
 typedef struct {
-    int style;
+    int style, startLine;
     bool visible, inSelectionMode;
     double x, y, w, h;
     PosRC caretPos, realCaretPos, renderPos, selectLeftPos, selectRightPos;
