@@ -20,32 +20,23 @@ void Display(void);
 // To reduce lag, Display() are commented in each event handler
 void KeyboardEventProcess(int key, int event)
 {
-    editor.drawLock = true;
     uiGetKeyboard(key, event);
     handleKeyboardEvent(&editor, key, event);
-    editor.updated = true;
-    editor.drawLock = false;
-    // Display();
+    //Display();
 }
 
 void CharEventProcess(char ch)
 {
-    editor.drawLock = true;
     uiGetChar(ch);
     handleInputEvent(&editor, ch);
-    editor.updated = true;
-    editor.drawLock = false;
     Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
 {
-    editor.drawLock = true;
     uiGetMouse(x, y, button, event);
     handleMouseEvent(&editor, x, y, button, event);
-    //editor.updated = true;
-    //editor.drawLock = false;
-    // Display();
+    if (event != MOUSEMOVE) Display();
 }
 
 void TimerEventProcess(int timerID)
@@ -84,7 +75,7 @@ void Main()
 //    Redo(&undoRedo);
 //    printPassage(&passage);
     initMenu();
-    startTimer(REFRESH_TIMER, 10);
+    startTimer(REFRESH_TIMER, 20);
     registerCharEvent(CharEventProcess);
     registerMouseEvent(MouseEventProcess);
     registerTimerEvent(TimerEventProcess);

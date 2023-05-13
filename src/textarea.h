@@ -38,7 +38,6 @@ typedef struct {
 typedef struct {
     int fileCount, curSelect;
     double menuHeight, barHeight;
-    bool drawLock, updated;
     char *filePath[MAX_FILE_COUNT], *fileName[MAX_FILE_COUNT];
     EditorForm *forms[MAX_FILE_COUNT];
 } Editor;
