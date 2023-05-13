@@ -10,6 +10,7 @@
 #include "graphics.h"
 #include "extgraph.h"
 #include "imgui.h"
+#include "extgui.h" 
 #include "undoredo.h"
 
 #define NEW(T) (T*)malloc(sizeof(T))
@@ -357,14 +358,15 @@ static void drawEditorForm(EditorForm *form) {
     form->renderPos.c = 0;
     
     // Traverse passage (list of lines)
-     Listptr curLine = kthNode(&(form->passage->passList), 1);
-     while(curLine != NULL) {
-         // Draw if and only if it's visible
-         if (curLineIndex >= form->startLine && curLinePosY + textFontHeight >= 0) {
-             // Draw line index
+    Listptr curLine = kthNode(&(form->passage->passList), 1);
+    while(curLine != NULL) {
+        // Draw if and only if it's visible
+        if (curLineIndex >= form->startLine && curLinePosY + textFontHeight >= 0) {
+            // Draw line index - background 
             SetPenColor(g_palette[g_selection].lineIndexBackground);
             drawRectangle(form->x, curLinePosY, indexLength, textFontHeight, 1);
             sprintf(lineIndex, "%3d", curLineIndex);
+            // Draw line index - text
             SetPenColor(g_palette[g_selection].lineIndexForeground);
             if (curLineIndex == form->realCaretPos.r) SetStyle(Bold);
             MovePen(form->x + indexLength - TextStringWidth(lineIndex) - 0.1, curLinePosY + GetFontDescent());
@@ -373,13 +375,16 @@ static void drawEditorForm(EditorForm *form) {
             // Traverse line (list of tokens)
             drawCodeLine(form, curLine->datptr, form->x + indexLength, curLinePosY, form->w, textFontHeight);
             curLinePosY -= textFontHeight;
+            
         }
         curLine = curLine->next;
         curLineIndex++;
         form->renderPos.r++;
         form->renderPos.c = 0;
-     }
-     // printf("%d %d", g_cursorPos.r, g_cursorPos.c);
+    }
+    int s = 1, t = form->passage->passList.listLen;
+    int is = form->startLine, it = min(t, form->startLine + form->h / textFontHeight);
+    form->startLine = vertivalScrollBar(GenUIID(0), form->x, form->y, form->w, form->h, s, t, is, it);
     return;
 }
 
@@ -526,15 +531,15 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
     double y = ScaleYInches(py);
     Passage *passage = form->passage;
     int row = (passage->passList).listLen;
-    char fullLine[MAX_LINE_SIZE];
     
+    char fullLine[MAX_LINE_SIZE];
     SetPointSize(textPointSize);	//Restore the font size
     textFontHeight = GetFontHeight();
     PosRC pos;
     pos.r = max(1, form->startLine + (form->h - y) / textFontHeight);
+    pos.r = min(pos.r, form->passage->passList.listLen);
     getLine(passage, fullLine, pos.r);
     pos.c = strlen(fullLine) - 1;
-
     double minDistance = winWidth, dist;
     int col = pos.c;
     
@@ -563,6 +568,8 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
     static int isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
 
+    if (ScaleXInches(x) >= curForm->x + curForm->w - GUTTER_WIDTH) return;
+    
     menuGetMouse(curForm, x, y, button, event);
     switch(event){
         case BUTTON_DOWN:
@@ -607,14 +614,10 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
             }
             break;
         case ROLL_DOWN:
-            if (!isControlDown) 
-                curForm->startLine = min(curForm->passage->passList.listLen, curForm->startLine + SCROLL_DIST);
-            else textPointSize -= 2;
+            if (isControlDown) textPointSize -= 2;
             break;
         case ROLL_UP:
-            if (!isControlDown) 
-                curForm->startLine = max(1, curForm->startLine - SCROLL_DIST);
-            else textPointSize += 2;
+            if (isControlDown) textPointSize += 2;
             break;
     }
 

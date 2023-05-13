@@ -43,8 +43,8 @@ void MouseEventProcess(int x, int y, int button, int event)
     editor.drawLock = true;
     uiGetMouse(x, y, button, event);
     handleMouseEvent(&editor, x, y, button, event);
-    editor.updated = true;
-    editor.drawLock = false;
+    //editor.updated = true;
+    //editor.drawLock = false;
     // Display();
 }
 
@@ -84,7 +84,7 @@ void Main()
 //    Redo(&undoRedo);
 //    printPassage(&passage);
     initMenu();
-    startTimer(REFRESH_TIMER, 20);
+    startTimer(REFRESH_TIMER, 10);
     registerCharEvent(CharEventProcess);
     registerMouseEvent(MouseEventProcess);
     registerTimerEvent(TimerEventProcess);

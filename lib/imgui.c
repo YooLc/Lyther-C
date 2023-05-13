@@ -178,9 +178,9 @@ void InitGUI()
 /* 调用该函数,得到鼠标的状态 */
 void uiGetMouse(int x, int y, int button, int event)
 {
-	 gs_UIState.mousex = ScaleXInches(x);/*pixels --> inches*/
-	 gs_UIState.mousey = ScaleYInches(y);/*pixels --> inches*/
-
+    gs_UIState.mousex = ScaleXInches(x);/*pixels --> inches*/
+	gs_UIState.mousey = ScaleYInches(y);/*pixels --> inches*/
+	
 	 switch (event) {
 	 case BUTTON_DOWN:
 		 gs_UIState.mousedown = 1;
@@ -188,6 +188,19 @@ void uiGetMouse(int x, int y, int button, int event)
 	 case BUTTON_UP:
 		 gs_UIState.mousedown = 0;
 		 break;
+	 case ROLL_DOWN:
+	     gs_UIState.mouserolldown = 1;
+	     break;
+     case ROLL_UP:
+         gs_UIState.mouserollup = 1;
+         break;
+     case MOUSEMOVE:
+         gs_UIState.mousedx = gs_UIState.mousex - gs_UIState.omousex;
+	     gs_UIState.mousedy = gs_UIState.mousey - gs_UIState.omousey;
+	     
+	     gs_UIState.omousex = gs_UIState.mousex;
+	     gs_UIState.omousey = gs_UIState.mousey;
+	     break;
 	 }
 }
 
