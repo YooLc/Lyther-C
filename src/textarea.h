@@ -20,7 +20,7 @@
 typedef struct {
     int style, startLine;
     bool visible, inSelectionMode;
-    double x, y, w, h;
+    double x, y, w, h, viewProgress;
     PosRC caretPos, realCaretPos, renderPos, selectLeftPos, selectRightPos;
     UndoRedo *urStack;
     Passage *passage;

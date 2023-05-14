@@ -195,8 +195,8 @@ void uiGetMouse(int x, int y, int button, int event)
          gs_UIState.mouserollup = 1;
          break;
      case MOUSEMOVE:
-         gs_UIState.mousedx = gs_UIState.mousex - gs_UIState.omousex;
-	     gs_UIState.mousedy = gs_UIState.mousey - gs_UIState.omousey;
+         gs_UIState.mousedx += gs_UIState.mousex - gs_UIState.omousex;
+	     gs_UIState.mousedy += gs_UIState.mousey - gs_UIState.omousey;
 	     
 	     gs_UIState.omousex = gs_UIState.mousex;
 	     gs_UIState.omousey = gs_UIState.mousey;

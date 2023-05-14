@@ -26,6 +26,7 @@ static int g_bracketDegree;
 
 extern Palette g_palette[];
 extern int g_selection;
+extern UIState gs_UIState;
 
 void initEditor(Editor* editor) {
     textPointSize = 22;
@@ -47,8 +48,8 @@ void initEditor(Editor* editor) {
     editor->menuHeight = editor->barHeight = uiFontHeight * 1.5;
     
     // Test properties
-    editor->drawLock = false;
-    editor->updated = true;
+//    editor->drawLock = false;
+//    editor->updated = true;
 }
 
 static char* getFileName(char* filePath) {
@@ -82,6 +83,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     form->x = form->y = 0;
     form->w = GetWindowWidth();
     form->h = GetWindowHeight() - editor->menuHeight - editor->barHeight;
+    form->viewProgress = 0;
     form->selectLeftPos.r = form->selectLeftPos.c = form->selectRightPos.r = form->selectRightPos.c = 0;
     form->passage = NEW(Passage);
     initPassage(form->passage);
@@ -114,13 +116,22 @@ void drawEditor(Editor* editor) {
     
     // Reversed drawing to avoid overlaping 
     int idx;
+    EditorForm *form;
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
-        drawEditorForm(editor->forms[idx]);
-        drawEditorSelection(editor->forms[idx]);
-        drawSymbolMatch(editor->forms[idx]);
-        drawCaret(editor->forms[idx]);
-        //drawMessageBar();
+        form = editor->forms[idx];
+        drawEditorForm(form);
+        drawEditorSelection(form);
+        drawSymbolMatch(form);
+        drawCaret(form);
+        
+        // If it needs a scroll bar
+        double scale = form->h / textFontHeight / (form->passage->passList.listLen ? form->passage->passList.listLen : 1);
+        if (scale < 1) {
+            form->viewProgress = vertivalScrollBar(GenUIID(idx), form->x, form->y, form->w, form->h, scale, form->viewProgress);
+            form->startLine = ceil(form->viewProgress * form->passage->passList.listLen);
+            form->startLine = max(1, form->startLine);
+        }
     }
     SetPointSize(uiPointSize);
     drawEditorBar(editor);
@@ -382,9 +393,6 @@ static void drawEditorForm(EditorForm *form) {
         form->renderPos.r++;
         form->renderPos.c = 0;
     }
-    int s = 1, t = form->passage->passList.listLen;
-    int is = form->startLine, it = min(t, form->startLine + form->h / textFontHeight);
-    form->startLine = vertivalScrollBar(GenUIID(0), form->x, form->y, form->w, form->h, s, t, is, it);
     return;
 }
 
@@ -564,7 +572,7 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
 } 
 
 void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
-    
+    if (gs_UIState.clickedItem) return;
     static int isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
 
