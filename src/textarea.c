@@ -129,7 +129,7 @@ void drawEditor(Editor* editor) {
         double scale = form->h / textFontHeight / (form->passage->passList.listLen ? form->passage->passList.listLen : 1);
         if (scale < 1) {
             form->viewProgress = vertivalScrollBar(GenUIID(idx), form->x, form->y, form->w, form->h, scale, form->viewProgress);
-            form->startLine = ceil(form->viewProgress * form->passage->passList.listLen);
+            form->startLine = ceil(form->viewProgress * form->passage->passList.listLen) + 1;
             form->startLine = max(1, form->startLine);
         }
     }
