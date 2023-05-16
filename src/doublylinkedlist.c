@@ -56,6 +56,21 @@ Listptr kthNode(LinkedList* list, int index) {
     return nowptr;
 }
 
+int getNodeIndex(LinkedList* list, Listptr node){
+	if(list->listLen == 0) return -1;
+	
+	int index = 1;
+	Listptr nowptr = list->head;
+	
+	while(nowptr != NULL){
+		if(nowptr == node) return index;
+		index++;
+		nowptr = nowptr->next;
+	}
+	
+	return -1;
+}
+
 void modifyNode(Listptr node, void* datptr) {
     node->datptr = datptr;
 }

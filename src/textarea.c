@@ -578,8 +578,8 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
     EditorForm* curForm = editor->forms[editor->curSelect];
 
     if (ScaleXInches(x) >= curForm->x + curForm->w - GUTTER_WIDTH) return;
-    if (ScaleXInches(y) >= curForm->y - editor->menuHeight - editor->barHeight) return;
-    
+    if (ScaleYInches(y) >= winHeight - editor->menuHeight - editor->barHeight) return;
+
     menuGetMouse(curForm, x, y, button, event);
     switch(event){
         case BUTTON_DOWN:

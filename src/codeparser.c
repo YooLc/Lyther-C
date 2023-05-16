@@ -298,21 +298,52 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
         return posRC;
     }
 
-    int offset = 0;
-    Token* token = getPos(passage, row, col, &offset)->datptr;
+    int offset = 0, nodeIndex = 0;
+    Line *line = kthNode(&(passage->passList), row)->datptr;
+    Token *token = getPos(passage, row, col, &offset)->datptr;
+    Token *nextToken = NEW(Token);
     
-    char tmpstr[MAX_WORD_SIZE] = "";
-    // tmpstr = orginal(before offset) + str + original(after offset)
-    strncpy(tmpstr, token->content, offset);
+    nodeIndex = getNodeIndex(&(line->lineList), getPos(passage, row, col, &offset));
+    printf("OFFSET = %d\n, NODEIDEX = %d CONTENT = %s\n", offset, nodeIndex,token->content);
+    
+    strcpy(nextToken->content, token->content + offset);
+    nextToken->length = strlen(nextToken->content);
+    
+    if(offset == 0){
+		deleteNode(&(line->lineList), nodeIndex);
+    	nodeIndex--;
+	}else{
+		token->content[offset] = '\0';
+		token->length = strlen(token->content);
+	}
+    
+    while(strlen(str) > MAX_WORD_SIZE){
+		Token *newToken = NEW(Token);
+		strncpy(newToken->content, str, MAX_WORD_SIZE);
+		newToken->content[MAX_WORD_SIZE] = '\0';
+		newToken->length = MAX_WORD_SIZE;
+		addNode(&(line->lineList), ++nodeIndex, newToken);
+		str += MAX_WORD_SIZE;
+	}
+	
+	if(strlen(str) > 0){
+		Token *newToken = NEW(Token);
+		strcpy(newToken->content, str);
+		newToken->length = strlen(newToken->content);
+		addNode(&(line->lineList), ++nodeIndex, newToken);
+	}
+	
+	addNode(&(line->lineList), ++nodeIndex, nextToken);
+	/*
     strcat(tmpstr, str);
     strcat(tmpstr, token->content + offset);
     
     strcpy(token->content, tmpstr);
     token->length = strlen(token->content);
-    
+    */
     //calculate the cursor position, a naive algorithm
     int newRow = parseLine(passage, row);
-    
+    char tmpstr[MAX_LINE_SIZE];
     getLine(&(passage->passList), tmpstr, newRow);
     
     int nowCol = (newRow == row) ? col : 0;
