@@ -82,6 +82,16 @@ void Main()
     registerMouseEvent(MouseEventProcess);
     registerTimerEvent(TimerEventProcess);
     registerKeyboardEvent(KeyboardEventProcess);
+    /*
+    Tire tire;
+    initTire(&tire);
+    addStringToTire(tire.root, "abcde");
+    addStringToTire(tire.root, "a");
+        addStringToTire(tire.root, "abcde");
+    deleteStringInTire(tire.root, "abcde");
+    TextList *list = matchPrefix(tire.root, "a");
+    printf("%s %s %d\n", kthNode(list, 1)->datptr, kthNode(list, 2)->datptr, list->listLen);
+	*/
 }
 
 void Display(void)

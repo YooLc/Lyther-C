@@ -5,35 +5,9 @@
 static void initNode(TreeNode *node){
 	node->childNum = 0;
 	int i=0;
-	for(i=0; i<26; i++) node->child[i] = NULL;
-}
-
-void initTire(Tire *tree){
-	tree->root = (TreeNode *)malloc(sizeof(TreeNode));
-	initNode(tree->root);
-}
-
-void addStringToTire(TreeNode *root, char *str){
-	if(root == NULL || str == NULL) return;
-	if(*str == '\0') return;
-	
-	char ch = *str;
-	int index = 0;
-	
-	if(ch >= 'a' && ch <= 'z'){
-		index = ch - 'a';
-	}else{
-		index = 26 + ch - 'A';
-	}
-	
-	if(root->child[index] == NULL){
-		TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
-		initNode(newNode);
-		root->child[index] = newNode;
-		root->childNum++;
-		addStringToTire(newNode, str+1);
-	}else{
-		addStringToTire(root->child[index], str+1);
+	for(i=0; i<26; i++){
+		node->child[i] = NULL;
+		node->cnt[i] = 0;
 	}
 }
 
@@ -51,6 +25,80 @@ static char indexToChar(int index){
 	}else{
 		return 'A' + index - 26;
 	}
+}
+
+void initTire(Tire *tree){
+	tree->root = (TreeNode *)malloc(sizeof(TreeNode));
+	initNode(tree->root);
+}
+
+void addStringToTire(TreeNode *root, char *str){
+	if(root == NULL || str == NULL) return;
+	if(*str == '\0') return;
+	
+	char ch = *str;
+	int index = 0;
+	
+	index = charToIndex(ch);
+	
+	if(root->child[index] == NULL){
+		TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
+		initNode(newNode);
+		root->child[index] = newNode;
+		root->childNum++;
+		if(*(str+1) == '\0'){
+			root->cnt[index]++;
+		}else{
+			addStringToTire(newNode, str+1);
+		}
+	}else{
+		if(*(str+1) == '\0'){
+			root->cnt[index]++;
+		}else{
+			addStringToTire(root->child[index], str+1);
+		}
+	}
+}
+
+int deleteStringInTire(TreeNode *root, char *str){
+	if(root == NULL || str == NULL) return;
+	char ch = *str;
+	int index = 0;
+	
+	if(ch == '\0'){
+		if(root->childNum == 0){
+			return 2;
+		}
+		return 3;
+	}
+	
+	index = charToIndex(ch);
+	TreeNode *child = root->child[index];
+	
+	if(child != NULL){
+
+		int isDeleteChild = deleteStringInTire(child, str+1);
+
+		if(isDeleteChild == 1 && root->cnt[index] == 0){
+			free(child);
+			root->child[index] = NULL;
+			root->childNum--;
+		}else if(isDeleteChild == 2){
+			root->cnt[index]--;
+			if(root->cnt[index] == 0){
+				free(child);
+				root->childNum--;
+				root->child[index] = NULL;
+			}
+		}else if(isDeleteChild == 3){
+			root->cnt[index]--;
+		}
+		
+		if(root->childNum == 0) return 1;
+		return 0;
+	}
+	
+	return 0;
 }
 
 TreeNode *searchString(TreeNode *root, char *str){
@@ -77,27 +125,42 @@ TreeNode *searchString(TreeNode *root, char *str){
 static void getAllString(TextList *textList, TreeNode *root, int addIndex){
 	if(root->childNum == 0) return;
 	int i=0;
+	
 	for(i=0; i<52; i++){
 		if(root->child[i] == NULL) continue;
+		
 		char *str = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
+		char *thisStr = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
 		int len = 0;
+		
 		*str = '\0';
 		if(addIndex != 0){
 			char *preStr = kthNode(textList, addIndex)->datptr;
 			strcpy(str, preStr);
 		}
+		
 		len = strlen(str);
 		str[len] = indexToChar(i);
 		str[len+1] = '\0';
+		strcpy(thisStr, str);
+		
 		addNodeToTail(textList, str);
-		getAllString(textList, root->child[i], textList->listLen);
+		TreeNode *child = root->child[i];
+		getAllString(textList, child, textList->listLen);
+		
+		if(root->cnt[i] >= 1 && child->childNum != 0){	//If it not the leaf of the tree
+			addNodeToTail(textList, thisStr);
+		}
+		
 	}
+	
 	if(addIndex != 0) deleteNode(textList, addIndex);
 }
 
 TextList *matchPrefix(TreeNode *root, char *str){
 	TreeNode *startNode = searchString(root, str);
 	
+	if(startNode == NULL) return NULL;
 	if(startNode->childNum == 0) return NULL;
 	
 	TextList *textList = (TextList *)malloc(sizeof(TextList));

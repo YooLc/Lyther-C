@@ -6,6 +6,7 @@
 
 typedef struct {
 	struct treeNode *child[52]; //0-25 + 26-51
+	int cnt[52];
 	int childNum;
 }TreeNode;
 
@@ -20,6 +21,8 @@ static void initNode(TreeNode *node);
 void initTire(Tire *tree);
 
 void addStringToTire(TreeNode *root, char *str);
+
+int deleteStringInTire(TreeNode *root, char *str);
 
 TreeNode *searchString(TreeNode *root, char *str);
 
