@@ -103,7 +103,7 @@ int deleteStringInTrie(TreeNode *root, char *str){
 
 TreeNode *searchString(TreeNode *root, char *str){
 	if(root == NULL || str == NULL) return NULL;
-	if(*str == '\0') return;
+	if(*str == '\0') return NULL;
 	
 	char ch = *str;
 	int index = 0;
@@ -115,7 +115,7 @@ TreeNode *searchString(TreeNode *root, char *str){
 	}else{
 		str++;
 		if(*str == '\0'){
-			return root;
+			return root->child[index];
 		}else{
 			return searchString(root->child[index], str);
 		}
@@ -134,6 +134,7 @@ static void getAllString(TextList *textList, TreeNode *root, int addIndex){
 		int len = 0;
 		
 		*str = '\0';
+		*thisStr = '\0';
 		if(addIndex != 0){
 			char *preStr = kthNode(textList, addIndex)->datptr;
 			strcpy(str, preStr);
