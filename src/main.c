@@ -10,6 +10,7 @@
 #include "undoredo.h"
 #include "menu.h"
 #include "clipboard.h"
+#include "tire.h"
 
 #define REFRESH_TIMER 1
 
