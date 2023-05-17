@@ -1,5 +1,5 @@
-#ifndef _TIRE_H_
-#define _TIRE_H_
+#ifndef _TRIE_H_
+#define _TRIE_H_
 
 #include "doublylinkedlist.h"
 
@@ -12,17 +12,17 @@ typedef struct {
 
 typedef struct {
 	TreeNode *root;
-}Tire;
+}Trie;
 
 typedef LinkedList TextList;
 
 static void initNode(TreeNode *node);
 
-void initTire(Tire *tree);
+void initTire(Trie *tree);
 
-void addStringToTire(TreeNode *root, char *str);
+void addStringToTrie(TreeNode *root, char *str);
 
-int deleteStringInTire(TreeNode *root, char *str);
+int deleteStringInTrie(TreeNode *root, char *str);
 
 TreeNode *searchString(TreeNode *root, char *str);
 

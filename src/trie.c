@@ -1,5 +1,5 @@
 #include <string.h>
-#include "tire.h"
+#include "trie.h"
 #include "codeparser.h"
 
 static void initNode(TreeNode *node){
@@ -27,12 +27,12 @@ static char indexToChar(int index){
 	}
 }
 
-void initTire(Tire *tree){
+void initTrie(Trie *tree){
 	tree->root = (TreeNode *)malloc(sizeof(TreeNode));
 	initNode(tree->root);
 }
 
-void addStringToTire(TreeNode *root, char *str){
+void addStringToTrie(TreeNode *root, char *str){
 	if(root == NULL || str == NULL) return;
 	if(*str == '\0') return;
 	
@@ -49,18 +49,18 @@ void addStringToTire(TreeNode *root, char *str){
 		if(*(str+1) == '\0'){
 			root->cnt[index]++;
 		}else{
-			addStringToTire(newNode, str+1);
+			addStringToTrie(newNode, str+1);
 		}
 	}else{
 		if(*(str+1) == '\0'){
 			root->cnt[index]++;
 		}else{
-			addStringToTire(root->child[index], str+1);
+			addStringToTrie(root->child[index], str+1);
 		}
 	}
 }
 
-int deleteStringInTire(TreeNode *root, char *str){
+int deleteStringInTrie(TreeNode *root, char *str){
 	if(root == NULL || str == NULL) return;
 	char ch = *str;
 	int index = 0;
@@ -77,7 +77,7 @@ int deleteStringInTire(TreeNode *root, char *str){
 	
 	if(child != NULL){
 
-		int isDeleteChild = deleteStringInTire(child, str+1);
+		int isDeleteChild = deleteStringInTrie(child, str+1);
 
 		if(isDeleteChild == 1 && root->cnt[index] == 0){
 			free(child);
