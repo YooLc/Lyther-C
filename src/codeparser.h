@@ -2,6 +2,8 @@
 #define _CODE_PARSER_H_
 
 #include "doublylinkedlist.h"
+#include "trie.h"
+
 #define MAX_WORD_SIZE 128
 #define MAX_LINE_SIZE 2048
 #define NEW(T) (T*)malloc(sizeof(T)) 
@@ -60,6 +62,7 @@ typedef struct{
 */
 typedef struct{
     LinkedList passList;
+    Trie trie;
 } Passage;
 
 typedef struct {

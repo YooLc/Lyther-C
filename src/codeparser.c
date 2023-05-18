@@ -4,6 +4,7 @@
 
 #include "codeparser.h"
 #include "textarea.h"
+#include "trie.h"
 
 /*
     Function: initPassage
@@ -11,6 +12,7 @@
 */
 void initPassage(Passage *passage){
     initList(&(passage->passList));
+    initTrie(&(passage->trie));
 }
 
 void deleteLine(Passage *passage, int row){
@@ -270,6 +272,47 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
     
     return nowNode;
 }
+
+static void refreshTrieAdd(Passage *passage, int rows, int rowt){
+	int nowRow = rows, tokenIndex = 1;
+	Line *line = NULL;
+	Token *token = NULL;
+	
+	for(nowRow = rows; nowRow <= rowt; nowRow++){
+		line = kthNode(&(passage->passList), nowRow)->datptr;
+		
+		for(tokenIndex = 1; tokenIndex <= line->lineList.listLen; tokenIndex++){
+			token = kthNode(&(line->lineList), tokenIndex)->datptr;
+			if(token->type == STRING){
+				printf("STR : %s %d", token->content, token->length);
+				token->content[token->length] = '\0';
+				addStringToTrie(passage->trie.root, token->content);
+			} 
+		}
+		
+	}
+	
+	printAllString(passage->trie.root);
+}
+
+static void refreshTrieDelete(Passage *passage, int rows, int rowt){
+	int nowRow = rows, tokenIndex = 1;
+	Line *line = NULL;
+	Token *token = NULL;
+	printf("%d %d %d\n", rows, rowt, passage->passList.listLen);
+	//return;
+	for(nowRow = rows; nowRow <= rowt; nowRow++){
+		line = kthNode(&(passage->passList), nowRow)->datptr;
+		
+		for(tokenIndex = 1; tokenIndex < line->lineList.listLen; tokenIndex++){
+			token = kthNode(&(line->lineList), tokenIndex)->datptr;
+			//if(token->type == STRING) deleteStringInTrie(passage->trie.root, token->content);
+		}
+		
+	}
+	
+	printAllString(passage->trie.root);
+}
 /*
     Function: addString(Passage *p, char *str, int row, int col)
     Insert string into the passage at given position, 
@@ -294,7 +337,7 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
         posRC.r = parseLine(passage, row);
         line = kthNode(&(passage->passList), posRC.r)->datptr;    //get the last row
         posRC.c = line->length;
-
+		refreshTrieAdd(passage, row, posRC.r);
         return posRC;
     }
 
@@ -303,6 +346,7 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
     Token *token = getPos(passage, row, col, &offset)->datptr;
     Token *nextToken = NEW(Token);
     
+    refreshTrieDelete(passage, row, row);
     nodeIndex = getNodeIndex(&(line->lineList), getPos(passage, row, col, &offset));
     printf("OFFSET = %d\n, NODEIDEX = %d CONTENT = %s\n", offset, nodeIndex,token->content);
     
@@ -355,7 +399,7 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
     
     posRC.r = newRow;
     posRC.c = nowCol;
-
+	refreshTrieAdd(passage, row, newRow);
     return posRC;
 }
 

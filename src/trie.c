@@ -177,3 +177,16 @@ TextList *matchPrefix(TreeNode *root, char *str){
 	
 	return textList;
 }
+
+void printAllString(TreeNode *root){
+	TextList *list = (TextList *)malloc(sizeof(TextList));
+	getAllString(list, root, 0);
+	puts("TRIE");
+	int i=0;
+	printf("NUM = %d\n", list->listLen);
+	/*
+	for(i=0; i<list->listLen; i++){
+		printf("	%s\n", kthNode(list, i+1)->datptr);
+	}
+	*/
+}

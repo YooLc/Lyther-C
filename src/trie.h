@@ -21,7 +21,7 @@ static void initNode(TreeNode *node);
 	function initTire(Trie *tree);
 	Call this when instantiate a new Trie
 */
-void initTire(Trie *tree);
+void initTrie(Trie *tree);
 
 /*
 	function addStringToTrie(TreeNode *root, char *str);
@@ -50,5 +50,7 @@ TreeNode *searchString(TreeNode *root, char *str);
 	If failed, return NULL.
 */
 TextList *matchPrefix(TreeNode *root, char *str);
+
+void printAllString(TreeNode *root);
 
 #endif
