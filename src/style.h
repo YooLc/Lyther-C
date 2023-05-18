@@ -44,6 +44,8 @@ typedef struct {
 
 void InitStyle();
 string getColorByTokenType(CodeTokenType type, int degree);
+string getBackgroundColor();
+string getForegroundColor();
 int getStyleByTokenType(CodeTokenType type);
 
 /*

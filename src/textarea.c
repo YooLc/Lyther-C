@@ -12,6 +12,7 @@
 #include "imgui.h"
 #include "extgui.h" 
 #include "undoredo.h"
+#include "helper.h"
 
 #define NEW(T) (T*)malloc(sizeof(T))
 
@@ -21,7 +22,6 @@ static int textPointSize, uiPointSize;
 static int isControlDown = 0;
 static double textFontHeight, uiFontHeight, indexLength;
 char g_messageString[250];
-
 static int g_bracketDegree;
 
 extern Palette g_palette[];
@@ -136,6 +136,9 @@ void drawEditor(Editor* editor) {
     SetPointSize(uiPointSize);
     drawEditorBar(editor);
     drawEditorMenu(editor);
+    if (isHelperActivated()) {
+        drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
+    }
 }
 
 static void drawEditorSelection(EditorForm* form){
@@ -293,6 +296,9 @@ static void drawEditorMenu(Editor* editor) {
         "Copy | Ctrl-C",
         "Cut  | Ctrl-X",
         "Paste| Ctrl-V"};
+    static char* menuListHelp[] = {"°ïÖú",
+        "°ïÖúÊÖ²á | Ctrl-H"
+    }; 
     int selection;
     double x, y, w, h, wlist, xindent;
     x = 0; y = winHeight - editor->menuHeight;
@@ -305,7 +311,7 @@ static void drawEditorMenu(Editor* editor) {
     wlist = TextStringWidth(menuListFile[5]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
         switch(selection) {
-        case 1: newFile(editor); break;
+        case 1: newFile(editor); printf("Clicked\n"); break;
         case 2: loadFile(editor); break;
         case 3: saveFile(editor); break;
         case 4: saveAs(editor); break;
@@ -337,6 +343,17 @@ static void drawEditorMenu(Editor* editor) {
         case 3: if(curForm->inSelectionMode) Copy(curForm); break;
         case 4: if(curForm->inSelectionMode) Cut(curForm); break;
         case 5: Paste(curForm); break;
+    }
+    
+    // Draw Helper Menu
+    x += w;
+    w = TextStringWidth(menuListHelp[0]) * 2;
+    wlist = TextStringWidth(menuListHelp[1]) * 1.25;
+    selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListHelp, sizeof(menuListHelp) / sizeof(menuListHelp[0]));
+    switch(selection) {
+        case 1: 
+			drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
+			break;
     }
 } 
 

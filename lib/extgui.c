@@ -29,7 +29,7 @@ static int barItem(int id, double x, double y, double w, double h, char *label, 
 		frameColor = gs_menu_color.hotFrame;
 		labelColor = gs_menu_color.hotLabel;
 		
-		if ( (gs_UIState.clickedItem == id || gs_UIState.clickedItem == 0) && gs_UIState.mousedown) {
+		if (!gs_UIState.actingMenu && (gs_UIState.clickedItem == id || gs_UIState.clickedItem == 0) && gs_UIState.mousedown) {
 			gs_UIState.clickedItem = id;
 		}
 	}
@@ -43,8 +43,8 @@ static int barItem(int id, double x, double y, double w, double h, char *label, 
 
 //    printf("gs_UIState.clickedItem %d, id %d\n", gs_UIState.clickedItem, id);
 //    printf("gs_UIState.mousedown: %d\n", gs_UIState.mousedown);
-	if( gs_UIState.clickedItem==id && // must be clicked before
-		! gs_UIState.mousedown )     // but now mouse button is up
+	if( gs_UIState.clickedItem == id && // must be clicked before
+		!gs_UIState.mousedown )     // but now mouse button is up
 	{
 		gs_UIState.clickedItem = 0;
 		return 1; 
@@ -57,8 +57,11 @@ int selectBar(int id, double x, double y, double w, double h, char *labels[], in
 {
     SetPenColor(gs_menu_color.frame);
     drawRectangle(x, y, w, h, 1);
+    
+    //printf("actingMenu %d\n", gs_UIState.actingMenu);
+    
     // Because there's no layer
-//    if( inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h) )
+//    if( inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h) && !gs_UIState.actingMenu)
 //		gs_UIState.actingMenu = id;
 	
 	int i, result = curSelect;
@@ -70,6 +73,7 @@ int selectBar(int id, double x, double y, double w, double h, char *labels[], in
         }
 	    curPosX += labelWidth;
     }
+    if (gs_UIState.actingMenu) return curSelect;
 	return result;
 }
 
