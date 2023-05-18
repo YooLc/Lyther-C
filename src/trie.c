@@ -27,9 +27,32 @@ static char indexToChar(int index){
 	}
 }
 
+
+void traverseTree(TreeNode *root){
+	if(root->childNum == 0) return;
+	int i=0;
+	for(i=0; i<52; i++){
+		TreeNode *child = root->child[i];
+		if(child == NULL) continue;
+		printf("char : %c childNum : %d endpoint %d\n", indexToChar(i), child->childNum, root->cnt[i]);
+		traverseTree(child);
+	}
+}
+
 void initTrie(Trie *tree){
 	tree->root = (TreeNode *)malloc(sizeof(TreeNode));
 	initNode(tree->root);
+	
+	addStringToTrie(tree->root, "a");
+	addStringToTrie(tree->root, "abc");
+	addStringToTrie(tree->root, "abcde");
+	addStringToTrie(tree->root, "a");
+	int i=0;
+	
+	for(i=0; i<3; i++){
+		//traverseTree(tree->root);
+		printAllString(tree->root);
+	}
 }
 
 void addStringToTrie(TreeNode *root, char *str){
@@ -129,40 +152,30 @@ TreeNode *searchString(TreeNode *root, char *str){
 /*
 	addIndex is the index of the prefix string in <textList>
 */
-static void getAllString(TextList *textList, TreeNode *root, int addIndex){
+static void getAllString(TextList *textList, TreeNode *root, char prefix[]){
 	if(root->childNum == 0) return;
 	int i=0;
-	
+
 	for(i=0; i<52; i++){
 		if(root->child[i] == NULL) continue;
-		
+
 		char *str = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
-		char *thisStr = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
-		int len = 0;
-		
+
 		*str = '\0';
-		*thisStr = '\0';
-		if(addIndex != 0){
-			char *preStr = kthNode(textList, addIndex)->datptr;
-			strcpy(str, preStr);
-		}
 		
-		len = strlen(str);
-		str[len] = indexToChar(i);
-		str[len+1] = '\0';
-		strcpy(thisStr, str);
+		prefix[strlen(prefix)] = indexToChar(i);
+		prefix[strlen(prefix)] = '\0';
 		
-		addNodeToTail(textList, str);
+		strcpy(str, prefix);
+
+		if(root->cnt[i] >= 1) addNodeToTail(textList, str);
+
 		TreeNode *child = root->child[i];
-		getAllString(textList, child, textList->listLen);
+		getAllString(textList, child, prefix);
 		
-		if(root->cnt[i] >= 1 && child->childNum != 0){	//If it not the leaf of the tree
-			addNodeToTail(textList, thisStr);
-		}
-		
+		prefix[strlen(prefix) - 1] = '\0';
 	}
 	
-	if(addIndex != 0) deleteNode(textList, addIndex);
 }
 
 TextList *matchPrefix(TreeNode *root, char *str){
@@ -173,21 +186,23 @@ TextList *matchPrefix(TreeNode *root, char *str){
 	
 	TextList *textList = (TextList *)malloc(sizeof(TextList));
 	initList(textList);
-	
-	getAllString(textList, startNode, 0);
+	char prefix[MAX_WORD_SIZE] = "";
+	getAllString(textList, startNode, prefix);
 	
 	return textList;
 }
 
 void printAllString(TreeNode *root){
 	TextList *list = (TextList *)malloc(sizeof(TextList));
-	getAllString(list, root, 0);
+	initList(list);
+	char prefix[MAX_WORD_SIZE] = "";
+	getAllString(list, root, prefix);
 	puts("TRIE");
 	int i=0;
 	printf("NUM = %d\n", list->listLen);
-	/*
+	
 	for(i=0; i<list->listLen; i++){
-		printf("	%s\n", kthNode(list, i+1)->datptr);
+		printf("	%s\n", (char *)kthNode(list, i+1)->datptr);
 	}
-	*/
+	free(list);
 }

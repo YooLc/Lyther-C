@@ -137,9 +137,32 @@ void drawEditor(Editor* editor) {
     SetPointSize(uiPointSize);
     drawEditorBar(editor);
     drawEditorMenu(editor);
+    drawEditorComplete(editor);
     if (isHelperActivated()) {
         drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
     }
+}
+
+static void drawEditorComplete(Editor *editor){
+	int offset = -1, i;
+	EditorForm *form = editor->forms[editor->curSelect];
+	if(form->caretPos.c == 0) return;
+	getPos(form->passage, form->caretPos.r, form->caretPos.c+1, &offset);
+	if(offset == 0 && form->caretPos.c > 1){
+		Token *token = getPos(form->passage, form->caretPos.r, form->caretPos.c, &offset)->datptr;
+		if(token->type != STRING) return;
+		TextList *list = matchPrefix(form->passage->trie.root, token->content);
+		char *labels[MAX_WORD_SIZE];
+		if(list == NULL || list->listLen == 0) return;
+		for(i=0; i<list->listLen; i++){
+			labels[i] = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
+			strcpy(labels[i], token->content);
+			strcat(labels[i], kthNode(list, i+1)->datptr);
+		}
+		completeList(GenUIID(0), (form->caretPos.c+1)*TextStringWidth("a")+indexLength, winHeight-(list->listLen)*editor->menuHeight-(form->caretPos.r)*textFontHeight-editor->barHeight-editor->menuHeight, TextStringWidth("aaaaaaaaaaaaaa"), editor->menuHeight, labels, list->listLen);
+		int i;
+		for(i=0; i<list->listLen; i++) free(labels[i]);
+	}
 }
 
 static void drawEditorSelection(EditorForm* form){
@@ -324,7 +347,7 @@ static void drawEditorMenu(Editor* editor) {
             break;
         case 6: exit(0); break;
     }
-    // Draw Editor Menu
+	// Draw Editor Menu
     x += w;
     w = TextStringWidth(menuListEdit[0]) * 2;
     wlist = TextStringWidth(menuListEdit[1]) * 1.25;
