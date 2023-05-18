@@ -67,7 +67,7 @@ void addStringToTrie(TreeNode *root, char *str){
 	if(root->child[index] == NULL){
 	    TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
 		initNode(newNode);
-		//root->child[index] = newNode;
+		root->child[index] = newNode;
 		root->childNum++;
 		if(*(str+1) == '\0'){
 			root->cnt[index]++;

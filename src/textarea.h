@@ -28,7 +28,7 @@
     
 */
 typedef struct {
-    int style, startLine;
+    int style, startLine, completeMode;
     bool visible, inSelectionMode;
     double x, y, w, h, viewProgress;
     PosRC caretPos, realCaretPos, renderPos, selectLeftPos, selectRightPos;

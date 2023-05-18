@@ -136,9 +136,9 @@ double vertivalScrollBar(int id, double x, double y, double w, double h, double 
 
 static int completeItem(int id, double x, double y, double w, double h, char *label)
 {
+	//puts("ABCD");
 	char * frameColor = gs_menu_color.frame;
 	char * labelColor = gs_menu_color.label;
-
 	if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
 		frameColor = gs_menu_color.hotFrame;
 		labelColor = gs_menu_color.hotLabel;
@@ -166,12 +166,12 @@ static int completeItem(int id, double x, double y, double w, double h, char *la
 
 int completeList(int id, double x, double y, double w, double h, char *labels[], int n)
 {
-	int result = 0;
+	int result = -1;
 	// ¥¶¿Ì Û±Í
 	int k;
 	
 	for( k=0; k<n; k++ ) {
-		if ( completeItem(GenUIID(k)+id, x, y-k*h, w, h, labels[k]) ) {
+		if ( completeItem(GenUIID(k)+id, x, y-(k+1)*h, w, h, labels[k]) ) {
 			result = k;
 		}
 	}

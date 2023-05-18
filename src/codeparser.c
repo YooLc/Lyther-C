@@ -307,7 +307,7 @@ static void refreshTrieAdd(Passage *passage, int rows, int rowt){
 		
 	}
 	//traverseTree(passage->trie.root);
-	//printAllString(passage->trie.root);
+	printAllString(passage->trie.root);
 }
 
 static void refreshTrieDelete(Passage *passage, int rows, int rowt){

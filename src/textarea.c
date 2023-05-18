@@ -76,6 +76,7 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     
     form->style = 0;
     form->startLine = 1;
+    form->completeMode = 0;
     form->visible = true;
     form->inSelectionMode = false;
     form->caretPos.r = form->realCaretPos.r = form->renderPos.r = 1;
@@ -148,19 +149,44 @@ static void drawEditorComplete(Editor *editor){
 	EditorForm *form = editor->forms[editor->curSelect];
 	if(form->caretPos.c == 0) return;
 	getPos(form->passage, form->caretPos.r, form->caretPos.c+1, &offset);
-	if(offset == 0 && form->caretPos.c > 1){
+	//printf("OFFSET %d\n", offset);
+	if(offset == 0 && form->caretPos.c >= 1){
 		Token *token = getPos(form->passage, form->caretPos.r, form->caretPos.c, &offset)->datptr;
 		if(token->type != STRING) return;
 		TextList *list = matchPrefix(form->passage->trie.root, token->content);
 		char *labels[MAX_WORD_SIZE];
+		//if(list == NULL) printf("NULL %s", token->content);
 		if(list == NULL || list->listLen == 0) return;
+
 		for(i=0; i<list->listLen; i++){
 			labels[i] = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
 			strcpy(labels[i], token->content);
 			strcat(labels[i], kthNode(list, i+1)->datptr);
+			//printf("COMP STR %s\n", labels[i]);
 		}
-		completeList(GenUIID(0), (form->caretPos.c+1)*TextStringWidth("a")+indexLength, winHeight-(list->listLen)*editor->menuHeight-(form->caretPos.r)*textFontHeight-editor->barHeight-editor->menuHeight, TextStringWidth("aaaaaaaaaaaaaa"), editor->menuHeight, labels, list->listLen);
-		int i;
+		SetPointSize(textPointSize);
+		double listx, listy, listw, listh;
+		listx = (form->caretPos.c+1)*TextStringWidth("a")+indexLength;
+		listy = winHeight-editor->barHeight-(form->caretPos.r+1)*editor->menuHeight;
+		listw = TextStringWidth("aaaaaaaaaaaaaa");
+		listh = editor->menuHeight;
+		//completeList(GenUIID(0), , winHeight-(list->listLen)*editor->menuHeight-(form->caretPos.r)*textFontHeight-editor->barHeight-editor->menuHeight, , editor->menuHeight, labels, list->listLen);
+		int selection = completeList(GenUIID(0), listx, listy, listw, listh, labels, list->listLen);
+		if(form->completeMode == 2){
+		 	form->completeMode = 0;
+		 	selection = 0;
+		}else{
+			form->completeMode = 1;
+		}
+		//return;
+		if(selection != -1){
+			int addLen = strlen(labels[selection])-token->length;
+			addTrace(form->urStack, ADD, form->caretPos.r, form->caretPos.c+1, form->caretPos.r, form->caretPos.c+1+strlen(labels)-token->length, labels[selection]+token->length);
+			addString(form->passage, labels[selection]+token->length, form->caretPos.r, form->caretPos.c+1);
+			form->caretPos.c += addLen;
+			form->realCaretPos.c += addLen;
+			form->completeMode = 0;
+		}
 		for(i=0; i<list->listLen; i++) free(labels[i]);
 	}
 }
@@ -728,7 +754,7 @@ void handleInputEvent(Editor* editor, char ch) {
             form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
             curPos = form->realCaretPos;
         }
-    } else if (ch == '\n' || ch == '\r') {
+    } else if ((ch == '\n' || ch == '\r') && form->completeMode == 0) {
         int offset;
         Token* lastToken = getPos(form->passage, curPos.r, curPos.c + 1, &offset)->datptr;
         printf("Caught return key, attempt to complete!\n");
@@ -795,9 +821,13 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
                 deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
                 break;
             case VK_RETURN:
-                addTrace(curForm->urStack, ADD, curPos.r, curPos.c+1, curPos.r, curPos.c+1, "\n");
-                curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
-                break;
+            	if(curForm->completeMode == 1){
+					curForm->completeMode = 2;
+				}else{
+                	addTrace(curForm->urStack, ADD, curPos.r, curPos.c+1, curPos.r, curPos.c+1, "\n");
+                	curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
+            	}
+				break;
             case VK_CONTROL:
                 isControlDown = 1;
                 break;
