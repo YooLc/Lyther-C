@@ -291,8 +291,8 @@ static void refreshTrieAdd(Passage *passage, int rows, int rowt){
 		}
 		
 	}
-	
-	printAllString(passage->trie.root);
+	//traverseTree(passage->trie.root);
+	//printAllString(passage->trie.root);
 }
 
 static void refreshTrieDelete(Passage *passage, int rows, int rowt){
@@ -302,16 +302,17 @@ static void refreshTrieDelete(Passage *passage, int rows, int rowt){
 	printf("%d %d %d\n", rows, rowt, passage->passList.listLen);
 	//return;
 	for(nowRow = rows; nowRow <= rowt; nowRow++){
+		
 		line = kthNode(&(passage->passList), nowRow)->datptr;
 		
 		for(tokenIndex = 1; tokenIndex < line->lineList.listLen; tokenIndex++){
 			token = kthNode(&(line->lineList), tokenIndex)->datptr;
-			//if(token->type == STRING) deleteStringInTrie(passage->trie.root, token->content);
+			if(token->type == STRING) deleteStringInTrie(passage->trie.root, token->content);
 		}
 		
 	}
-	
-	printAllString(passage->trie.root);
+	//traverseTree(passage->trie.root);
+	//printAllString(passage->trie.root);
 }
 /*
     Function: addString(Passage *p, char *str, int row, int col)
@@ -418,9 +419,15 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
         cols = colt;
         colt = i;
     }
-    
-    if(rows > 1) getLine(passage, prevLine, rows-1);
-    if(rowt < passage->passList.listLen) getLine(passage, nextLine, rowt+1);
+    refreshTrieDelete(passage, rows, rowt);
+    if(rows > 1){
+		getLine(passage, prevLine, rows-1);
+		refreshTrieDelete(passage, rows-1, rows-1);
+	} 
+    if(rowt < passage->passList.listLen){
+		refreshTrieDelete(passage, rowt+1, rowt+1);
+		getLine(passage, nextLine, rowt+1);
+	}
     getLine(passage, tmpLine1, rows);
     getLine(passage, tmpLine2, rowt);
     
@@ -451,7 +458,9 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
     addNodeToTail(&(line->lineList), token);
     addNode(&(passage->passList), (rows>1)?(rows-1):(rows), line);
 
-    parseLine(passage, (rows>1)?(rows-1):rows);
+    int newRow = parseLine(passage, (rows>1)?(rows-1):rows);
+    refreshTrieAdd(passage, (rows>1)?(rows-1):rows, newRow);
+    printf("ROW : %d\n", newRow);
 }
 /*
 void cancelNewline(Passage *passage, int row) {

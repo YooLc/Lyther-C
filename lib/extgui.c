@@ -133,3 +133,57 @@ double vertivalScrollBar(int id, double x, double y, double w, double h, double 
 	progress = (h - barPos - barLength) / h;
     return progress;
 }
+
+static int completeItem(int id, double x, double y, double w, double h, char *label)
+{
+	char * frameColor = gs_menu_color.frame;
+	char * labelColor = gs_menu_color.label;
+
+	if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+		frameColor = gs_menu_color.hotFrame;
+		labelColor = gs_menu_color.hotLabel;
+		if ( (gs_UIState.clickedItem == id ||gs_UIState.clickedItem == 0) && gs_UIState.mousedown) {
+			gs_UIState.clickedItem = id;
+		}
+	}
+	else {
+		if ( gs_UIState.clickedItem==id )
+			gs_UIState.clickedItem = 0;
+	}
+
+	mySetPenColor(frameColor);
+	drawBox(x, y, w, h, gs_menu_color.fillflag, label, 'L', labelColor);
+
+	if( gs_UIState.clickedItem==id && // must be clicked before
+		! gs_UIState.mousedown )     // but now mouse button is up
+	{
+		gs_UIState.clickedItem = 0;
+		return 1; 
+	}
+	
+	return 0;
+}
+
+int completeList(int id, double x, double y, double w, double h, char *labels[], int n)
+{
+	int result = 0;
+	// ¥¶¿Ì Û±Í
+	int k;
+	
+	for( k=0; k<n; k++ ) {
+		if ( completeItem(GenUIID(k)+id, x, y-k*h, w, h, labels[k]) ) {
+			result = k;
+		}
+	}
+	/*
+	// If clicked outside the menu, then close it.
+	if (gs_UIState.actingMenu == id && gs_UIState.mousedown &&
+        notInMenu(gs_UIState.mousex, gs_UIState.mousey) && 
+        !inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+            unfoldMenu = 0;
+    }
+    
+	if(unfoldMenu == 0) gs_UIState.actingMenu = 0;
+	*/
+	return result;
+}
