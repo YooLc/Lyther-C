@@ -431,7 +431,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit39]
-FileName=..\src\tire.c
+FileName=..\src\trie.c
 CompileCpp=0
 Folder=src
 Compile=1
@@ -441,7 +441,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit40]
-FileName=..\src\tire.h
+FileName=..\src\trie.h
 CompileCpp=0
 Folder=src
 Compile=1
