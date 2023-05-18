@@ -29,6 +29,7 @@ static int barItem(int id, double x, double y, double w, double h, char *label, 
 		frameColor = gs_menu_color.hotFrame;
 		labelColor = gs_menu_color.hotLabel;
 		
+		printf("acting menu %d\n", gs_UIState.actingMenu ); 
 		if (!gs_UIState.actingMenu && (gs_UIState.clickedItem == id || gs_UIState.clickedItem == 0) && gs_UIState.mousedown) {
 			gs_UIState.clickedItem = id;
 		}

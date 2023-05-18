@@ -461,6 +461,14 @@ int menuList(int id, double x, double y, double w, double wlist, double h, char 
 			}
 		}
 	}
+	
+	// If clicked outside the menu, then close it.
+	if (gs_UIState.actingMenu == id && gs_UIState.mousedown &&
+        notInMenu(gs_UIState.mousex, gs_UIState.mousey) && 
+        !inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+            unfoldMenu = 0;
+    }
+    
 	if(unfoldMenu == 0) gs_UIState.actingMenu = 0;
 	return result;
 }

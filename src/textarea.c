@@ -296,8 +296,8 @@ static void drawEditorMenu(Editor* editor) {
         "Copy | Ctrl-C",
         "Cut  | Ctrl-X",
         "Paste| Ctrl-V"};
-    static char* menuListHelp[] = {"����",
-        "�����ֲ� | Ctrl-H"
+    static char* menuListHelp[] = {"Helper",
+        "Open Mannual | Ctrl-H"
     }; 
     int selection;
     double x, y, w, h, wlist, xindent;
