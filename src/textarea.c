@@ -152,11 +152,17 @@ static void drawEditorComplete(Editor *editor){
 	//printf("OFFSET %d\n", offset);
 	if(offset == 0 && form->realCaretPos.c >= 1){
 		Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
-		if(token->type != STRING) return;
+		if(token->type != STRING){
+			form->completeMode = 0;
+			return;
+		}
 		TextList *list = matchPrefix(form->passage->trie.root, token->content);
 		char *labels[MAX_WORD_SIZE];
 		//if(list == NULL) printf("NULL %s", token->content);
-		if(list == NULL || list->listLen == 0) return;
+		if(list == NULL || list->listLen == 0){
+			form->completeMode = 0;
+			return;
+		}
 
 		for(i=0; i<list->listLen; i++){
 			labels[i] = (char *)malloc(sizeof(char)*MAX_WORD_SIZE);
@@ -181,10 +187,11 @@ static void drawEditorComplete(Editor *editor){
 		//return;
 		if(selection != -1){
 			int addLen = strlen(labels[selection])-token->length;
-			addTrace(form->urStack, ADD, form->realCaretPos.r, form->realCaretPos.c+1, form->realCaretPos.r, form->realCaretPos.c+1+strlen(labels)-token->length, labels[selection]+token->length);
+			printf("POS %d %d %d\n", form->realCaretPos.r, form->realCaretPos.c+1, addLen);
+			addTrace(form->urStack, ADD, form->realCaretPos.r, form->realCaretPos.c+1, form->realCaretPos.r, form->realCaretPos.c+addLen, labels[selection]+token->length);
 			addString(form->passage, labels[selection]+token->length, form->realCaretPos.r, form->realCaretPos.c+1);
 			form->realCaretPos.c += addLen;
-			form->realCaretPos.c += addLen;
+			form->caretPos.c += addLen;
 			form->completeMode = 0;
 		}
 		for(i=0; i<list->listLen; i++) free(labels[i]);
