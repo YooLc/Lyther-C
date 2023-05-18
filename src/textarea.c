@@ -304,7 +304,7 @@ static void drawEditorMenu(Editor* editor) {
     w = TextStringWidth(menuListFile[0]) * 2;
     wlist = TextStringWidth(menuListFile[5]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
-        switch(selection) {
+	 switch(selection) {
         case 1: newFile(editor); break;
         case 2: loadFile(editor); break;
         case 3: saveFile(editor); break;

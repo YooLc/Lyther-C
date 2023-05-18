@@ -430,8 +430,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit39]
-FileName=..\src\tire.c
+[Unit40]
+FileName=..\src\trie.h
 CompileCpp=0
 Folder=src
 Compile=1
@@ -440,8 +440,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit40]
-FileName=..\src\tire.h
+[Unit39]
+FileName=..\src\trie.c
 CompileCpp=0
 Folder=src
 Compile=1

@@ -348,6 +348,7 @@ static int menuItem(int id, double x, double y, double w, double h, char *label)
 {
 	char * frameColor = gs_menu_color.frame;
 	char * labelColor = gs_menu_color.label;
+
 	if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
 		frameColor = gs_menu_color.hotFrame;
 		labelColor = gs_menu_color.hotLabel;
@@ -370,7 +371,7 @@ static int menuItem(int id, double x, double y, double w, double h, char *label)
 		gs_UIState.clickedItem = 0;
 		return 1; 
 	}
-
+	
 	return 0;
 }
 
@@ -446,6 +447,10 @@ int menuList(int id, double x, double y, double w, double wlist, double h, char 
 
 	if( menuItem(id, x, y, w, h, labels[0]) )
 		unfoldMenu = ! unfoldMenu;
+
+	if( !inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + wlist, y-n*h, y+h) && gs_UIState.mousedown){
+		if(unfoldMenu) unfoldMenu = 0;
+	}
 
 	if( gs_UIState.actingMenu == id && unfoldMenu  ) {
 		int k;

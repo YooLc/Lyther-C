@@ -67,9 +67,9 @@ int deleteStringInTrie(TreeNode *root, char *str){
 	
 	if(ch == '\0'){
 		if(root->childNum == 0){
-			return 2;
+			return 2;	//This node is (leaf && endpoint && delete)
 		}
-		return 3;
+		return 3;	//This node is endpoint
 	}
 	
 	index = charToIndex(ch);
@@ -80,6 +80,9 @@ int deleteStringInTrie(TreeNode *root, char *str){
 		int isDeleteChild = deleteStringInTrie(child, str+1);
 
 		if(isDeleteChild == 1 && root->cnt[index] == 0){
+			/*
+				Child is a leaf but not endpoint, needs to be deleted
+			*/
 			free(child);
 			root->child[index] = NULL;
 			root->childNum--;
@@ -94,11 +97,11 @@ int deleteStringInTrie(TreeNode *root, char *str){
 			root->cnt[index]--;
 		}
 		
-		if(root->childNum == 0) return 1;
+		if(root->childNum == 0) return 1;	//This node is leaf
 		return 0;
 	}
 	
-	return 0;
+	return 0;	//NOP
 }
 
 TreeNode *searchString(TreeNode *root, char *str){
@@ -122,6 +125,9 @@ TreeNode *searchString(TreeNode *root, char *str){
 	}
 }
 
+/*
+	addIndex is the index of the prefix string in <textList>
+*/
 static void getAllString(TextList *textList, TreeNode *root, int addIndex){
 	if(root->childNum == 0) return;
 	int i=0;
