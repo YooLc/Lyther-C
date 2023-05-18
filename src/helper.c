@@ -13,7 +13,7 @@ void drawHelper(double x, double y, double w, double h)
     isActivated = true;
     SetPenColor(getBackgroundColor());
     drawRectangle(x, y, w, h, 1);
-    MovePen(x + w / 4, y + h / 4);
+    MovePen(x, y + GetFontAscent());
     SetPenColor(getForegroundColor());
     SetPointSize(22);
     SetStyle(Bold);

@@ -92,8 +92,9 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
         int idx = 1;
         while(!feof(fp)) {
             fgets(buf, MAX_LINE_SIZE, fp);
+            if (feof(fp)) break;
             addString(form->passage, buf, idx++, 1);
-        }    
+        }
     }
     else {
         addString(form->passage, "\n", 1, 1);
@@ -296,7 +297,7 @@ static void drawEditorMenu(Editor* editor) {
         "Copy | Ctrl-C",
         "Cut  | Ctrl-X",
         "Paste| Ctrl-V"};
-    static char* menuListHelp[] = {"Helper",
+    static char* menuListHelp[] = {"Help",
         "Open Mannual | Ctrl-H"
     }; 
     int selection;
@@ -436,14 +437,7 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
 
 static void drawTokenBox(Token* token, double x, double y, double w, double h) {
     SetStyle(getStyleByTokenType(token->type));
-    switch(token->type) {
-        case LEFT_BRACKETS: case LEFT_PARENTHESES: case LEFT_BRACE:
-            SetPenColor(getColorByTokenType(token->type, ++g_bracketDegree)); break;
-        case RIGHT_BRACKETS: case RIGHT_PARENTHESES: case RIGHT_BRACE:
-            SetPenColor(getColorByTokenType(token->type, g_bracketDegree--)); break;
-        default:
-            SetPenColor(getColorByTokenType(token->type, 0)); break;
-    }
+    SetPenColor(getColorByTokenType(token->type, token->level + 1));
     MovePen(x, y + GetFontDescent());
     DrawTextString(token->content);
 }
@@ -705,6 +699,18 @@ void handleInputEvent(Editor* editor, char ch) {
         // Due to the calculation in addString(), we must use a loop to finish this
         int i;
         for (i = 0; i < INDENT_LENGTH; i++) {
+            sprintf(tmpstr, " ");
+            addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
+            LOG("Attempting to add [%s]\n", tmpstr);
+            form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
+            curPos = form->realCaretPos;
+        }
+    } else if (ch == '\n' || ch == '\r') {
+        int offset;
+        Token* lastToken = getPos(form->passage, curPos.r, curPos.c + 1, &offset)->datptr;
+        printf("Caught return key, attempt to complete!\n");
+        int i;
+        for (i = 0; i < lastToken->level * INDENT_LENGTH; i++) {
             sprintf(tmpstr, " ");
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
             LOG("Attempting to add [%s]\n", tmpstr);

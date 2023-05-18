@@ -5,7 +5,7 @@
 static void initNode(TreeNode *node){
 	node->childNum = 0;
 	int i=0;
-	for(i=0; i<26; i++){
+	for(i=0; i<52; i++){
 		node->child[i] = NULL;
 		node->cnt[i] = 0;
 	}
@@ -40,16 +40,17 @@ void addStringToTrie(TreeNode *root, char *str){
 	int index = 0;
 	
 	index = charToIndex(ch);
-	
+	printf("Current string [%s], index: %d\n", str, index); 
 	if(root->child[index] == NULL){
-		TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
+	    TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
 		initNode(newNode);
-		root->child[index] = newNode;
+		//root->child[index] = newNode;
 		root->childNum++;
 		if(*(str+1) == '\0'){
 			root->cnt[index]++;
-		}else{
-			addStringToTrie(newNode, str+1);
+		}
+        else{
+		    addStringToTrie(newNode, str+1);
 		}
 	}else{
 		if(*(str+1) == '\0'){

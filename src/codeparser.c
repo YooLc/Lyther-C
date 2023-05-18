@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <windows.h>
 
 #include "codeparser.h"
 #include "textarea.h"
@@ -46,9 +47,10 @@ int getLine(Passage *passage, char *dst, int row){
      return totLen;
 }
 
-static void setToken(Token* token, char *content, CodeTokenType type){
+static void setToken(Token* token, char *content, int level, CodeTokenType type){
     strcpy(token->content, content);
     token->length = strlen(content);
+    token->level = level;
     token->type = type;
 }
 
@@ -90,6 +92,13 @@ int parseLine(Passage *passage, int row){
     
     char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
     int totLen = 0, idx = 1, newLine = 0;
+    
+	int levelCounter = 0, offset, initrow = row;
+	if (row > 1) {
+	    Line*  lastLine = kthNode(passage, row - 1)->datptr;
+	    Token* lastToken = getPos(passage, row - 1, lastLine->length + 1, &offset)->datptr;
+	    levelCounter = lastToken->level;
+    }
 
     Line  *line  = NEW(Line);
      initList(&(line->lineList));
@@ -108,27 +117,33 @@ int parseLine(Passage *passage, int row){
         // token->selected = 1; // For test
         switch(tmpLine[idx-1]){
             case '(':
-                setToken(token, "(", LEFT_PARENTHESES);
+                setToken(token, "(", levelCounter, LEFT_PARENTHESES);
+                levelCounter++;
                 idx++;
                 break;
             case ')':
-                setToken(token, ")", RIGHT_PARENTHESES);
+                levelCounter = max(0, levelCounter - 1);
+                setToken(token, ")", levelCounter, RIGHT_PARENTHESES);
                 idx++;
                 break;
             case '[':
-                setToken(token, "[", LEFT_BRACKETS);
+                setToken(token, "[", levelCounter, LEFT_BRACKETS);
+                levelCounter++;
                 idx++;
                 break;
             case ']':
-                setToken(token, "]", RIGHT_BRACKETS);
+                levelCounter = max(0, levelCounter - 1);
+                setToken(token, "]", levelCounter, RIGHT_BRACKETS);
                 idx++;
                 break;
             case '{':
-                setToken(token, "{", LEFT_BRACE);
+                setToken(token, "{", levelCounter, LEFT_BRACE);
+                levelCounter++;
                 idx++;
                 break;
             case '}':
-                setToken(token, "}", RIGHT_BRACE);
+                levelCounter = max(0, levelCounter - 1);
+                setToken(token, "}", levelCounter, RIGHT_BRACE);
                 idx++;
                 break;
             case '\'':
@@ -142,7 +157,7 @@ int parseLine(Passage *passage, int row){
                 if(tmpWord[cnt] != '\n') idx++;
                 if(tmpWord[cnt] == '\n') cnt--;
                 tmpWord[cnt+1] = '\0';
-                setToken(token, tmpWord, SINGLE_QUOTE);
+                setToken(token, tmpWord, levelCounter, SINGLE_QUOTE);
                 break;
             case '"':
                 idx++;
@@ -155,18 +170,18 @@ int parseLine(Passage *passage, int row){
                 if(tmpWord[cnt] != '\n') idx++;
                 if(tmpWord[cnt] == '\n') cnt--;
                 tmpWord[cnt+1] = '\0';
-                setToken(token, tmpWord, DOUBLE_QUOTE);
+                setToken(token, tmpWord, levelCounter, DOUBLE_QUOTE);
                 break;
             case ' ':
-                setToken(token, " ", SPACE);
+                setToken(token, " ", levelCounter, SPACE);
                 idx++;
                 break;
             case ';':
-                setToken(token, ";", SEMI_COLON);
+                setToken(token, ";", levelCounter, SEMI_COLON);
                 idx++;
                 break;
             case '\n':
-                setToken(token, "\n", ENTER);
+                setToken(token, "\n", levelCounter, ENTER);
                 idx++;
                 //if this is not the end of the line, creat a newline tag
                 if(idx <= totLen) newLine = 1;
@@ -180,9 +195,9 @@ int parseLine(Passage *passage, int row){
                         idx++;
                     }
                     tmpWord[cnt+1] = '\0';
-                    setToken(token, tmpWord, COMMENT);
+                    setToken(token, tmpWord, levelCounter, COMMENT);
                 }else if(idx < totLen && tmpLine[idx] == '*'){
-                    setToken(token, "/*", LEFT_COMMENT);
+                    setToken(token, "/*", levelCounter, LEFT_COMMENT);
                     token->length = 2;
                     idx += 2;
                 }else{
@@ -194,11 +209,11 @@ int parseLine(Passage *passage, int row){
                 break;
             case '*':
                 if(idx < totLen && tmpLine[idx] == '/'){
-                    setToken(token, "*/", RIGHT_COMMENT);
+                    setToken(token, "*/", levelCounter, RIGHT_COMMENT);
                     token->length = 2;
                     idx += 2;
                 }else{
-                    setToken(token, "*", RIGHT_COMMENT);
+                    setToken(token, "*", levelCounter, RIGHT_COMMENT);
                     token->length = 1;
                     idx++;
                 }
@@ -211,7 +226,7 @@ int parseLine(Passage *passage, int row){
                     idx++;
                 }
                 tmpWord[cnt+1] = '\0';
-                setToken(token, tmpWord, PREPROCESS);
+                setToken(token, tmpWord, levelCounter, PREPROCESS);
                 break;
             default:
                 if( !isCharacter(tmpLine[idx-1]) ){
@@ -227,7 +242,7 @@ int parseLine(Passage *passage, int row){
                     idx++;
                 }
                 tmpWord[cnt] = '\0';
-                setToken(token, tmpWord, STRING);
+                setToken(token, tmpWord, levelCounter, STRING);
         }
         
         token->length = strlen(token->content);
@@ -248,6 +263,7 @@ int parseLine(Passage *passage, int row){
     }
     
     maintainLineLength(line);    //maintain the length of the current line
+    maintainLevel(passage, row, line->length);
     return row;
 }
 
@@ -257,7 +273,7 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
     
     Listptr nowNode = kthNode(&(l->lineList), 1);   // get the pointer of the first node of this line
     Token* token = nowNode->datptr;                 // pointer of the token in the node
-    
+//    printf("Getting pos, current token [%s]\n", token->content);
     // Find the node which contains the 'col'th column
     int nowcol = token->length;
     while(nowcol < col) {
@@ -266,7 +282,6 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
         nowcol += token->length;
     }
     
-    // Calculate the exact col in this word
     int nowLen = token->length;
     *offset = nowLen - (nowcol - col + 1);
     
@@ -545,6 +560,37 @@ PosRC searchForwardByChar(Passage *passage, int row, int col, char ch){
     return posRC;
 }
 
+void maintainLevel(Passage *passage, int row, int col){
+    int offset, levelCounter;
+    ListNode* nowNode = getPos(passage, row, col, &offset);
+    Token* token = nowNode->datptr;
+    levelCounter = token->level;
+    
+    while(levelCounter >= 0) {
+        nowNode = nowNode->next;
+        if (nowNode == NULL) {
+            if (row < passage->passList.listLen) {
+                nowNode = getPos(passage, ++row, 0, &offset);
+            } else return; // EOF
+        }
+        token = nowNode->datptr;
+        switch(token->type) {
+            case LEFT_PARENTHESES: case LEFT_BRACKETS: case LEFT_BRACE:
+                token->level = levelCounter;
+                levelCounter++;
+                break;
+            case RIGHT_PARENTHESES: case RIGHT_BRACKETS: case RIGHT_BRACE:
+                levelCounter--;
+                if (levelCounter < 0) return;
+                token->level = levelCounter;
+                break;
+            default:
+                token->level = levelCounter;
+                break;
+        }
+    }
+}
+
 PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch){
     //Initialize variables
     int offset = 0, i = 0, len = 0;
@@ -581,7 +627,6 @@ PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch){
 
 //for debug use
 void printPassage(Passage *p){ 
-    return;
      Listptr nowLineNode = kthNode(&(p->passList), 1);
      printf("Total line num: %d\n", p->passList.listLen);
      while(nowLineNode != NULL){
@@ -591,7 +636,7 @@ void printPassage(Passage *p){
          Listptr nowWordNode = kthNode(&(l->lineList), 1);
          while(nowWordNode != NULL){
              Token* w = nowWordNode->datptr;
-             printf("        content: \"%s\", len: %d, type: %d\n", w->content, w->length, w->type);
+             printf("        content: \"%s\", len: %d, type: %d, level: %d\n", w->content, w->length, w->type, w->level);
              nowWordNode = nowWordNode->next;
          }
          nowLineNode = nowLineNode->next;
