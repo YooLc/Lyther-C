@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000000000000
-UnitCount=40
+UnitCount=42
 
 [VersionInfo]
 Major=1
@@ -430,6 +430,16 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit39]
+FileName=..\src\trie.c
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit40]
 FileName=..\src\trie.h
 CompileCpp=0
@@ -440,8 +450,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit39]
-FileName=..\src\trie.c
+[Unit41]
+FileName=..\src\helper.c
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit42]
+FileName=..\src\helper.h
 CompileCpp=0
 Folder=src
 Compile=1

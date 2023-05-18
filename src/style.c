@@ -59,6 +59,16 @@ string getColorByTokenType(CodeTokenType type, int degree)
     }
 }
 
+string getBackgroundColor()
+{
+    return g_palette[g_selection].background;
+}
+
+string getForegroundColor()
+{
+    return g_palette[g_selection].foreground;
+}
+
 int getStyleByTokenType(CodeTokenType type)
 {
     switch(type) {
