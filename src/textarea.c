@@ -147,11 +147,11 @@ void drawEditor(Editor* editor) {
 static void drawEditorComplete(Editor *editor){
 	int offset = -1, i;
 	EditorForm *form = editor->forms[editor->curSelect];
-	if(form->caretPos.c == 0) return;
-	getPos(form->passage, form->caretPos.r, form->caretPos.c+1, &offset);
+	if(form->realCaretPos.c == 0) return;
+	getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c+1, &offset);
 	//printf("OFFSET %d\n", offset);
-	if(offset == 0 && form->caretPos.c >= 1){
-		Token *token = getPos(form->passage, form->caretPos.r, form->caretPos.c, &offset)->datptr;
+	if(offset == 0 && form->realCaretPos.c >= 1){
+		Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
 		if(token->type != STRING) return;
 		TextList *list = matchPrefix(form->passage->trie.root, token->content);
 		char *labels[MAX_WORD_SIZE];
@@ -166,11 +166,11 @@ static void drawEditorComplete(Editor *editor){
 		}
 		SetPointSize(textPointSize);
 		double listx, listy, listw, listh;
-		listx = (form->caretPos.c+1)*TextStringWidth("a")+indexLength;
-		listy = winHeight-editor->barHeight-(form->caretPos.r+1)*editor->menuHeight;
+		listx = (form->realCaretPos.c+1)*TextStringWidth("a")+indexLength;
+		listy = winHeight-editor->barHeight-(form->realCaretPos.r+1)*editor->menuHeight;
 		listw = TextStringWidth("aaaaaaaaaaaaaa");
 		listh = editor->menuHeight;
-		//completeList(GenUIID(0), , winHeight-(list->listLen)*editor->menuHeight-(form->caretPos.r)*textFontHeight-editor->barHeight-editor->menuHeight, , editor->menuHeight, labels, list->listLen);
+		//completeList(GenUIID(0), , winHeight-(list->listLen)*editor->menuHeight-(form->realCaretPos.r)*textFontHeight-editor->barHeight-editor->menuHeight, , editor->menuHeight, labels, list->listLen);
 		int selection = completeList(GenUIID(0), listx, listy, listw, listh, labels, list->listLen);
 		if(form->completeMode == 2){
 		 	form->completeMode = 0;
@@ -181,9 +181,9 @@ static void drawEditorComplete(Editor *editor){
 		//return;
 		if(selection != -1){
 			int addLen = strlen(labels[selection])-token->length;
-			addTrace(form->urStack, ADD, form->caretPos.r, form->caretPos.c+1, form->caretPos.r, form->caretPos.c+1+strlen(labels)-token->length, labels[selection]+token->length);
-			addString(form->passage, labels[selection]+token->length, form->caretPos.r, form->caretPos.c+1);
-			form->caretPos.c += addLen;
+			addTrace(form->urStack, ADD, form->realCaretPos.r, form->realCaretPos.c+1, form->realCaretPos.r, form->realCaretPos.c+1+strlen(labels)-token->length, labels[selection]+token->length);
+			addString(form->passage, labels[selection]+token->length, form->realCaretPos.r, form->realCaretPos.c+1);
+			form->realCaretPos.c += addLen;
 			form->realCaretPos.c += addLen;
 			form->completeMode = 0;
 		}
@@ -698,7 +698,7 @@ void handleInputEvent(Editor* editor, char ch) {
     EditorForm *form = editor->forms[editor->curSelect];
     PosRC curPos = form->realCaretPos;
     static char lastCn = 0;//track the last Chinese character, if is not, this var is 0
-    static bool completed = false;
+    //static bool completed = false;
     char tmpstr[MAX_LINE_SIZE] = "";
     
     if(ch < 0){
@@ -713,14 +713,14 @@ void handleInputEvent(Editor* editor, char ch) {
         }
     }
     else if (ch >= 32 && ch < 127) {
-        switch(ch) {
-            case '}': case ']': case ')':
-            case '>': case '\"': case '\'':
-                if (completed) {
-                    completed = false;
-                    return;
-                }
-        }
+//        switch(ch) {
+//            case '}': case ']': case ')':
+//            case '>': case '\"': case '\'':
+//                if (completed) {
+//                    completed = false;
+//                    return;
+//                }
+//        }
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
         LOG("Attempting to add %s\n", tmpstr);
@@ -742,8 +742,8 @@ void handleInputEvent(Editor* editor, char ch) {
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
             LOG("Attempting to complete by adding %s\n", tmpstr);
             addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
-            completed = true;
-        } else completed = false;
+            //completed = true;
+        } //else completed = false;
     } else if (ch == '\t') {
         // Due to the calculation in addString(), we must use a loop to finish this
         int i;
@@ -858,6 +858,6 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
     }
     curForm->realCaretPos.c = col;
     printf("Caret at (%d, %d), Real Caret at (%d, %d)\n", 
-            curForm->caretPos.r, curForm->caretPos.c, 
-            curForm->realCaretPos.r, curForm->realCaretPos.c);
+    curForm->caretPos.r, curForm->caretPos.c, 
+    curForm->realCaretPos.r, curForm->realCaretPos.c);
 }
