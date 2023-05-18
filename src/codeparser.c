@@ -93,15 +93,16 @@ int parseLine(Passage *passage, int row){
     char tmpLine[MAX_LINE_SIZE], tmpWord[MAX_WORD_SIZE];
     int totLen = 0, idx = 1, newLine = 0;
     
-	int levelCounter = 0, offset, initrow = row;
+	int levelCounter = 0, offset;
 	if (row > 1) {
 	    Line*  lastLine = kthNode(passage, row - 1)->datptr;
 	    Token* lastToken = getPos(passage, row - 1, lastLine->length + 1, &offset)->datptr;
 	    levelCounter = lastToken->level;
     }
+    int initLevel = levelCounter;
 
     Line  *line  = NEW(Line);
-     initList(&(line->lineList));
+    initList(&(line->lineList));
      
     //store the target line in char array <tmpLine>
      totLen = getLine(passage, tmpLine, row);
@@ -262,8 +263,9 @@ int parseLine(Passage *passage, int row){
         
     }
     
-    maintainLineLength(line);    //maintain the length of the current line
-    maintainLevel(passage, row, line->length);
+    maintainLineLength(line); //maintain the length of the current line
+    if (levelCounter != initLevel)
+        maintainLevel(passage, row, line->length);
     return row;
 }
 
@@ -575,6 +577,9 @@ void maintainLevel(Passage *passage, int row, int col){
     Token* token = nowNode->datptr;
     levelCounter = token->level;
     
+    if (token->type == LEFT_PARENTHESES || token->type == LEFT_BRACKETS || token->type == LEFT_BRACE)
+        levelCounter++;
+    
     while(levelCounter >= 0) {
         nowNode = nowNode->next;
         if (nowNode == NULL) {
@@ -636,6 +641,7 @@ PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch){
 
 //for debug use
 void printPassage(Passage *p){ 
+    return;
      Listptr nowLineNode = kthNode(&(p->passList), 1);
      printf("Total line num: %d\n", p->passList.listLen);
      while(nowLineNode != NULL){
