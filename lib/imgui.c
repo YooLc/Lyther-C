@@ -448,10 +448,6 @@ int menuList(int id, double x, double y, double w, double wlist, double h, char 
 	if( menuItem(id, x, y, w, h, labels[0]) )
 		unfoldMenu = ! unfoldMenu;
 
-	if( !inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + wlist, y-n*h, y+h) && gs_UIState.mousedown){
-		if(unfoldMenu) unfoldMenu = 0;
-	}
-
 	if( gs_UIState.actingMenu == id && unfoldMenu  ) {
 		int k;
 		gs_UIState.charInput = 0; // disable text editing
@@ -465,6 +461,7 @@ int menuList(int id, double x, double y, double w, double wlist, double h, char 
 			}
 		}
 	}
+	if(unfoldMenu == 0) gs_UIState.actingMenu = 0;
 	return result;
 }
 
