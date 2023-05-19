@@ -1,60 +1,48 @@
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
-#include <math.h>
 #include <stdbool.h>
+#include <windows.h>
 
-#include "textarea.h"
-#include "codeparser.h"
+#include "imgui.h"
 #include "style.h"
+#include "extgui.h" 
+#include "helper.h"
 #include "graphics.h"
 #include "extgraph.h"
-#include "imgui.h"
-#include "extgui.h" 
+#include "textarea.h"
 #include "undoredo.h"
-#include "helper.h"
+#include "codeparser.h"
 
 #define NEW(T) (T*)malloc(sizeof(T))
 
 double winWidth, winHeight;
-
-int textPointSize, uiPointSize;
+int    textPointSize, uiPointSize;
 double textFontHeight, uiFontHeight, indexLength;
-char g_messageString[250];
+char   g_messageString[250];
 
 extern Palette g_palette[];
-extern int g_selection;
+extern int     g_selection;
 extern UIState gs_UIState;
 
 void initEditor(Editor* editor) {
-    textPointSize = 22;
-    uiPointSize = 15;
-    indexLength = 0.5;
+    textPointSize = TEXT_POINT_SIZE;
+    uiPointSize   = UI_POINT_SIZE;
+    indexLength   = LINE_INDEX_LENGTH;
     
-    winWidth = GetWindowWidth();
+    winWidth  = GetWindowWidth();
     winHeight = GetWindowHeight();
     
     SetPointSize(uiPointSize);
-    uiFontHeight = GetFontHeight();
+    uiFontHeight   = GetFontHeight();
     SetPointSize(textPointSize);
     textFontHeight = GetFontHeight();
     
     editor->fileCount = 0;
     editor->curSelect = 0;
+    editor->forms[0]  = NULL;
     editor->filePath[0] = NULL;
-    editor->forms[0] = NULL;
-    editor->menuHeight = editor->barHeight = uiFontHeight * 1.5;
-}
-
-static char* getFileName(char* filePath) {
-    // To Be Implemented
-    int len = strlen(filePath);
-    char* fileName = (char *)malloc(sizeof(char) * len);
-    
-    int idx = len - 1;
-    while (idx >= 0 && filePath[idx] != '\\') idx--;
-    strcpy(fileName, filePath + 1 + idx);
-    return fileName;
+    editor->menuHeight  = editor->barHeight = uiFontHeight * 1.5;
 }
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {

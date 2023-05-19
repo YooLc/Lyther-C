@@ -21,7 +21,7 @@ Palette g_palette[] = {
 
 int g_selection = 1;
 
-void InitStyle()
+void initStyle()
 {
     // Classic
     defineColorRGB("Light Blue", "ccffff");

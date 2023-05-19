@@ -11,6 +11,9 @@
 #define MAX_FILE_COUNT 20
 #define INDENT_LENGTH 4
 #define SCROLL_DIST 3
+#define LINE_INDEX_LENGTH 0.5
+#define UI_POINT_SIZE   15
+#define TEXT_POINT_SIZE 22
 
 /*
     Struct: Editor Form
@@ -62,12 +65,12 @@ typedef enum {
 
 /*
     Function: initEditor
-    Set default values for newly allocated editor
+    Set default values for newly allocated editor.
 */
 void initEditor(Editor* editor);
 /*
     Function: drawEditorMenu
-    Display right click menu when it's called
+    Display right click menu when it's called.
 */
 static void drawEditorMenu(Editor* editor);
 /*
