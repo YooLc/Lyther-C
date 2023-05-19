@@ -11,6 +11,7 @@
 #include "menu.h"
 #include "clipboard.h"
 #include "trie.h"
+#include "ioutils.h"
 
 #define REFRESH_TIMER 1
 
@@ -23,21 +24,21 @@ void Display(void);
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
-    handleKeyboardEvent(&editor, key, event);
+    if (!isHelperActivated()) handleKeyboardEvent(&editor, key, event);
     //Display();
 }
 
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
-    handleInputEvent(&editor, ch);
+    if (!isHelperActivated()) handleInputEvent(&editor, ch);
     Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
-    handleMouseEvent(&editor, x, y, button, event);
+    if (!isHelperActivated()) handleMouseEvent(&editor, x, y, button, event);
     if (event != MOUSEMOVE) Display();
 }
 
@@ -53,7 +54,7 @@ void Main()
     SetWindowTitle("Light C code editor");
     InitGraphics();
     InitConsole(); // For debug use.
-    SetFont("Cascadia Code");
+    SetFont("Consolas");
     SetPointSize(22); // This fix werid offset when drawing text. Note that this value varies to different fonts
     InitStyle();
     InitGUI();

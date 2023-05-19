@@ -91,15 +91,11 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
 */
 static void drawEditorComplete(Editor *editor);
 static void drawToken(Token* token, double x, double y, double w, double h);
-static void drawEditorSelection(EditorForm* from);
+void drawEditorSelection(EditorForm* from);
 static void drawSymbolMatch(EditorForm *form);
 static void drawTokenBox(Token* token, double x, double y, double w, double h);
 void drawMessageBar();
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath);
 static void drawCaret(EditorForm* form);
-static void moveCaret(EditorForm *form, CaretAction action, char* curLine, char* preLine);
-void moveCaretByMouse(Editor* editor, int x, int y, int button, int event);
-void moveCaretByKey(Editor* editor, int key, int event);
-void addChar(char ch);
 #endif
