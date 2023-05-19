@@ -122,7 +122,7 @@ PosRC addString(Passage *passage, char *str, int row, int col);
     If want to delete the empty line(contaning only \n) at i colomn, need to call:
         deleteString(passage, i-1, (i-1).length, i, 1)
 */ 
-void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
+PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
 
 /*
     Function: getString(Passage *passage, int rows, int cols, int rowt, int colt)

@@ -240,16 +240,18 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
                     }
                     char *tmpstr = getString(curForm->passage, posl.r, posl.c+1, posr.r, posr.c);
                     addTrace(curForm->urStack, DELE, posl.r, posl.c+1, posr.r, posr.c, tmpstr);
-                    deleteString(curForm->passage, posl.r, posl.c + 1, posr.r, posr.c);
+                    curForm->caretPos = deleteString(curForm->passage, posl.r, posl.c + 1, posr.r, posr.c);
                     free(tmpstr);
+                    // When exiting selection mode, reset select position
+                    curForm->selectLeftPos = curForm->selectRightPos = curForm->caretPos;
                     curForm->inSelectionMode = false;
                 }
                 break;
             case VK_DELETE: // <Delete>: delete contes after caret
                 if(curPos.c == strlen(curLine)) curLine[curPos.c] = '\n';
                 curLine[curPos.c+1] = '\0';
-                addTrace(curForm->urStack, DELE, curPos.r, curPos.c+1, curPos.r, curPos.c + 1, curLine + curPos.c);
-                deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
+                addTrace(curForm->urStack, DELE, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, curLine + curPos.c);
+                curForm->caretPos = deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
                 break;
             case VK_RETURN:
             	if(curForm->completeMode == 1) curForm->completeMode = 2;
@@ -269,10 +271,13 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
                 break;
         }
     }
-
+    
+    printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n", 
+    curForm->caretPos.r, curForm->caretPos.c, 
+    curForm->realCaretPos.r, curForm->realCaretPos.c, curPos.r, curPos.c);
     // Smart Caret Position, matches the nearest position that is available,
     // with Chinese character support.
-    curPos = curForm->caretPos;
+    curPos = curForm->realCaretPos = curForm->caretPos;
     getLine(curForm->passage, curLine, curPos.r);
     int i, col = 0, minDistance = MAX_LINE_SIZE, charWidth;
     for(i = 0; curLine[i]; i += charWidth) {
@@ -284,9 +289,9 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
         else break;
     }
     curForm->realCaretPos.c = col;
-    printf("Caret at (%d, %d), Real Caret at (%d, %d)\n", 
+    printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n", 
     curForm->caretPos.r, curForm->caretPos.c, 
-    curForm->realCaretPos.r, curForm->realCaretPos.c);
+    curForm->realCaretPos.r, curForm->realCaretPos.c, curPos.r, curPos.c);
 }
 
 void handleInputEvent(Editor* editor, char ch) {
@@ -432,7 +437,10 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
                 // curForm->selectRightPos.r, curForm->selectRightPos.c);
                 if(!atSamePos(curForm->selectRightPos, curForm->selectLeftPos))
                      curForm->inSelectionMode = true;
-                else curForm->inSelectionMode = false;
+                else {
+                    curForm->selectLeftPos = curForm->selectRightPos = curForm->realCaretPos;
+                    curForm->inSelectionMode = false;
+                }
                 isLeftButtonDown = false;
             }
             break;
@@ -441,7 +449,10 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
                 curForm->selectRightPos = pixelToPosRC(curForm, x, y);
                 if(!atSamePos(curForm->selectRightPos, curForm->selectLeftPos))
                      curForm->inSelectionMode = true;
-                else curForm->inSelectionMode = false;
+                else {
+                    curForm->selectLeftPos = curForm->selectRightPos = curForm->realCaretPos;
+                    curForm->inSelectionMode = false;
+                }
                 drawEditorSelection(editor->forms[editor->curSelect]);
             }
             break;
