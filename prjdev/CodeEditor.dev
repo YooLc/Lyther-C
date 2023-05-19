@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000000000000
-UnitCount=44
+UnitCount=42
 
 [VersionInfo]
 Major=1
@@ -350,47 +350,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit31]
-FileName=..\src\fileio.h
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit32]
-FileName=..\src\fileio.c
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit33]
-FileName=..\src\menu.h
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit34]
-FileName=..\src\menu.c
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit35]
 FileName=..\src\clipboard.h
 CompileCpp=0
 Folder=src
@@ -400,7 +360,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit36]
+[Unit34]
 FileName=..\src\clipboard.c
 CompileCpp=0
 Folder=src
@@ -410,17 +370,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit38]
-FileName=..\lib\extgui.h
-CompileCpp=0
-Folder=lib
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit37]
+[Unit35]
 FileName=..\lib\extgui.c
 CompileCpp=0
 Folder=lib
@@ -430,7 +380,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit40]
+[Unit36]
+FileName=..\lib\extgui.h
+CompileCpp=0
+Folder=lib
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit38]
 FileName=..\src\trie.h
 CompileCpp=0
 Folder=src
@@ -440,7 +400,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit39]
+[Unit37]
 FileName=..\src\trie.c
 CompileCpp=0
 Folder=src
@@ -450,7 +410,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit41]
+[Unit40]
+FileName=..\src\helper.h
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit39]
 FileName=..\src\helper.c
 CompileCpp=0
 Folder=src
@@ -460,8 +430,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit41]
+FileName=..\src\ioutils.c
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit42]
-FileName=..\src\helper.h
+FileName=..\src\ioutils.h
 CompileCpp=0
 Folder=src
 Compile=1
@@ -482,6 +462,26 @@ BuildCmd=
 
 [Unit44]
 FileName=..\src\ioutils.h
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit31]
+FileName=..\src\menu.h
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit32]
+FileName=..\src\menu.c
 CompileCpp=0
 Folder=src
 Compile=1
