@@ -1,8 +1,10 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <windows.h>
+#include <commdlg.h>
+#include <stdbool.h>
 
 #include "imgui.h"
 #include "extgui.h"
@@ -21,12 +23,12 @@ extern double textFontHeight, indexLength;
 extern UIState gs_UIState;
 
 static bool isControlDown = 0;
+static int  newFileCount  = 1; // Already added one in main()
 
 /*
     Part I: File Utilities
 */
 string getFileName(char* filePath) {
-    // To Be Implemented
     int len = strlen(filePath);
     string fileName = (char *)malloc(sizeof(char) * len);
     
@@ -34,6 +36,113 @@ string getFileName(char* filePath) {
     while (idx >= 0 && filePath[idx] != '\\') idx--;
     strcpy(fileName, filePath + 1 + idx);
     return fileName;
+}
+
+void loadFile(Editor *editor){
+    // Contruct OPENFILENAME structure to call Windows api to get file path
+    OPENFILENAME ofn;
+    char openFile[MAX_PATH];
+    memset(&ofn, 0, sizeof(OPENFILENAME));
+    memset(openFile, 0, sizeof(char) * MAX_PATH);
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.lpstrFilter = "All C files(*c, *h)\0*.c;*.h\0C source files(*.c)\0*.c\0Header files(*.h)\0*.h\0\0";
+    ofn.lpstrFile = (LPTSTR)openFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_FILEMUSTEXIST;
+    GetOpenFileName(&ofn);
+
+    FILE *fp = fopen(openFile, "r");
+    if(fp == NULL){
+        printf("FAILED TO OPEN FILE [%s]", openFile);
+        return;
+    }
+    char* filePath = (char*)malloc(sizeof(char) * strlen(openFile));
+    strcpy(filePath, openFile);
+    addCodeToEditor(editor, fp, filePath);
+    fclose(fp);
+}
+
+void newFile(Editor *editor){
+    char tmpstr[MAX_PATH] = "";
+    sprintf(tmpstr, "+\\Untitled %d", ++newFileCount);
+    addCodeToEditor(editor, NULL, tmpstr);
+}
+
+void saveFile(Editor *editor){
+    if(editor->filePath[editor->curSelect][0] == '+') {
+        saveAs(editor);
+        return;
+    }
+    
+    FILE *fp = fopen(editor->filePath[editor->curSelect], "w");
+    if(fp == NULL){
+        printf("FAILED TO SAVE FILE [%s]", editor->filePath[editor->curSelect]);
+        return;
+    }
+
+    // Write code to file
+    EditorForm *form = editor->forms[editor->curSelect];
+
+    Passage *p = form->passage;
+    Listptr nowLineNode = kthNode(&(p->passList), 1);
+
+    while(nowLineNode != NULL){
+        Line* l = nowLineNode->datptr;
+        Listptr nowWordNode = kthNode(&(l->lineList), 1);
+        while(nowWordNode != NULL){
+            Token* w = nowWordNode->datptr;
+            fprintf(fp, "%s", w->content);
+            nowWordNode = nowWordNode->next;
+        }
+        nowLineNode = nowLineNode->next;
+    }
+    fclose(fp);
+}
+
+void saveAs(Editor *editor) {
+    char saveFile[MAX_PATH];
+
+    // Contruct OPENFILENAME structure to call Windows api to get file path
+    OPENFILENAME ofn;
+    memset(&ofn,0,sizeof(OPENFILENAME));
+    memset(saveFile,0,sizeof(char)*MAX_PATH);
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.lpstrFilter = "All C files(*c, *h)\0*.c;*.h\0C source files(*.c)\0*.c\0Header files(*.h)\0*.h\0\0";
+    ofn.lpstrFile = saveFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_FILEMUSTEXIST;
+    GetSaveFileName(&ofn);
+
+    editor->filePath[editor->curSelect] = (char*)malloc(sizeof(char) * strlen(saveFile) + 1);
+    strcpy(editor->filePath[editor->curSelect], saveFile);
+    editor->fileName[editor->curSelect]= getFileName(saveFile);
+
+    printf("SAVE %s\n", saveFile);
+    FILE *fp = fopen(saveFile, "w");
+    if(fp == NULL){
+        puts("FAILURE IN SAVE FILE");
+        return;
+    }
+
+    // Write code to file
+    EditorForm *form = editor->forms[editor->curSelect];
+
+    Passage *p = form->passage;
+    Listptr nowLineNode = kthNode(&(p->passList), 1);
+
+    while(nowLineNode != NULL){
+        Line* l = nowLineNode->datptr;
+        Listptr nowWordNode = kthNode(&(l->lineList), 1);
+        while(nowWordNode != NULL){
+            Token* w = nowWordNode->datptr;
+            fprintf(fp, "%s", w->content);
+            nowWordNode = nowWordNode->next;
+        }
+        nowLineNode = nowLineNode->next;
+    }
+    fclose(fp);
 }
 
 /*

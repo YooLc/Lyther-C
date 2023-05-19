@@ -74,7 +74,7 @@ void Main()
     initStyle();
     initEditor(&editor);
     initMenu();
-    addCodeToEditor(&editor, NULL, "Untitled.c");
+    addCodeToEditor(&editor, NULL, "+\\Untitled 1");
 
     // Setup callback functions to handle various events
     startTimer(REFRESH_TIMER, 20);

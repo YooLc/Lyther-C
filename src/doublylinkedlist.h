@@ -2,7 +2,7 @@
 #define _DOUBLY_LINKED_LIST_H_
 
 // struct of a node in the linked list
-typedef struct {
+typedef struct ListNode{
     void* datptr;
     struct listNode *prev;
     struct listNode *next;
@@ -16,7 +16,7 @@ typedef ListNode* Listptr;
     this is a warpped struct containing all variables
     used as the ONLY identification of a list
 */
-typedef struct {
+typedef struct LinkedList{
     Listptr head;
     Listptr tail;
     int listLen;

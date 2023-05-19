@@ -12,6 +12,22 @@
     Get file name from its Windows-styled absolute path.
 */
 string getFileName(char* filePath);
+/*
+    Function：newFile(Editor *editor)
+    Creat a new C file, named as <Untitled>
+*/
+void newFile(Editor *editor);
+/*
+    Function: loadFile(Editor *editor)
+    load <filename> into editor, and rewind the <curselect> to this file
+*/
+void loadFile(Editor *editor);
+/*
+    Function: saveAs(Editor *editor)
+    Save <curselect> in editor as <fileName>
+*/
+void saveAs(Editor *editor);
+void saveFile(Editor *editor);
 
 /*
     Part II: Keyboard Utilities
