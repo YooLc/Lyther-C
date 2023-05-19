@@ -407,10 +407,10 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
 
 void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
     if (gs_UIState.clickedItem) return;
-    
+
     static bool isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
-
+	if(curForm->completeMode != 0) return;
     if (ScaleXInches(x) >= curForm->x + curForm->w - GUTTER_WIDTH) return;
     if (ScaleYInches(y) >= winHeight - editor->menuHeight - editor->barHeight) return;
 
