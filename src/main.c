@@ -29,14 +29,14 @@ void Display(void)
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
-    if (!isHelperActivated())
+    if (!helperActivated() && !aboutActivated())
         handleKeyboardEvent(&editor, key, event);
 }
 
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
-    if (!isHelperActivated())
+    if (!helperActivated() && !aboutActivated())
         handleInputEvent(&editor, ch);
     Display();
 }
@@ -44,7 +44,7 @@ void CharEventProcess(char ch)
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
-    if (!isHelperActivated())
+    if (!helperActivated() && !aboutActivated())
         handleMouseEvent(&editor, x, y, button, event);
     if (event != MOUSEMOVE)
         Display();

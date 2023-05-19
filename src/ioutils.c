@@ -17,9 +17,9 @@
 #define isGB2312(X) (X < 0) // The top bit of Chinese characters in GB2312 is 1, so it's negative
 #define atSamePos(X, Y) (X.r == Y.r && X.c == Y.c)
 
-extern double winWidth, winHeight;
-extern int    textPointSize;
-extern double textFontHeight, indexLength;
+extern double  winWidth, winHeight;
+extern int     textPointSize;
+extern double  textFontHeight, indexLength;
 extern UIState gs_UIState;
 
 static bool isControlDown = 0;
@@ -297,9 +297,9 @@ void handleInputEvent(Editor* editor, char ch) {
     char tmpstr[MAX_LINE_SIZE] = "";
     
     if(ch < 0){
-        if(lastCn == 0){
+        if(lastCn == 0) {
             lastCn = ch;
-        }else{
+        } else {
             sprintf(tmpstr, "%c%c\0", lastCn, ch);
             addTrace(form->urStack, ADD, curPos.r, curPos.c+1, curPos.r, curPos.c+2, tmpstr);
             LOG("Attempting to add %s\n", tmpstr);
@@ -349,11 +349,9 @@ void handleInputEvent(Editor* editor, char ch) {
             form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
             curPos = form->realCaretPos;
         }
-    } else if ((ch == '\n' || ch == '\r') && form->completeMode == 0) {
-        int offset;
+    } else if ((ch == '\n' || ch == '\r') && form->completeMode == 0 && !isControlDown) {
+        int offset, i;
         Token* lastToken = getPos(form->passage, curPos.r, curPos.c + 1, &offset)->datptr;
-        printf("Caught return key, attempt to complete!\n");
-        int i;
         for (i = 0; i < lastToken->level * INDENT_LENGTH; i++) {
             sprintf(tmpstr, " ");
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);

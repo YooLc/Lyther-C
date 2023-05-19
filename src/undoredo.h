@@ -4,14 +4,14 @@
 #include "doublylinkedlist.h"
 #include "codeparser.h"
 
-typedef enum{
+typedef enum {
     ADD,
     DELE
 } TraceType;
 
 typedef struct{
     TraceType type;
-    int rows, cols, rowt, colt; //interval (closed)
+    int rows, cols, rowt, colt; // closed interval
     char content[MAX_LINE_SIZE];
 } Trace;
 
@@ -25,10 +25,9 @@ typedef struct{
     Listptr nowNode;
 }UndoRedo;
 
-//Call this function when there is an Undo event
+// Call this function when there is an Undo event
 PosRC Undo(UndoRedo *ur);
-
-//Call this function when there is an Redo event
+// Call this function when there is an Redo event
 PosRC Redo(UndoRedo *ur);
 
 /*

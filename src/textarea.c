@@ -4,10 +4,10 @@
 #include <stdbool.h>
 #include <windows.h>
 
+#include "help.h"
 #include "imgui.h"
 #include "style.h"
-#include "extgui.h" 
-#include "helper.h"
+#include "extgui.h"
 #include "graphics.h"
 #include "extgraph.h"
 #include "textarea.h"
@@ -119,11 +119,12 @@ void drawEditor(Editor* editor) {
     }
     SetPointSize(uiPointSize);
     drawEditorBar(editor);
+    
+    drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
+    drawAbout(0, 0, winWidth, winHeight - editor->menuHeight);
+    
     drawEditorMenu(editor);
     drawEditorComplete(editor);
-    if (isHelperActivated()) {
-        drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
-    }
 }
 
 static void drawEditorComplete(Editor *editor){
@@ -336,7 +337,8 @@ static void drawEditorMenu(Editor* editor) {
         "Cut  | Ctrl-X",
         "Paste| Ctrl-V"};
     static char* menuListHelp[] = {"Help",
-        "Open Mannual | Ctrl-H"
+        "Open Mannual | Ctrl-H",
+        "About | Ctrl-B"
     }; 
     int selection;
     double x, y, w, h, wlist, xindent;
@@ -350,7 +352,7 @@ static void drawEditorMenu(Editor* editor) {
     wlist = TextStringWidth(menuListFile[5]) * 1.25;
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListFile, sizeof(menuListFile) / sizeof(menuListFile[0]));
         switch(selection) {
-        case 1: newFile(editor); printf("Clicked\n"); break;
+        case 1: newFile(editor); break;
         case 2: loadFile(editor); break;
         case 3: saveFile(editor); break;
         case 4: saveAs(editor); break;
@@ -388,13 +390,17 @@ static void drawEditorMenu(Editor* editor) {
     x += w;
     w = TextStringWidth(menuListHelp[0]) * 2;
     wlist = TextStringWidth(menuListHelp[1]) * 1.25;
-    if (isHelperActivated()) menuListHelp[1] = "Close Mannual | Ctrl-H";
+    if (helperActivated()) menuListHelp[1] = "Close Mannual | Ctrl-H";
+    else menuListHelp[1] = "Open Mannual | Ctrl-H";
     selection = menuList(GenUIID(0), x, y, w, wlist, h, menuListHelp, sizeof(menuListHelp) / sizeof(menuListHelp[0]));
     switch(selection) {
         case 1:
-            if (isHelperActivated()) closeHelper();
+            if (helperActivated()) closeHelper();
 			else activateHelper();
 			break;
+		case 2: if (aboutActivated()) closeAbout();
+		    else activateAbout();
+		    break;
     }
 } 
 
