@@ -4,7 +4,7 @@
 #include "doublylinkedlist.h"
 #include "trie.h"
 
-#define MAX_WORD_SIZE 128
+#define MAX_WORD_SIZE 256
 #define MAX_LINE_SIZE 2048
 #define NEW(T) (T*)malloc(sizeof(T)) 
 #define LOG(x,y) printf("[LOG][%d -> %s()] ", __LINE__, __func__); \

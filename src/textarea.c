@@ -140,6 +140,7 @@ static void drawEditorComplete(Editor *editor){
 			return;
 		}
 		TextList *list = matchPrefix(form->passage->trie.root, token->content);
+
 		char *labels[MAX_WORD_SIZE];
 		//if(list == NULL) printf("NULL %s", token->content);
 		if(list == NULL || list->listLen == 0){
@@ -156,10 +157,10 @@ static void drawEditorComplete(Editor *editor){
 		SetPointSize(textPointSize);
 		double listx, listy, listw, listh;
 		listx = (form->realCaretPos.c+1)*TextStringWidth("a")+indexLength;
-		listy = winHeight-editor->barHeight-(form->realCaretPos.r+1)*editor->menuHeight;
+		listy = winHeight-editor->barHeight-(-form->startLine+form->realCaretPos.r+2)*textFontHeight;
 		listw = TextStringWidth("aaaaaaaaaaaaaa");
 		listh = editor->menuHeight;
-		//completeList(GenUIID(0), , winHeight-(list->listLen)*editor->menuHeight-(form->realCaretPos.r)*textFontHeight-editor->barHeight-editor->menuHeight, , editor->menuHeight, labels, list->listLen);
+
 		int selection = completeList(GenUIID(0), listx, listy, listw, listh, labels, list->listLen);
 		if(form->completeMode == 2){
 		 	form->completeMode = 0;
@@ -177,7 +178,11 @@ static void drawEditorComplete(Editor *editor){
 			form->caretPos.c += addLen;
 			form->completeMode = 0;
 		}
-		for(i=0; i<list->listLen; i++) free(labels[i]);
+		for(i=0; i<list->listLen; i++){
+			free(labels[i]);
+			free(kthNode(list, i+1)->datptr);
+		}
+		free(list);
 	}
 }
 
