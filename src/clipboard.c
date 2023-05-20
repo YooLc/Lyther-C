@@ -36,31 +36,29 @@ static void mySetClipBoard(char *str){
     CloseClipboard();
 }
 
-static void myGetClipBoard(char* dst){
-
-    if (!IsClipboardFormatAvailable(CF_TEXT)) return; 
-    if (!OpenClipboard(NULL)) return; 
+static void myGetClipBoard(char* dst) {
+    if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
+        dst[0] = '\0';
+    }
     
     HGLOBAL hglb;
     char *src;
 
-    hglb = GetClipboardData(CF_TEXT); 
-    if (hglb != NULL){ 
+    hglb = GetClipboardData(CF_TEXT);
+    if (hglb != NULL) {  
         src = GlobalLock(hglb); 
-        if(src == NULL){
-            dst[0] = '\0';
-        }else{
-            strcpy(dst, src);
-        }
+        if(src == NULL) dst[0] = '\0';
+        else strcpy(dst, src);
         CloseClipboard(); 
     }
+    else dst[0] = '\0';
 }
 
-void Copy(EditorForm *form){
+void Copy(EditorForm *form) {
     PosRC posl = form->selectLeftPos, posr = form->selectRightPos;
     if(posl.r > posr.r || \
         (posl.r == posr.r && posl.c > posr.c)    
-    ){
+    ) {
         PosRC tmp = posl;
         posl = posr;
         posr = tmp;
@@ -71,7 +69,7 @@ void Copy(EditorForm *form){
     free(dst);
 }
 
-void Cut(EditorForm *form){
+void Cut(EditorForm *form) {
     PosRC posl = form->selectLeftPos, posr = form->selectRightPos;
     if(posl.r > posr.r || \
         (posl.r == posr.r && posl.c > posr.c)    
@@ -90,13 +88,14 @@ void Cut(EditorForm *form){
 }
 
 void Paste(EditorForm *form){
-    char *dst = (char*)malloc(sizeof(char)*MAX_LINE_SIZE*10); //overflow danger
+    char *dst = (char*)malloc(sizeof(char) * MAX_LINE_SIZE * 40); //overflow danger
     PosRC newRC;
     
     myGetClipBoard(dst);
-    if(dst[0] == '\0') return;
-    newRC = addString(form->passage, dst, form->caretPos.r, form->caretPos.c+1);
-    addTrace(form->urStack, ADD, form->caretPos.r, form->caretPos.c+1, newRC.r, newRC.c, dst);
+    if (dst[0] == '\0') return;
+    
+    newRC = addString(form->passage, dst, form->realCaretPos.r, form->realCaretPos.c + 1);
+    addTrace(form->urStack, ADD, form->realCaretPos.r, form->realCaretPos.c+1, newRC.r, newRC.c, dst);
     form->caretPos = form->realCaretPos = newRC;
     free(dst);
 }

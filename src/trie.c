@@ -50,7 +50,7 @@ void initTrie(Trie *tree){
 
 void addStringToTrie(TreeNode *root, char *str){
 	if(root == NULL || str == NULL) return;
-	if(*str == '\0') return;
+	if(*str <= 0) return;
 	
 	char ch = *str;
 	int index = 0;
@@ -78,7 +78,9 @@ void addStringToTrie(TreeNode *root, char *str){
 }
 
 int deleteStringInTrie(TreeNode *root, char *str){
-	if(root == NULL || str == NULL) return;
+	if (root == NULL || str == NULL) return 0; 
+    if (*str < 0) return 0;
+    
 	char ch = *str;
 	int index = 0;
 	
@@ -123,7 +125,7 @@ int deleteStringInTrie(TreeNode *root, char *str){
 
 TreeNode *searchString(TreeNode *root, char *str){
 	if(root == NULL || str == NULL) return NULL;
-	if(*str == '\0') return NULL;
+	if(*str <= 0) return NULL;
 	
 	char ch = *str;
 	int index = 0;

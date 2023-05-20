@@ -20,7 +20,6 @@ UndoRedo undoRedo;
 
 void Display(void)
 {
-    printPassage(editor.forms[editor.curSelect]->passage);
     DisplayClear();
     drawEditor(&editor);
     displayMenu();
