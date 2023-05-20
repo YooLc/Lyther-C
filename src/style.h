@@ -42,8 +42,10 @@ typedef struct {
     char hotLabel[MAX_NAME_LEN];
 } Palette;
 
-void InitStyle();
+void initStyle();
 string getColorByTokenType(CodeTokenType type, int degree);
+string getBackgroundColor();
+string getForegroundColor();
 int getStyleByTokenType(CodeTokenType type);
 
 /*
