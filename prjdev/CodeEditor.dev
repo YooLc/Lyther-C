@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000001000000
-UnitCount=43
+UnitCount=45
 
 [VersionInfo]
 Major=1
@@ -450,16 +450,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit44]
-FileName=..\src\ioutils.h
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit31]
 FileName=..\src\menu.h
 CompileCpp=0
@@ -481,9 +471,28 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit43]
-FileName=..\res\OIG.ico
+FileName=..\res\icon.ico
 Folder=res
 Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit45]
+FileName=..\res\icon.h
+CompileCpp=0
+Folder=res
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit44]
+FileName=..\res\icon.rc
+Folder=res
+Compile=1
 Link=0
 Priority=1000
 OverrideBuildCmd=0
