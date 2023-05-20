@@ -8,7 +8,7 @@
 #include "undoredo.h"
 #include "style.h"
 
-#define MAX_FILE_COUNT    200
+#define MAX_FILE_COUNT    20
 #define INDENT_LENGTH     4
 #define SCROLL_DIST       3
 #define LINE_INDEX_LENGTH 0.5

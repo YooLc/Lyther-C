@@ -65,11 +65,11 @@ void loadFile(Editor *editor){
 
 void newFile(Editor *editor){
     char tmpstr[MAX_PATH] = "";
-    sprintf(tmpstr, "+\\Untitled %d", ++newFileCount);
+    sprintf(tmpstr, "+\\Untitled %d.c", ++newFileCount);
     addCodeToEditor(editor, NULL, tmpstr);
 }
 
-void saveFile(Editor *editor){
+void saveFile(Editor *editor) {
 	printf("FILE PATH : %s\n", editor->filePath[editor->curSelect]);
     if(editor->filePath[editor->curSelect][0] == '+') {
         saveAs(editor);
@@ -106,8 +106,8 @@ void saveAs(Editor *editor) {
 
     // Contruct OPENFILENAME structure to call Windows api to get file path
     OPENFILENAME ofn;
-    memset(&ofn,0,sizeof(OPENFILENAME));
-    memset(saveFile,0,sizeof(char)*MAX_PATH);
+    memset(&ofn, 0, sizeof(OPENFILENAME));
+    memset(saveFile, 0, sizeof(char) * MAX_PATH);
     ofn.lStructSize = sizeof(OPENFILENAME);
     ofn.lpstrFilter = "All C files(*c, *h)\0*.c;*.h\0C source files(*.c)\0*.c\0Header files(*.h)\0*.h\0\0";
     ofn.lpstrFile = saveFile;
@@ -116,10 +116,16 @@ void saveAs(Editor *editor) {
     ofn.Flags = OFN_FILEMUSTEXIST;
     if(!GetSaveFileName(&ofn)) return;
 
+    int len = strlen(saveFile);
+    printf("Save file: [%s]\n", saveFile);
+    if (len >= 2 && saveFile[len - 2] != '.') {
+        strcat(saveFile, ".c");
+    }
+
     editor->filePath[editor->curSelect] = (char*)malloc(sizeof(char) * strlen(saveFile) + 1);
     strcpy(editor->filePath[editor->curSelect], saveFile);
-    editor->fileName[editor->curSelect]= getFileName(saveFile);
-
+    editor->fileName[editor->curSelect] = getFileName(saveFile);
+    
     printf("SAVE %s\n", saveFile);
     FILE *fp = fopen(saveFile, "w");
     if(fp == NULL){
@@ -129,7 +135,6 @@ void saveAs(Editor *editor) {
 
     // Write code to file
     EditorForm *form = editor->forms[editor->curSelect];
-
     Passage *p = form->passage;
     Listptr nowLineNode = kthNode(&(p->passList), 1);
 
@@ -211,6 +216,7 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
     EditorForm *curForm = editor->forms[editor->curSelect];
     PosRC curPos = curForm->realCaretPos;
     char  curLine[MAX_LINE_SIZE], preLine[MAX_LINE_SIZE];
+    int   row = curForm->passage->passList.listLen;
 
     // Get current and previous line, then trim all '\n'
     getLine(curForm->passage, curLine, curPos.r);
@@ -239,7 +245,7 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
                         posl = posr;
                         posr = tmp;
                     }
-                    char *tmpstr = getString(curForm->passage, posl.r, posl.c+1, posr.r, posr.c);
+                    char *tmpstr = getString(curForm->passage, posl.r, posl.c + 1, posr.r, posr.c);
                     addTrace(curForm->urStack, DELE, posl.r, posl.c+1, posr.r, posr.c, tmpstr);
                     curForm->caretPos = deleteString(curForm->passage, posl.r, posl.c + 1, posr.r, posr.c);
                     free(tmpstr);
@@ -248,9 +254,9 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
                     curForm->inSelectionMode = false;
                 }
                 break;
-            case VK_DELETE: // <Delete>: delete contes after caret
-                if(curPos.c == strlen(curLine)) curLine[curPos.c] = '\n';
-                curLine[curPos.c+1] = '\0';
+            case VK_DELETE: // <Delete>: delete contents after caret
+                if (curPos.c == 0 && strlen(curLine) == 0) break;
+                if (curPos.r == row && curPos.c == strlen(curLine)) break;
                 addTrace(curForm->urStack, DELE, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, curLine + curPos.c);
                 curForm->caretPos = deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
                 break;

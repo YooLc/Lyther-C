@@ -282,11 +282,12 @@ Listptr getPos(Passage *passage, int row, int col, int *offset){
     Line* l = kthNode(&(passage->passList), row)->datptr;
     
     Listptr nowNode = kthNode(&(l->lineList), 1);   // get the pointer of the first node of this line
+    if (nowNode == NULL) return NULL;
     Token* token = nowNode->datptr;                 // pointer of the token in the node
 //    printf("Getting pos, current token [%s]\n", token->content);
     // Find the node which contains the 'col'th column
     int nowcol = token->length;
-    while(nowcol < col) {
+    while(nowcol < col && nowNode->next != NULL) {
         nowNode = nowNode->next;
         token = nowNode->datptr;
         nowcol += token->length;
@@ -556,6 +557,7 @@ PosRC searchForwardByChar(Passage *passage, int row, int col, char ch){
 void maintainLevel(Passage *passage, int row, int col){
     int offset, levelCounter;
     ListNode* nowNode = getPos(passage, row, col, &offset);
+    if (nowNode == NULL) return; 
     Token* token = nowNode->datptr;
     levelCounter = token->level;
     
@@ -623,7 +625,7 @@ PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch){
 
 //for debug use
 void printPassage(Passage *p){ 
-    return;
+    //return;
      Listptr nowLineNode = kthNode(&(p->passList), 1);
      printf("Total line num: %d\n", p->passList.listLen);
      while(nowLineNode != NULL){
