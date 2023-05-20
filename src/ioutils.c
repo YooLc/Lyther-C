@@ -70,7 +70,7 @@ void newFile(Editor *editor){
 }
 
 void saveFile(Editor *editor) {
-	printf("FILE PATH : %s\n", editor->filePath[editor->curSelect]);
+    printf("FILE PATH : %s\n", editor->filePath[editor->curSelect]);
     if(editor->filePath[editor->curSelect][0] == '+') {
         saveAs(editor);
         return;
@@ -192,23 +192,23 @@ static void deleteLastChar(EditorForm* form) {
     getLine(form->passage, tmpLine, curPos.r);
 
     if (curPos.c > 0) {
-    	if(tmpLine[curPos.c - 1] < 0){
-    		strncpy(target, tmpLine + curPos.c - 2, 2);
-    		target[2] = '\0';
-			deleteString(form->passage, curPos.r, curPos.c-1, curPos.r, curPos.c);
-			addTrace(form->urStack, DELE, curPos.r, curPos.c-1, curPos.r, curPos.c, target);
-		}else{
-			target[0] = tmpLine[curPos.c - 1];
-			target[1] = '\0';
-			deleteString(form->passage, curPos.r, curPos.c, curPos.r, curPos.c);
-			addTrace(form->urStack, DELE, curPos.r, curPos.c, curPos.r, curPos.c, target);
-		}
+        if(tmpLine[curPos.c - 1] < 0){
+            strncpy(target, tmpLine + curPos.c - 2, 2);
+            target[2] = '\0';
+            deleteString(form->passage, curPos.r, curPos.c-1, curPos.r, curPos.c);
+            addTrace(form->urStack, DELE, curPos.r, curPos.c-1, curPos.r, curPos.c, target);
+        }else{
+            target[0] = tmpLine[curPos.c - 1];
+            target[1] = '\0';
+            deleteString(form->passage, curPos.r, curPos.c, curPos.r, curPos.c);
+            addTrace(form->urStack, DELE, curPos.r, curPos.c, curPos.r, curPos.c, target);
+        }
     }
     else if (curPos.r > 1) {
         Line *preLine = kthNode(&(form->passage->passList), curPos.r - 1)->datptr;
-    	addTrace(form->urStack, DELE, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1, "\n");
+        addTrace(form->urStack, DELE, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1, "\n");
         deleteString(form->passage, curPos.r - 1, preLine->length + 1, curPos.r - 1, preLine->length + 1);
-	} 
+    } 
 }
 
 void handleKeyboardEvent(Editor* editor, int key, int event) {
@@ -261,12 +261,12 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
                 curForm->caretPos = deleteString(curForm->passage, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1);
                 break;
             case VK_RETURN:
-            	if(curForm->completeMode == 1) curForm->completeMode = 2;
-				else {
-                	addTrace(curForm->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, "\n");
-                	curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
-            	}
-				break;
+                if(curForm->completeMode == 1) curForm->completeMode = 2;
+                else {
+                    addTrace(curForm->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, "\n");
+                    curForm->caretPos = curForm->realCaretPos = addString(curForm->passage, "\n", curPos.r, curPos.c + 1);
+                }
+                break;
             case VK_CONTROL:
                 isControlDown = true;
                 break;
@@ -330,7 +330,7 @@ void handleInputEvent(Editor* editor, char ch) {
             case '{': ac = '}'; break;
             case '[': ac = ']'; break;
             case '(': ac = ')'; break;
-            case '<': ac = '>'; break;
+            // case '<': ac = '>'; break;
             case '\"': ac = '\"'; break;
             case '\'': ac = '\''; break;
         }
@@ -407,10 +407,10 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
 
 void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
     if (gs_UIState.clickedItem) return;
-	if (gs_UIState.actingMenu) return;
+    if (gs_UIState.actingMenu) return;
     static bool isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
-	if(curForm->completeMode != 0) return;
+    if(curForm->completeMode != 0) return;
     if (ScaleXInches(x) >= curForm->x + curForm->w - GUTTER_WIDTH) return;
     if (ScaleYInches(y) >= winHeight - editor->menuHeight - editor->barHeight) return;
 
