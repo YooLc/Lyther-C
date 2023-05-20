@@ -301,8 +301,8 @@ static void drawSymbolMatch(EditorForm *form){
     // We just match brackets before the caret
     if (form->realCaretPos.c == 0) return;
     int offset = 0;
-    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - (form->realCaretPos.r-form->startLine+1)*textFontHeight;
-    double x2 = form->x + indexLength, y2 = form->h+(form->startLine-1)*textFontHeight;
+    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
+    double x2 = form->x + indexLength, y2 = form->h;
     PosRC matchPos;
     Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
     
@@ -346,6 +346,7 @@ static void drawEditorMenu(Editor* editor) {
         "Paste| Ctrl-V"};
     static char* menuListHelp[] = {"Help",
         "Open Mannual | Ctrl-H",
+        "Change Theme | Ctrl-P", 
         "About | Ctrl-B"
     }; 
     int selection;
@@ -406,7 +407,10 @@ static void drawEditorMenu(Editor* editor) {
             if (helperActivated()) closeHelper();
 			else activateHelper();
 			break;
-		case 2: if (aboutActivated()) closeAbout();
+		case 2:
+		    g_selection = 1 - g_selection;
+		    break;
+		case 3: if (aboutActivated()) closeAbout();
 		    else activateAbout();
 		    break;
     }
@@ -479,9 +483,9 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
 
     // Traverse tokens
      while (curToken != NULL) {
-         Token* token = curToken->datptr;
-         tokenWidth = TextStringWidth(token->content);
-         drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
+        Token* token = curToken->datptr;
+        tokenWidth = TextStringWidth(token->content);
+        drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
         form->renderPos.c += token->length;
         curTokenPosX += tokenWidth;
         curToken = curToken->next;
