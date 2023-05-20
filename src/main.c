@@ -59,7 +59,7 @@ void TimerEventProcess(int timerID)
 void Main() 
 {
     // Initialize libgraphics and imgui
-    SetWindowTitle("Light C code editor");
+    SetWindowTitle("Lyther ÇáÓð");
     InitGraphics();
     InitGUI();
     // For debug use.
