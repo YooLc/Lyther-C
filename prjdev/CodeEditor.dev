@@ -411,7 +411,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit40]
-FileName=..\src\helper.h
+FileName=..\src\ioutils.h
 CompileCpp=0
 Folder=src
 Compile=1
@@ -421,16 +421,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit39]
-FileName=..\src\helper.c
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit41]
 FileName=..\src\ioutils.c
 CompileCpp=0
 Folder=src
@@ -440,8 +430,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit41]
+FileName=..\src\help.c
+CompileCpp=0
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit42]
-FileName=..\src\ioutils.h
+FileName=..\src\help.h
 CompileCpp=0
 Folder=src
 Compile=1
