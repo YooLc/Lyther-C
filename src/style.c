@@ -14,7 +14,7 @@ Palette g_palette[] = {
     {"Classic Plus", 
      "Dark Black", "Light Gray",
      "Dark Black", "Light Gray",
-     "Dark Green", {"Very Blue", "Light Yellow", "Light Purple"}, "Brown", "Brown", "Super Blue",
+     "Dark Green", {"Very Blue", "Light Yellow", "Light Purple"}, "Brown", "Dark Green", "Super Blue",
      "Dark Blue", "Light Black",
      "Light Gray", "Darker Black", "Light Gray", "Light Black", "White"}
 };

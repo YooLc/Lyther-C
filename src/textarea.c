@@ -100,7 +100,8 @@ void drawEditor(Editor* editor) {
     indexLength = 0.5 + (textPointSize - 22) / 50.0;
     
     // Reversed drawing to avoid overlaping 
-    int idx;
+    int idx, row;
+    PosRC pos;
     EditorForm *form;
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
@@ -109,23 +110,33 @@ void drawEditor(Editor* editor) {
         drawEditorSelection(form);
         drawSymbolMatch(form);
         drawCaret(form);
-        
+        row = form->passage->passList.listLen;
+        pos = form->realCaretPos;
+
         // If it needs a scroll bar
         double scale = form->h / textFontHeight / (form->passage->passList.listLen ? form->passage->passList.listLen : 1);
         if (scale < 1) {
             form->viewProgress = vertivalScrollBar(GenUIID(idx), form->x, form->y, form->w, form->h, scale, form->viewProgress);
-            form->startLine = ceil(form->viewProgress * form->passage->passList.listLen) + 1;
+            form->startLine = round(form->viewProgress * form->passage->passList.listLen) + 1;
             form->startLine = max(1, form->startLine);
         }
     }
     SetPointSize(uiPointSize);
+    drawEditorComplete(editor);
     drawEditorBar(editor);
     
     drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
     drawAbout(0, 0, winWidth, winHeight - editor->menuHeight);
     
     drawEditorMenu(editor);
-    drawEditorComplete(editor);
+    
+    SetStyle(Bold);
+    SetPenColor(g_palette[g_selection].foreground);
+    char tmpStr[MAX_LINE_SIZE] = "";
+    sprintf(tmpStr, "Statistics | Row:%4d Col:%4d Total Row:%4d  ", pos.r, pos.c, row);
+    MovePen(winWidth - TextStringWidth(tmpStr), winHeight - editor->menuHeight + GetFontAscent() / 2);
+    DrawTextString(tmpStr);
+    SetStyle(Normal);
 }
 
 static void drawEditorComplete(Editor *editor){
@@ -157,10 +168,10 @@ static void drawEditorComplete(Editor *editor){
 		}
 		SetPointSize(textPointSize);
 		double listx, listy, listw, listh;
-		listx = (form->realCaretPos.c)*TextStringWidth("a")+indexLength;
+		listx = (form->realCaretPos.c) * TextStringWidth("a") + indexLength;
 		listy = winHeight-editor->barHeight-(-form->startLine+form->realCaretPos.r+2)*textFontHeight;
-		listw = TextStringWidth("aaaaaaaaaaaaaa");
-		listh = editor->menuHeight;
+		listw = TextStringWidth("a") * 20;
+		listh = textFontHeight;
 
 		int selection = completeList(GenUIID(0), listx, listy, listw, listh, labels, list->listLen);
 		if(form->completeMode == 2){

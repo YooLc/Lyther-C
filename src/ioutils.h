@@ -26,7 +26,7 @@ void loadFile(Editor *editor);
     Function: saveAs(Editor *editor)
     Save <curselect> in editor as <fileName>
 */
-void saveAs(Editor *editor);
+void saveAs(Editor *editor); 
 void saveFile(Editor *editor);
 
 /*

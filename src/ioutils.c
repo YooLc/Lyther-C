@@ -314,14 +314,6 @@ void handleInputEvent(Editor* editor, char ch) {
         }
     }
     else if (ch >= 32 && ch < 127) {
-//        switch(ch) {
-//            case '}': case ']': case ')':
-//            case '>': case '\"': case '\'':
-//                if (completed) {
-//                    completed = false;
-//                    return;
-//                }
-//        }
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
         LOG("Attempting to add %s\n", tmpstr);
@@ -341,10 +333,8 @@ void handleInputEvent(Editor* editor, char ch) {
         if (ac) {
             sprintf(tmpstr, "%c", ac);
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
-            // LOG("Attempting to complete by adding %s\n", tmpstr);
             addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
-            //completed = true;
-        } //else completed = false;
+        }
     } else if (ch == '\t') {
         // Due to the calculation in addString(), we must use a loop to finish this
         int i;
@@ -434,8 +424,6 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
         case BUTTON_UP:
             if(button == LEFT_BUTTON) {
                 curForm->selectRightPos = pixelToPosRC(curForm, x, y);
-                // printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c,\
-                // curForm->selectRightPos.r, curForm->selectRightPos.c);
                 if(!atSamePos(curForm->selectRightPos, curForm->selectLeftPos))
                      curForm->inSelectionMode = true;
                 else {
@@ -459,9 +447,11 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
             break;
         case ROLL_DOWN:
             if (isControlDown) textPointSize -= 2;
+            textFontHeight = GetFontHeight();
             break;
         case ROLL_UP:
             if (isControlDown) textPointSize += 2;
+            textFontHeight = GetFontHeight();
             break;
     }
 }
