@@ -151,8 +151,8 @@ void saveAs(Editor *editor) {
 */
 void moveCaret(EditorForm *form, CaretAction action, char* curLine, char* preLine) {
     // Some essential variables to count new position
-    PosRC curPos = form->realCaretPos;
-    int row = (form->passage->passList).listLen;
+    PosRC curPos = form->caretPos;
+    int row = form->passage->passList.listLen;
     
     // When occur GB2312 character, we advance by two steps
     switch(action) {
@@ -273,12 +273,9 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
         }
     }
     
-    printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n", 
-    curForm->caretPos.r, curForm->caretPos.c, 
-    curForm->realCaretPos.r, curForm->realCaretPos.c, curPos.r, curPos.c);
     // Smart Caret Position, matches the nearest position that is available,
     // with Chinese character support.
-    curPos = curForm->realCaretPos = curForm->caretPos;
+    curPos = curForm->caretPos;
     getLine(curForm->passage, curLine, curPos.r);
     int i, col = 0, minDistance = MAX_LINE_SIZE, charWidth;
     for(i = 0; curLine[i]; i += charWidth) {
@@ -289,6 +286,7 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
         }
         else break;
     }
+    curForm->realCaretPos.r = curForm->caretPos.r;
     curForm->realCaretPos.c = col;
     printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n", 
     curForm->caretPos.r, curForm->caretPos.c, 

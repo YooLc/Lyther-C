@@ -122,14 +122,13 @@ void drawEditor(Editor* editor) {
         }
     }
     SetPointSize(uiPointSize);
-    drawEditorComplete(editor);
     drawEditorBar(editor);
-    
+
     drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
     drawAbout(0, 0, winWidth, winHeight - editor->menuHeight);
-    
+
     drawEditorMenu(editor);
-    
+
     SetStyle(Bold);
     SetPenColor(g_palette[g_selection].foreground);
     char tmpStr[MAX_LINE_SIZE] = "";
@@ -137,6 +136,8 @@ void drawEditor(Editor* editor) {
     MovePen(winWidth - TextStringWidth(tmpStr), winHeight - editor->menuHeight + GetFontAscent() / 2);
     DrawTextString(tmpStr);
     SetStyle(Normal);
+
+    drawEditorComplete(editor);
 }
 
 static void drawEditorComplete(Editor *editor){

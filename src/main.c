@@ -63,7 +63,7 @@ void Main()
     InitGraphics();
     InitGUI();
     // For debug use.
-    // InitConsole();
+    InitConsole();
 
     // The special point size is tofix werid offset when drawing text caused by libgraphics.
     // Note that this value varies to different fonts
