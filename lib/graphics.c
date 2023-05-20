@@ -818,7 +818,7 @@ void repaint()
 
 static void InitDisplay(void)
 {
-    WNDCLASS wndcls;
+    WNDCLASSEX wndcls;
     RECT bounds, consoleRect, graphicsRect;
     double screenHeight, screenWidth, xSpace, ySpace;
     double xScale, yScale, scaleFactor;
@@ -857,18 +857,20 @@ static void InitDisplay(void)
 	g_mouse = NULL;
 	g_timer = NULL;
     
+    wndcls.cbSize = sizeof(WNDCLASSEX);
     wndcls.cbClsExtra = 0;
     wndcls.cbWndExtra = 0;
     wndcls.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wndcls.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndcls.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wndcls.hIcon = (HICON)LoadImage(NULL, "IDI_ICON", IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), 0);
+    wndcls.hIconSm = (HICON)LoadImage(NULL, "IDI_ICON", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0);
     wndcls.hInstance = NULL;
     wndcls.lpfnWndProc = GraphicsEventProc;
     wndcls.lpszClassName = "Graphics Window";
     wndcls.lpszMenuName = NULL;
     wndcls.style = CS_HREDRAW | CS_VREDRAW;
     
-    RegisterClass(&wndcls);
+    RegisterClassEx(&wndcls);
     
     graphicsWindow = CreateWindow(
       GWClassName,
