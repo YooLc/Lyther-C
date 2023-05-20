@@ -401,7 +401,7 @@ static PosRC pixelToPosRC(EditorForm *form, int px, int py) {
 
 void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
     if (gs_UIState.clickedItem) return;
-
+	if (gs_UIState.actingMenu) return;
     static bool isLeftButtonDown = 0;
     EditorForm* curForm = editor->forms[editor->curSelect];
 	if(curForm->completeMode != 0) return;
