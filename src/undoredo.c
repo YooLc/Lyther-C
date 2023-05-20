@@ -32,6 +32,7 @@ PosRC Undo(UndoRedo *ur){
 PosRC Redo(UndoRedo *ur){
 	PosRC posRC = {-1,-1};
     if(ur->undoRedoList.listLen == 0) return posRC;
+    if(ur->nowNode->next == NULL) return posRC;
     
     if(ur->nowNode == NULL){    //If it is before the head of the list
         ur->nowNode = ur->undoRedoList.head;

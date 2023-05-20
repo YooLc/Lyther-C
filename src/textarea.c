@@ -315,8 +315,8 @@ static void drawSymbolMatch(EditorForm *form){
     // We just match brackets before the caret
     if (form->realCaretPos.c == 0) return;
     int offset = 0;
-    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
-    double x2 = form->x + indexLength, y2 = form->h;
+    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - (form->realCaretPos.r-form->startLine+1)*textFontHeight;
+    double x2 = form->x + indexLength, y2 = form->h + (form->startLine-1)*textFontHeight;
     PosRC matchPos;
     Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
     
