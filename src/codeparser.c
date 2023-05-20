@@ -7,6 +7,11 @@
 #include "textarea.h"
 #include "trie.h"
 
+char* KeyWord[32] = {"auto","break","case","char","const","continue","default","do",\
+                    "double","else","enum","extern","float","for","goto","if",\
+                    "int","long","register","return","short","signed","sizeof","static",\
+                    "struct","switch","typedef","union","unsigned","void","volatile","while"};
+
 /*
     Function: initPassage
     Initialize doubly linked list for a passage
@@ -187,6 +192,10 @@ int parseLine(Passage *passage, int row){
                 //if this is not the end of the line, creat a newline tag
                 if(idx <= totLen) newLine = 1;
                 break;
+            case '\t':
+            	setToken(token, "    ", levelCounter, SPACE);
+            	idx++;
+            	break;
             case '/':
                 if(idx < totLen && tmpLine[idx] == '/'){
                     cnt = -1;

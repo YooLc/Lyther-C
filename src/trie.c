@@ -42,16 +42,9 @@ void traverseTree(TreeNode *root){
 void initTrie(Trie *tree){
 	tree->root = (TreeNode *)malloc(sizeof(TreeNode));
 	initNode(tree->root);
-	
-	addStringToTrie(tree->root, "a");
-	addStringToTrie(tree->root, "abc");
-	addStringToTrie(tree->root, "abcde");
-	addStringToTrie(tree->root, "a");
-	int i=0;
-	
-	for(i=0; i<3; i++){
-		//traverseTree(tree->root);
-		printAllString(tree->root);
+	int i;
+	for(i=0; i<32; i++){
+		addStringToTrie(tree->root, KeyWord[i]);
 	}
 }
 

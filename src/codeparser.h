@@ -69,10 +69,6 @@ typedef struct {
     int r, c;
 } PosRC;
 
-static char* KeyWord[32] = {"auto","break","case","char","const","continue","default","do",\
-                    "double","else","enum","extern","float","for","goto","if",\
-                    "int","long","register","return","short","signed","sizeof","static",\
-                    "struct","switch","typedef","union","unsigned","void","volatile","while"};
 /*
     Function: initPassage
     Initialize doubly linked list for a passage
@@ -130,8 +126,6 @@ PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
     **Caller have the duty to free the allocated space
 */
 char *getString(Passage *passage, int rows, int cols, int rowt, int colt);
-
-void inputString(char *str);
 
 /*
     Function: searchForwardByChar(Passage *passage, int row, int col, char ch)

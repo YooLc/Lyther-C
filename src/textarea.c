@@ -52,7 +52,8 @@ void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
     }
     editor->fileCount++;
     editor->curSelect = editor->fileCount;
-    editor->filePath[editor->fileCount] = filePath;
+    editor->filePath[editor->fileCount] = (char *)malloc(sizeof(char)*(strlen(filePath)+1));
+    strcpy(editor->filePath[editor->fileCount], filePath);
     editor->fileName[editor->fileCount] = getFileName(filePath);
     editor->forms[editor->fileCount] = form;
     
@@ -156,7 +157,7 @@ static void drawEditorComplete(Editor *editor){
 		}
 		SetPointSize(textPointSize);
 		double listx, listy, listw, listh;
-		listx = (form->realCaretPos.c+1)*TextStringWidth("a")+indexLength;
+		listx = (form->realCaretPos.c)*TextStringWidth("a")+indexLength;
 		listy = winHeight-editor->barHeight-(-form->startLine+form->realCaretPos.r+2)*textFontHeight;
 		listw = TextStringWidth("aaaaaaaaaaaaaa");
 		listh = editor->menuHeight;

@@ -70,6 +70,7 @@ void newFile(Editor *editor){
 }
 
 void saveFile(Editor *editor){
+	printf("FILE PATH : %s\n", editor->filePath[editor->curSelect]);
     if(editor->filePath[editor->curSelect][0] == '+') {
         saveAs(editor);
         return;
@@ -113,7 +114,7 @@ void saveAs(Editor *editor) {
     ofn.nMaxFile = MAX_PATH;
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_FILEMUSTEXIST;
-    GetSaveFileName(&ofn);
+    if(!GetSaveFileName(&ofn)) return;
 
     editor->filePath[editor->curSelect] = (char*)malloc(sizeof(char) * strlen(saveFile) + 1);
     strcpy(editor->filePath[editor->curSelect], saveFile);

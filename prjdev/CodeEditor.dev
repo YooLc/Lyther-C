@@ -6,14 +6,14 @@ Ver=2
 ObjFiles=
 Includes=../lib
 Libs=
-PrivateResource=
+PrivateResource=CodeEditor_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=
 CppCompiler=
 Linker=
 IsCpp=0
-Icon=
+Icon=CodeEditor.ico
 ExeOutput=../
 ObjectOutput=../compiled
 LogOutput=
@@ -24,12 +24,12 @@ HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
 CommandLine=
-Folders=lib,src
+Folders=lib,res,src
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000001000000
-UnitCount=42
+UnitCount=43
 
 [VersionInfo]
 Major=1
@@ -450,16 +450,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit43]
-FileName=..\src\ioutils.c
-CompileCpp=0
-Folder=src
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit44]
 FileName=..\src\ioutils.h
 CompileCpp=0
@@ -486,6 +476,15 @@ CompileCpp=0
 Folder=src
 Compile=1
 Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit43]
+FileName=..\res\OIG.ico
+Folder=res
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=

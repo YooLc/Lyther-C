@@ -92,13 +92,27 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
     Function: drawToken
     Display single token from parser, with code highlight
 */
-static void drawEditorComplete(Editor *editor);
 static void drawToken(Token* token, double x, double y, double w, double h);
+/*
+    Function: drawEditorComplete
+    Draw auto complete box
+*/
+static void drawEditorComplete(Editor *editor);
+/*
+    Function: drawEditorSelection
+    Draw mouse selection range
+*/
 void drawEditorSelection(EditorForm* from);
+
 static void drawSymbolMatch(EditorForm *form);
 static void drawTokenBox(Token* token, double x, double y, double w, double h);
-void drawMessageBar();
 
+void drawMessageBar();
+/*
+    Function: addCodeToEditor
+    Add a new file to editor
+*/
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath);
+
 static void drawCaret(EditorForm* form);
 #endif

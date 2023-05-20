@@ -63,7 +63,7 @@ void Main()
     InitGraphics();
     InitGUI();
     // For debug use.
-    InitConsole();
+    //InitConsole();
 
     // The special point size is tofix werid offset when drawing text caused by libgraphics.
     // Note that this value varies to different fonts
@@ -83,15 +83,5 @@ void Main()
     registerTimerEvent(TimerEventProcess);
     registerKeyboardEvent(KeyboardEventProcess);
 
-    /*
-    Tire tire;
-    initTire(&tire);
-    addStringToTire(tire.root, "abcde");
-    addStringToTire(tire.root, "a");
-        addStringToTire(tire.root, "abcde");
-    deleteStringInTire(tire.root, "abcde");
-    TextList *list = matchPrefix(tire.root, "a");
-    printf("%s %s %d\n", kthNode(list, 1)->datptr, kthNode(list, 2)->datptr, list->listLen);
-	*/
 }
 

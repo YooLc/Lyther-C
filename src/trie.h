@@ -3,9 +3,11 @@
 
 #include "doublylinkedlist.h"
 
+extern char* KeyWord[];
+
 typedef struct {
 	struct treeNode *child[52]; //0-25 + 26-51
-	int cnt[52];
+	int cnt[52];	//the number of strings end at child i
 	int childNum;
 }TreeNode;
 
@@ -51,6 +53,7 @@ TreeNode *searchString(TreeNode *root, char *str);
 */
 TextList *matchPrefix(TreeNode *root, char *str);
 
+//debug use
 void printAllString(TreeNode *root);
 
 #endif

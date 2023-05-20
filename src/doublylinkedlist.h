@@ -21,11 +21,40 @@ typedef struct LinkedList{
     Listptr tail;
     int listLen;
 } LinkedList;
+
+/*
+	function:
+*/
+/*
+	function:initList(LinkedList* list);
+	Call the after instantiate a list
+*/
 void initList(LinkedList* list);
+
+/*
+	function:addNodeToTail(LinkedList* list, void* datptr);
+	add a Node at the end of the list
+*/
 void addNodeToTail(LinkedList* list, void* datptr);
+
+/*
+	function:addNodeToHead(LinkedList* list, void* datptr);
+	add a Node at the start of the list
+*/
 void addNodeToHead(LinkedList* list, void* datptr);
+
+/*
+	function:kthNode(LinkedList* list, int index);
+	find the node at <index>, and return the pointer
+*/
 Listptr kthNode(LinkedList* list, int index);
+
+/*
+	function:getNodeIndex(LinkedList* list, Listptr node);
+	return the index of <node>
+*/
 int getNodeIndex(LinkedList* list, Listptr node);
+
 void modifyNode(Listptr node, void* datptr);
 void deleteNode(LinkedList* list, int index);
 void deleteNodeByPtr(LinkedList* list, Listptr nowNode);
