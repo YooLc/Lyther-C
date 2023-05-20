@@ -2,7 +2,9 @@
 #define _CODE_PARSER_H_
 
 #include "doublylinkedlist.h"
-#define MAX_WORD_SIZE 128
+#include "trie.h"
+
+#define MAX_WORD_SIZE 256
 #define MAX_LINE_SIZE 2048
 #define NEW(T) (T*)malloc(sizeof(T)) 
 #define LOG(x,y) printf("[LOG][%d -> %s()] ", __LINE__, __func__); \
@@ -41,7 +43,7 @@ typedef enum{
 */
 typedef struct{
     char content[MAX_WORD_SIZE];
-    int length;//, selected;
+    int length, level;
     CodeTokenType type;
 } Token;
 
@@ -60,16 +62,13 @@ typedef struct{
 */
 typedef struct{
     LinkedList passList;
+    Trie trie;
 } Passage;
 
 typedef struct {
     int r, c;
 } PosRC;
 
-static char* KeyWord[32] = {"auto","break","case","char","const","continue","default","do",\
-                    "double","else","enum","extern","float","for","goto","if",\
-                    "int","long","register","return","short","signed","sizeof","static",\
-                    "struct","switch","typedef","union","unsigned","void","volatile","while"};
 /*
     Function: initPassage
     Initialize doubly linked list for a passage
@@ -119,7 +118,7 @@ PosRC addString(Passage *passage, char *str, int row, int col);
     If want to delete the empty line(contaning only \n) at i colomn, need to call:
         deleteString(passage, i-1, (i-1).length, i, 1)
 */ 
-void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
+PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
 
 /*
     Function: getString(Passage *passage, int rows, int cols, int rowt, int colt)
@@ -127,8 +126,6 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt);
     **Caller have the duty to free the allocated space
 */
 char *getString(Passage *passage, int rows, int cols, int rowt, int colt);
-
-void inputString(char *str);
 
 /*
     Function: searchForwardByChar(Passage *passage, int row, int col, char ch)

@@ -28,6 +28,8 @@
 typedef struct {
 	double mousex;
 	double mousey;
+	double omousex, omousey;
+    double mousedx, mousedy; 
 	int    mousedown;
 	int    clickedItem;// item that was clicked
 	int    actingMenu; // acting menu list 
@@ -36,6 +38,8 @@ typedef struct {
 	int    keyPress;   // input key
 	int    charInput;  // input char
 	int    keyModifiers;  //  key modifier (shift, ctrl)
+	int    mouserolldown;
+	int    mouserollup;
 } UIState;
 
 /* ²Ëµ¥ÑÕÉ« */

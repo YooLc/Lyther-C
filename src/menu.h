@@ -17,7 +17,7 @@ typedef struct{
 
 Menu menu;
 
-static char* Entrys[] = {" Copy | (C)", " Cut | (X)", " Paste | (V)", " Undo | (Z)", " Redo | (Y)"};
+static char* menuEntry[] = {" Copy | (C)", " Cut | (X)", " Paste | (V)", " Undo | (Z)", " Redo | (Y)"};
 
 void initMenu();
 

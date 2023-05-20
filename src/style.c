@@ -7,24 +7,29 @@
 Palette g_palette[] = {
     {"Classic", 
      "White", "Black",
-     "Gray", "Black",
-     "Green", {"Red", "Red", "Red"}, "Blue", "Blue", "Black",
-     "SelectedColor", "Light Blue"
-     "Black", "Light Black", "Light Gray", "Light Black", "Light Yellow"},
+     "Space Gray", "Black",
+     "Super Green", {"Red", "Red", "Red"}, "Pure Blue", "Sky Blue", "Black",
+     "Dark Blue", "Light Blue",
+     "Black", "Space Gray", "Black", "Grayer Gray", "Black"},
     {"Classic Plus", 
      "Dark Black", "Light Gray",
      "Dark Black", "Light Gray",
-     "Dark Green", {"Very Blue", "Light Yellow", "Light Purple"}, "Brown", "Brown", "Super Blue",
+     "Dark Green", {"Very Blue", "Light Yellow", "Light Purple"}, "Brown", "Dark Green", "Super Blue",
      "Dark Blue", "Light Black",
      "Light Gray", "Darker Black", "Light Gray", "Light Black", "White"}
 };
 
 int g_selection = 1;
 
-void InitStyle()
+void initStyle()
 {
     // Classic
     defineColorRGB("Light Blue", "ccffff");
+    defineColorRGB("Space Gray", "f2f2f2");
+    defineColorRGB("Grayer Gray", "ededed"); 
+    defineColorRGB("Super Green", "008000");
+    defineColorRGB("Pure Blue", "0000ff");
+    defineColorRGB("Sky Blue", "0078d7");
     
     // Classic Plus
     defineColorRGB("Dark Black", "1f1f1f");
@@ -54,15 +59,30 @@ string getColorByTokenType(CodeTokenType type, int degree)
             return g_palette[g_selection].quote;
         case KEYWORD:
             return g_palette[g_selection].keyword;
+        case COMMENT:
+            return g_palette[g_selection].comment; 
         default:
             return g_palette[g_selection].foreground;
     }
+}
+
+string getBackgroundColor()
+{
+    return g_palette[g_selection].background;
+}
+
+string getForegroundColor()
+{
+    return g_palette[g_selection].foreground;
 }
 
 int getStyleByTokenType(CodeTokenType type)
 {
     switch(type) {
         case KEYWORD: case DOUBLE_QUOTE: case SINGLE_QUOTE:
+        case LEFT_PARENTHESES: case RIGHT_PARENTHESES:
+        case LEFT_BRACKETS: case RIGHT_BRACKETS: 
+        case LEFT_BRACE: case RIGHT_BRACE:
             return Bold;
         case COMMENT:
             return Italic;
