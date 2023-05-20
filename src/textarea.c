@@ -46,6 +46,8 @@ void initEditor(Editor* editor) {
 }
 
 void addCodeToEditor(Editor* editor, FILE* fp, char* filePath) {
+    if (editor->fileCount >= MAX_FILE_COUNT) return;
+    
     EditorForm *form = NEW(EditorForm);
     if(editor->fileCount != 0){
         editor->forms[editor->curSelect]->visible = 0;
