@@ -178,9 +178,9 @@ void InitGUI()
 /* 调用该函数,得到鼠标的状态 */
 void uiGetMouse(int x, int y, int button, int event)
 {
-	 gs_UIState.mousex = ScaleXInches(x);/*pixels --> inches*/
-	 gs_UIState.mousey = ScaleYInches(y);/*pixels --> inches*/
-
+    gs_UIState.mousex = ScaleXInches(x);/*pixels --> inches*/
+	gs_UIState.mousey = ScaleYInches(y);/*pixels --> inches*/
+	
 	 switch (event) {
 	 case BUTTON_DOWN:
 		 gs_UIState.mousedown = 1;
@@ -188,6 +188,19 @@ void uiGetMouse(int x, int y, int button, int event)
 	 case BUTTON_UP:
 		 gs_UIState.mousedown = 0;
 		 break;
+	 case ROLL_DOWN:
+	     gs_UIState.mouserolldown = 1;
+	     break;
+     case ROLL_UP:
+         gs_UIState.mouserollup = 1;
+         break;
+     case MOUSEMOVE:
+         gs_UIState.mousedx += gs_UIState.mousex - gs_UIState.omousex;
+	     gs_UIState.mousedy += gs_UIState.mousey - gs_UIState.omousey;
+	     
+	     gs_UIState.omousex = gs_UIState.mousex;
+	     gs_UIState.omousey = gs_UIState.mousey;
+	     break;
 	 }
 }
 
@@ -335,6 +348,7 @@ static int menuItem(int id, double x, double y, double w, double h, char *label)
 {
 	char * frameColor = gs_menu_color.frame;
 	char * labelColor = gs_menu_color.label;
+
 	if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
 		frameColor = gs_menu_color.hotFrame;
 		labelColor = gs_menu_color.hotLabel;
@@ -357,7 +371,7 @@ static int menuItem(int id, double x, double y, double w, double h, char *label)
 		gs_UIState.clickedItem = 0;
 		return 1; 
 	}
-
+	
 	return 0;
 }
 
@@ -447,6 +461,15 @@ int menuList(int id, double x, double y, double w, double wlist, double h, char 
 			}
 		}
 	}
+	
+	// If clicked outside the menu, then close it.
+	if (gs_UIState.actingMenu == id && gs_UIState.mousedown &&
+        notInMenu(gs_UIState.mousex, gs_UIState.mousey) && 
+        !inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+            unfoldMenu = 0;
+    }
+    
+	if(unfoldMenu == 0) gs_UIState.actingMenu = 0;
 	return result;
 }
 

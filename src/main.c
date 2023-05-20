@@ -1,95 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-#include "graphics.h"
-#include "extgraph.h"
-#include "imgui.h"
-#include "textarea.h"
-#include "codeparser.h"
-#include "undoredo.h"
+#include "trie.h"
 #include "menu.h"
+#include "imgui.h"
+#include "ioutils.h"
+#include "extgraph.h"
+#include "graphics.h"
+#include "textarea.h"
+#include "undoredo.h"
 #include "clipboard.h"
+#include "codeparser.h"
 
 #define REFRESH_TIMER 1
 
 Editor editor;
 UndoRedo undoRedo;
-
-void Display(void);
-
-// To reduce lag, Display() are commented in each event handler
-void KeyboardEventProcess(int key, int event)
-{
-    editor.drawLock = true;
-    uiGetKeyboard(key, event);
-    handleKeyboardEvent(&editor, key, event);
-    editor.updated = true;
-    editor.drawLock = false;
-    // Display();
-}
-
-void CharEventProcess(char ch)
-{
-    editor.drawLock = true;
-    uiGetChar(ch);
-    handleInputEvent(&editor, ch);
-    editor.updated = true;
-    editor.drawLock = false;
-    Display();
-}
-
-void MouseEventProcess(int x, int y, int button, int event)
-{
-    editor.drawLock = true;
-    uiGetMouse(x, y, button, event);
-    handleMouseEvent(&editor, x, y, button, event);
-    editor.updated = true;
-    editor.drawLock = false;
-    // Display();
-}
-
-void TimerEventProcess(int timerID)
-{
-    if (timerID == REFRESH_TIMER) {
-        Display();
-    }
-}
-
-void Main() 
-{
-    SetWindowTitle("Light C code editor");
-    InitGraphics();
-    InitConsole(); // For debug use.
-    SetFont("Cascadia Code");
-    SetPointSize(22); // This fix werid offset when drawing text. Note that this value varies to different fonts
-    InitStyle();
-    InitGUI();
-    initEditor(&editor);
-    addCodeToEditor(&editor, NULL, "Unamed 1.c");
-    addCodeToEditor(&editor, NULL, "Unamed 2.c");
-//    initUndoRedoList(&undoRedo, &passage);
-    //initEditor(&editor);
-    
-    // A simple test case
-//    Passage* passage = editor.forms[1]->passage;
-//    addString(passage, "\n", 1, 1);
-//    addString(passage, "#include <stdio.h>\n", 1, 1);
-//    addString(passage, "void main() { //ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½\n", 2, 1);
-//    addString(passage, "    printf(\"Hello World\"); /*abc*/ \n\n", 3, 1);
-//    addString(passage, "}\n", 5, 1);
-//    addString(passage, "ï¿½ï¿½ï¿½ ", 3, 19);
-//    addString(passage, " ", 4, 1);
-//     addTrace(&undoRedo, ADD, 1, 1, 1, 2, "#i");
-//    Undo(&undoRedo);
-//    Redo(&undoRedo);
-//    printPassage(&passage);
-    initMenu();
-    startTimer(REFRESH_TIMER, 20);
-    registerCharEvent(CharEventProcess);
-    registerMouseEvent(MouseEventProcess);
-    registerTimerEvent(TimerEventProcess);
-    registerKeyboardEvent(KeyboardEventProcess);
-}
 
 void Display(void)
 {
@@ -97,3 +24,63 @@ void Display(void)
     drawEditor(&editor);
     displayMenu();
 }
+
+// To reduce lag, Display() are called only if it's nesessary except timer event.
+void KeyboardEventProcess(int key, int event)
+{
+    uiGetKeyboard(key, event);
+    if (!helperActivated() && !aboutActivated())
+        handleKeyboardEvent(&editor, key, event);
+}
+
+void CharEventProcess(char ch)
+{
+    uiGetChar(ch);
+    if (!helperActivated() && !aboutActivated())
+        handleInputEvent(&editor, ch);
+    Display();
+}
+
+void MouseEventProcess(int x, int y, int button, int event)
+{
+    uiGetMouse(x, y, button, event);
+    if (!helperActivated() && !aboutActivated())
+        handleMouseEvent(&editor, x, y, button, event);
+    if (event != MOUSEMOVE)
+        Display();
+}
+
+void TimerEventProcess(int timerID)
+{
+    if (timerID == REFRESH_TIMER)
+        Display();
+}
+
+void Main() 
+{
+    // Initialize libgraphics and imgui
+    SetWindowTitle("Lyther ÇáÓð");
+    InitGraphics();
+    InitGUI();
+    // For debug use.
+    // InitConsole();
+
+    // The special point size is tofix werid offset when drawing text caused by libgraphics.
+    // Note that this value varies to different fonts
+    SetFont("Consolas");
+    SetPointSize(TEXT_POINT_SIZE);
+
+    // Initialize of data structures used in the editor
+    initStyle();
+    initEditor(&editor);
+    initMenu();
+    addCodeToEditor(&editor, NULL, "+\\Untitled 1");
+
+    // Setup callback functions to handle various events
+    startTimer(REFRESH_TIMER, 20);
+    registerCharEvent(CharEventProcess);
+    registerMouseEvent(MouseEventProcess);
+    registerTimerEvent(TimerEventProcess);
+    registerKeyboardEvent(KeyboardEventProcess);
+}
+

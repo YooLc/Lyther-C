@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "locale.h"
 #include "extgraph.h"
 #include "undoredo.h"
 #include "clipboard.h"
@@ -91,7 +92,7 @@ void displayMenu(){
     SetPenColor("Black");
     for(i=0; i<MENUENTRY; i++){
         MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy) - (i+1)*menu.entryHeight + GetFontDescent() + menu.entryMargin);
-        DrawTextString(Entrys[i]);
+        DrawTextString(menuEntry[i]);
     }
 
     //Highlight selected entry
@@ -109,5 +110,5 @@ void displayMenu(){
     
     SetPenColor("White");
     MovePen(ScaleXInches(menu.posx), ScaleYInches(menu.posy) - (menu.selected+1)*menu.entryHeight + GetFontDescent() + menu.entryMargin);
-    DrawTextString(Entrys[menu.selected]);
+    DrawTextString(menuEntry[menu.selected]);
 }
