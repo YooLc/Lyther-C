@@ -421,7 +421,7 @@ PosRC addString(Passage *passage, char *str, int row, int col) {
     return posRC;
 }
 
-void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
+PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
     int i = 0;
 
     char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE];    //store string in the first and last row
@@ -478,6 +478,10 @@ void deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
     int newRow = parseLine(passage, (rows>1)?(rows-1):rows);
     refreshTrieAdd(passage, (rows>1)?(rows-1):rows, newRow);
     printf("ROW : %d\n", newRow);
+    
+    PosRC newPos;
+    newPos.r = rows; newPos.c = max(0, cols - 1);
+    return newPos;
 }
 /*
 void cancelNewline(Passage *passage, int row) {

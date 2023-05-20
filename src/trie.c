@@ -152,7 +152,7 @@ TreeNode *searchString(TreeNode *root, char *str){
 /*
 	addIndex is the index of the prefix string in <textList>
 */
-static void getAllString(TextList *textList, TreeNode *root, char prefix[]){
+static void getAllString(TextList *textList, TreeNode *root, char prefix[]) {
 	if(root->childNum == 0) return;
 	int i=0;
 

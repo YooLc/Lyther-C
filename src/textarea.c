@@ -192,6 +192,8 @@ void drawEditorSelection(EditorForm* form){
     if(form->selectLeftPos.r == form->selectRightPos.r && form->selectLeftPos.c == form->selectRightPos.c) return;
     if(form->inSelectionMode == false) return;
     
+    printf("Selected (%d, %d) - (%d, %d)\n", form->selectLeftPos.r, form->selectLeftPos.c, form->selectRightPos.r, form->selectRightPos.c);
+    
     PosRC lRC = form->selectLeftPos, rRC = form->selectRightPos;
     
     if(form->selectLeftPos.r > form->selectRightPos.r ||
