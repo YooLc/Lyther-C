@@ -46,7 +46,7 @@
  * DefaultFont     -- Font that serves as the "Default" font
  */
 
-#define DesiredWidth       10.0
+#define DesiredWidth       13.0
 #define DesiredHeight      7.0
 #define DefaultSize       12
 #define MaxTitle          256

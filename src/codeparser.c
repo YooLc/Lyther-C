@@ -273,8 +273,7 @@ int parseLine(Passage *passage, int row){
     }
     
     maintainLineLength(line); //maintain the length of the current line
-    if (levelCounter != initLevel)
-        maintainLevel(passage, row, line->length);
+    maintainLevel(passage, row, line->length);
     return row;
 }
 
@@ -492,36 +491,6 @@ PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt){
     newPos.r = rows; newPos.c = max(0, cols - 1);
     return newPos;
 }
-/*
-void cancelNewline(Passage *passage, int row) {
-    // Validation check
-    if (row <= 1 || row > (passage->passList).listLen) return;
-    
-    // Add current line to previous line, then delete current line
-    char preLine[MAX_LINE_SIZE], curLine[MAX_LINE_SIZE];
-    getLine(passage, preLine, row - 1);
-    getLine(passage, curLine, row);
-    
-    int idx = strlen(preLine) - 1;
-    while (preLine[idx] == '\n') preLine[idx] = '\0';
-    strcat(preLine, curLine);
-    
-    deleteLine(&(passage->passList), row - 1);
-    deleteLine(&(passage->passList), row - 1); // Note that prev line has deleted
-    
-    //initialize and insert the remaining string
-    Line  *line  = NEW(Line);
-    Token *token = NEW(Token);
-    strcpy(token->content, preLine);
-    token->length = strlen(preLine);
-    token->type = STRING;
-    initList(&(line->lineList));
-    addNodeToTail(&(line->lineList), token);
-    addNode(&(passage->passList), row - 1, line);
-
-    parseLine(passage, row - 1);
-}
-*/
 
 char *getString(Passage *passage, int rows, int cols, int rowt, int colt){
     char *dst = (char*)malloc(sizeof(char)*MAX_LINE_SIZE*(rowt-rows+1));

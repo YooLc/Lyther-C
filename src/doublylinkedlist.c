@@ -57,18 +57,18 @@ Listptr kthNode(LinkedList* list, int index) {
 }
 
 int getNodeIndex(LinkedList* list, Listptr node){
-	if(list->listLen == 0) return -1;
-	
-	int index = 1;
-	Listptr nowptr = list->head;
-	
-	while(nowptr != NULL){
-		if(nowptr == node) return index;
-		index++;
-		nowptr = nowptr->next;
-	}
-	
-	return -1;
+    if(list->listLen == 0) return -1;
+    
+    int index = 1;
+    Listptr nowptr = list->head;
+    
+    while(nowptr != NULL){
+        if(nowptr == node) return index;
+        index++;
+        nowptr = nowptr->next;
+    }
+    
+    return -1;
 }
 
 void modifyNode(Listptr node, void* datptr) {
@@ -98,7 +98,7 @@ void deleteNode(LinkedList* list, int index){
     free(nowNode);
 }
 
-void deleteNodeByPtr(LinkedList* list, Listptr nowNode){
+void deleteNodeByPtr(LinkedList* list, Listptr nowNode) {
     list->listLen--;
 //return ;
     if(nowNode->prev == NULL){

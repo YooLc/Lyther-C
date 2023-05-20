@@ -59,11 +59,11 @@ void TimerEventProcess(int timerID)
 void Main() 
 {
     // Initialize libgraphics and imgui
-    SetWindowTitle("Light C code editor");
+    SetWindowTitle("Lyther ÇáÓð");
     InitGraphics();
     InitGUI();
     // For debug use.
-    //InitConsole();
+    // InitConsole();
 
     // The special point size is tofix werid offset when drawing text caused by libgraphics.
     // Note that this value varies to different fonts
@@ -82,6 +82,5 @@ void Main()
     registerMouseEvent(MouseEventProcess);
     registerTimerEvent(TimerEventProcess);
     registerKeyboardEvent(KeyboardEventProcess);
-
 }
 

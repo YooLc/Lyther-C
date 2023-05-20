@@ -100,7 +100,8 @@ void drawEditor(Editor* editor) {
     indexLength = 0.5 + (textPointSize - 22) / 50.0;
     
     // Reversed drawing to avoid overlaping 
-    int idx;
+    int idx, row;
+    PosRC pos;
     EditorForm *form;
     for (idx = 1; idx <= editor->fileCount; idx++) {
         if (!editor->forms[idx]->visible) continue;
@@ -109,22 +110,33 @@ void drawEditor(Editor* editor) {
         drawEditorSelection(form);
         drawSymbolMatch(form);
         drawCaret(form);
-        
+        row = form->passage->passList.listLen;
+        pos = form->realCaretPos;
+
         // If it needs a scroll bar
         double scale = form->h / textFontHeight / (form->passage->passList.listLen ? form->passage->passList.listLen : 1);
         if (scale < 1) {
             form->viewProgress = vertivalScrollBar(GenUIID(idx), form->x, form->y, form->w, form->h, scale, form->viewProgress);
-            form->startLine = ceil(form->viewProgress * form->passage->passList.listLen) + 1;
+            form->startLine = round(form->viewProgress * form->passage->passList.listLen) + 1;
             form->startLine = max(1, form->startLine);
         }
     }
     SetPointSize(uiPointSize);
     drawEditorBar(editor);
-    
+
     drawHelper(0, 0, winWidth, winHeight - editor->menuHeight);
     drawAbout(0, 0, winWidth, winHeight - editor->menuHeight);
-    
+
     drawEditorMenu(editor);
+
+    SetStyle(Bold);
+    SetPenColor(g_palette[g_selection].foreground);
+    char tmpStr[MAX_LINE_SIZE] = "";
+    sprintf(tmpStr, "Statistics | Row:%4d Col:%4d Total Row:%4d  ", pos.r, pos.c, row);
+    MovePen(winWidth - TextStringWidth(tmpStr), winHeight - editor->menuHeight + GetFontAscent() / 2);
+    DrawTextString(tmpStr);
+    SetStyle(Normal);
+
     drawEditorComplete(editor);
 }
 
@@ -157,10 +169,10 @@ static void drawEditorComplete(Editor *editor){
 		}
 		SetPointSize(textPointSize);
 		double listx, listy, listw, listh;
-		listx = (form->realCaretPos.c)*TextStringWidth("a")+indexLength;
+		listx = (form->realCaretPos.c) * TextStringWidth("a") + indexLength;
 		listy = winHeight-editor->barHeight-(-form->startLine+form->realCaretPos.r+2)*textFontHeight;
-		listw = TextStringWidth("aaaaaaaaaaaaaa");
-		listh = editor->menuHeight;
+		listw = TextStringWidth("a") * 20;
+		listh = textFontHeight;
 
 		int selection = completeList(GenUIID(0), listx, listy, listw, listh, labels, list->listLen);
 		if(form->completeMode == 2){
@@ -301,8 +313,8 @@ static void drawSymbolMatch(EditorForm *form){
     // We just match brackets before the caret
     if (form->realCaretPos.c == 0) return;
     int offset = 0;
-    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - (form->realCaretPos.r-form->startLine+1)*textFontHeight;
-    double x2 = form->x + indexLength, y2 = form->h+(form->startLine-1)*textFontHeight;
+    double x1 = form->x + indexLength + (form->realCaretPos.c-1)*TextStringWidth("a"), y1 = form->h - form->realCaretPos.r*textFontHeight;
+    double x2 = form->x + indexLength, y2 = form->h;
     PosRC matchPos;
     Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c, &offset)->datptr;
     
@@ -346,6 +358,7 @@ static void drawEditorMenu(Editor* editor) {
         "Paste| Ctrl-V"};
     static char* menuListHelp[] = {"Help",
         "Open Mannual | Ctrl-H",
+        "Change Theme | Ctrl-P", 
         "About | Ctrl-B"
     }; 
     int selection;
@@ -406,7 +419,10 @@ static void drawEditorMenu(Editor* editor) {
             if (helperActivated()) closeHelper();
 			else activateHelper();
 			break;
-		case 2: if (aboutActivated()) closeAbout();
+		case 2:
+		    g_selection = 1 - g_selection;
+		    break;
+		case 3: if (aboutActivated()) closeAbout();
 		    else activateAbout();
 		    break;
     }
@@ -479,9 +495,9 @@ static void drawCodeLine(EditorForm* form, Line* line, double x, double y, doubl
 
     // Traverse tokens
      while (curToken != NULL) {
-         Token* token = curToken->datptr;
-         tokenWidth = TextStringWidth(token->content);
-         drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
+        Token* token = curToken->datptr;
+        tokenWidth = TextStringWidth(token->content);
+        drawTokenBox(token, curTokenPosX, y, tokenWidth, h);
         form->renderPos.c += token->length;
         curTokenPosX += tokenWidth;
         curToken = curToken->next;

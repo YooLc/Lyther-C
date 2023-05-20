@@ -8,12 +8,12 @@
 #include "undoredo.h"
 #include "style.h"
 
-#define MAX_FILE_COUNT 20
-#define INDENT_LENGTH 4
-#define SCROLL_DIST 3
+#define MAX_FILE_COUNT    20
+#define INDENT_LENGTH     4
+#define SCROLL_DIST       3
 #define LINE_INDEX_LENGTH 0.5
-#define UI_POINT_SIZE   15
-#define TEXT_POINT_SIZE 22
+#define UI_POINT_SIZE     15
+#define TEXT_POINT_SIZE   22
 
 /*
     Struct: Editor Form

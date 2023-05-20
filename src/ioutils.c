@@ -151,8 +151,8 @@ void saveAs(Editor *editor) {
 */
 void moveCaret(EditorForm *form, CaretAction action, char* curLine, char* preLine) {
     // Some essential variables to count new position
-    PosRC curPos = form->realCaretPos;
-    int row = (form->passage->passList).listLen;
+    PosRC curPos = form->caretPos;
+    int row = form->passage->passList.listLen;
     
     // When occur GB2312 character, we advance by two steps
     switch(action) {
@@ -273,12 +273,9 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
         }
     }
     
-    printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n", 
-    curForm->caretPos.r, curForm->caretPos.c, 
-    curForm->realCaretPos.r, curForm->realCaretPos.c, curPos.r, curPos.c);
     // Smart Caret Position, matches the nearest position that is available,
     // with Chinese character support.
-    curPos = curForm->realCaretPos = curForm->caretPos;
+    curPos = curForm->caretPos;
     getLine(curForm->passage, curLine, curPos.r);
     int i, col = 0, minDistance = MAX_LINE_SIZE, charWidth;
     for(i = 0; curLine[i]; i += charWidth) {
@@ -289,6 +286,7 @@ void handleKeyboardEvent(Editor* editor, int key, int event) {
         }
         else break;
     }
+    curForm->realCaretPos.r = curForm->caretPos.r;
     curForm->realCaretPos.c = col;
     printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n", 
     curForm->caretPos.r, curForm->caretPos.c, 
@@ -314,14 +312,6 @@ void handleInputEvent(Editor* editor, char ch) {
         }
     }
     else if (ch >= 32 && ch < 127) {
-//        switch(ch) {
-//            case '}': case ']': case ')':
-//            case '>': case '\"': case '\'':
-//                if (completed) {
-//                    completed = false;
-//                    return;
-//                }
-//        }
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
         LOG("Attempting to add %s\n", tmpstr);
@@ -341,10 +331,8 @@ void handleInputEvent(Editor* editor, char ch) {
         if (ac) {
             sprintf(tmpstr, "%c", ac);
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
-            // LOG("Attempting to complete by adding %s\n", tmpstr);
             addString(form->passage, tmpstr, curPos.r, curPos.c + 1);
-            //completed = true;
-        } //else completed = false;
+        }
     } else if (ch == '\t') {
         // Due to the calculation in addString(), we must use a loop to finish this
         int i;
@@ -434,8 +422,6 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
         case BUTTON_UP:
             if(button == LEFT_BUTTON) {
                 curForm->selectRightPos = pixelToPosRC(curForm, x, y);
-                // printf("Selection range: [(%d %d), (%d %d)]\n",curForm->selectLeftPos.r, curForm->selectLeftPos.c,\
-                // curForm->selectRightPos.r, curForm->selectRightPos.c);
                 if(!atSamePos(curForm->selectRightPos, curForm->selectLeftPos))
                      curForm->inSelectionMode = true;
                 else {
@@ -459,9 +445,11 @@ void handleMouseEvent(Editor* editor, int x, int y, int button, int event) {
             break;
         case ROLL_DOWN:
             if (isControlDown) textPointSize -= 2;
+            textFontHeight = GetFontHeight();
             break;
         case ROLL_UP:
             if (isControlDown) textPointSize += 2;
+            textFontHeight = GetFontHeight();
             break;
     }
 }
