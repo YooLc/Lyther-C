@@ -408,7 +408,7 @@ PosRC addString(Passage *passage, char *str, int row, int col)
     PosRC posRC;
 
     // If it is a new row
-    if (passage->passList.listLen == row - 1) {
+    if (row == passage->passList.listLen + 1) {
         Line *line = NEW(Line);
         Token *token = NEW(Token);
         strcpy(token->content, str);
@@ -423,6 +423,10 @@ PosRC addString(Passage *passage, char *str, int row, int col)
         posRC.c = line->length;
         refreshTrieAdd(passage, row, posRC.r);
         return posRC;
+    } else if (row > passage->passList.listLen + 1
+               || row <= 0) { // Failsafe: If it is an invalid position, just ignore
+        posRC.r = posRC.c = 0;
+        return posRC;
     }
 
     int offset = 0, nodeIndex = 0;
@@ -431,7 +435,6 @@ PosRC addString(Passage *passage, char *str, int row, int col)
     Token *nextToken = NEW(Token);
     refreshTrieDelete(passage, row, row);
     nodeIndex = getNodeIndex(&(line->lineList), getPos(passage, row, col, &offset));
-    printf("OFFSET = %d\n, NODEIDEX = %d CONTENT = %s\n", offset, nodeIndex, token->content);
     strcpy(nextToken->content, token->content + offset);
     nextToken->length = strlen(nextToken->content);
 
@@ -460,13 +463,6 @@ PosRC addString(Passage *passage, char *str, int row, int col)
     }
 
     addNode(&(line->lineList), ++nodeIndex, nextToken);
-    /*
-    strcat(tmpstr, str);
-    strcat(tmpstr, token->content + offset);
-
-    strcpy(token->content, tmpstr);
-    token->length = strlen(token->content);
-    */
     //calculate the cursor position, a naive algorithm
     int newRow = parseLine(passage, row);
     char tmpstr[MAX_LINE_SIZE];
@@ -709,7 +705,7 @@ PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch)
 //for debug use
 void printPassage(Passage *p)
 {
-    //return;
+    // return;
     Listptr nowLineNode = kthNode(&(p->passList), 1);
     printf("Total line num: %d\n", p->passList.listLen);
 

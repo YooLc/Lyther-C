@@ -361,9 +361,7 @@ void handleInputEvent(Editor *editor, char ch)
     char tmpstr[MAX_LINE_SIZE] = "";
 
     if (ch < 0) {
-        if (lastCn == 0)
-            lastCn = ch;
-
+        if (lastCn == 0) lastCn = ch;
         else {
             sprintf(tmpstr, "%c%c\0", lastCn, ch);
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 2, tmpstr);

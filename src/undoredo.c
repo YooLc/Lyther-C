@@ -39,7 +39,6 @@ PosRC Redo(UndoRedo *ur)
 
     if (ur->nowNode == NULL) //If it is before the head of the list
         ur->nowNode = ur->undoRedoList.head;
-
     else {
         if (ur->nowNode->next == NULL) return posRC;
 
@@ -56,14 +55,11 @@ PosRC Redo(UndoRedo *ur)
 
     if (trace->type == ADD)
         posRC = addString(ur->passage, trace->content, rows, cols);
-
     else if (trace->type == DELE) {
         deleteString(ur->passage, rows, cols, rowt, colt);
         posRC.r = rows;
         posRC.c = cols - 1;
     }
-
-    if (ur->nowNode->next != NULL) ur->nowNode = ur->nowNode->next;
 
     printf("NEW POS AFTER REDO %d %d\n", posRC.r, posRC.c);
     return posRC;
