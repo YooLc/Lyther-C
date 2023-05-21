@@ -64,7 +64,6 @@ void menuGetMouse(EditorForm *form, int x, int y, int button, int event)
                 if (newPos.r != -1) form->caretPos = form->realCaretPos = newPos;
                 break;
             }
-            //printf("%d %d %d %d\n", form->selectLeftPos.r, form->selectLeftPos.c, form->selectRightPos.r, form->selectRightPos.c);
             menu.selected = -1;
         } else
             menu.activate = 0;

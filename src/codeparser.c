@@ -28,7 +28,6 @@ void deleteLine(Passage *passage, int row)
 {
     Line *l = kthNode(&(passage->passList), row)->datptr;
     Listptr nowWordNode = kthNode(&(l->lineList), 1);
-
     while (nowWordNode->next != NULL)
         deleteNode(&(l->lineList), 2);
     deleteNode(&(l->lineList), 1);
@@ -41,7 +40,6 @@ int getLine(Passage *passage, char *dst, int row)
     strcpy(dst, "");
     if (passage->passList.listLen == 0) return 0;
     else if (row < 1 || row > passage->passList.listLen) return 0;
-
     Line *l = kthNode(&(passage->passList), row)->datptr;
     Listptr nowWordNode = kthNode(&(l->lineList), 1);
     while (nowWordNode != NULL) {
@@ -77,7 +75,6 @@ static void maintainLineLength(Line *line)
         return;
     }
     line->length = 0;
-
     Listptr nowNode = kthNode(&(line->lineList), 1);
     Token *token = nowNode->datptr;
     while (1) {
@@ -107,19 +104,16 @@ int parseLine(Passage *passage, int row)
     }
     int initLevel = levelCounter;
     Line *line = NEW(Line);
-
     initList(&(line->lineList));
     //store the target line in char array <tmpLine>
     totLen = getLine(passage, tmpLine, row);
     //delete the old line, add a new empty line
     deleteLine(passage, row);
     addNode(&(passage->passList), row, line);
-    printf("Attempt to parse %s (length %d)", tmpLine, totLen);
-    
     while (idx <= totLen) {
         int cnt = 0;
         Token *token = NEW(Token);
-        // token->selected = 1; // For test
+        // For test
         switch (tmpLine[idx - 1]) {
         case '(':
             setToken(token, "(", levelCounter, LEFT_PARENTHESES);
@@ -284,7 +278,6 @@ Listptr getPos(Passage *passage, int row, int col, int *offset)
     Listptr nowNode = kthNode(&(l->lineList), 1);
     if (nowNode == NULL) return NULL;
     Token *token = nowNode->datptr; // pointer of the token in the node
-// printf("Getting pos, current token [%s]\n", token->content);
     // Find the node which contains the 'col'th column
     int nowcol = token->length;
     while (nowcol < col && nowNode->next != NULL) {
@@ -307,14 +300,11 @@ static void refreshTrieAdd(Passage *passage, int rows, int rowt)
         for (tokenIndex = 1; tokenIndex <= line->lineList.listLen; tokenIndex++) {
             token = kthNode(&(line->lineList), tokenIndex)->datptr;
             if (token->type == STRING) {
-                printf("STR : %s %d", token->content, token->length);
                 token->content[token->length] = '\0';
                 addStringToTrie(passage->trie.root, token->content);
             }
         }
     }
-    //traverseTree(passage->trie.root);
-    printAllString(passage->trie.root);
 }
 
 static void refreshTrieDelete(Passage *passage, int rows, int rowt)
@@ -322,8 +312,6 @@ static void refreshTrieDelete(Passage *passage, int rows, int rowt)
     int nowRow = rows, tokenIndex = 1;
     Line *line = NULL;
     Token *token = NULL;
-    printf("%d %d %d\n", rows, rowt, passage->passList.listLen);
-    //return;
     for (nowRow = rows; nowRow <= rowt; nowRow++) {
         line = kthNode(&(passage->passList), nowRow)->datptr;
         for (tokenIndex = 1; tokenIndex < line->lineList.listLen; tokenIndex++) {
@@ -331,8 +319,6 @@ static void refreshTrieDelete(Passage *passage, int rows, int rowt)
             if (token->type == STRING) deleteStringInTrie(passage->trie.root, token->content);
         }
     }
-    //traverseTree(passage->trie.root);
-    //printAllString(passage->trie.root);
 }
 /*
     Function: addString(Passage *p, char *str, int row, int col)
@@ -438,13 +424,9 @@ PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt)
     getLine(passage, tmpLine2, rowt);
     // If it is GB2312 character, then delete two characters.
     if (rows > 1) strcat(targetLine, prevLine);
-    //if (tmpLine1[cols - 1] < 0 && cols > 1)
-    // strncat(targetLine, tmpLine1, cols - 2);
-    //else
     strncat(targetLine, tmpLine1, cols - 1);
     strcat(targetLine, tmpLine2 + colt);
     if (rowt < passage->passList.listLen) strcat(targetLine, nextLine);
-    printf("\n\n **** DELETE STRING : \"%s\"\n", targetLine);
     if (rowt < passage->passList.listLen) deleteLine(&(passage->passList), rowt + 1);
     //delete original string
     for (i = rowt; i >= rows; i--)
@@ -461,7 +443,6 @@ PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt)
     addNode(&(passage->passList), (rows > 1) ? (rows - 1) : (rows), line);
     int newRow = parseLine(passage, (rows > 1) ? (rows - 1) : rows);
     refreshTrieAdd(passage, (rows > 1) ? (rows - 1) : rows, newRow);
-    printf("ROW : %d\n", newRow);
     PosRC newPos;
     newPos.r = rows;
     newPos.c = max(0, cols - 1);
@@ -488,9 +469,7 @@ char *getString(Passage *passage, int rows, int cols, int rowt, int colt)
         }
         nowRow++;
         strcat(dst, targetLine);
-        printf("Target content \"%s\"", targetLine);
     }
-    printf("Range content \"%s\"", dst);
     return dst;
 }
 
@@ -596,25 +575,4 @@ PosRC searchBackwardByChar(Passage *passage, int row, int col, char ch)
         }
     }
     return posRC;
-}
-
-//for debug use
-void printPassage(Passage *p)
-{
-    // return;
-    Listptr nowLineNode = kthNode(&(p->passList), 1);
-    printf("Total line num: %d\n", p->passList.listLen);
-    while (nowLineNode != NULL) {
-        Line *l = nowLineNode->datptr;
-        printf("    Line length: %d\n", l->length);
-        printf("    Total Node num: %d\n", l->lineList.listLen);
-        Listptr nowWordNode = kthNode(&(l->lineList), 1);
-        while (nowWordNode != NULL) {
-            Token *w = nowWordNode->datptr;
-            printf("        content: \"%s\", len: %d, type: %d, level: %d\n", w->content, w->length,
-                   w->type, w->level);
-            nowWordNode = nowWordNode->next;
-        }
-        nowLineNode = nowLineNode->next;
-    }
 }

@@ -36,8 +36,6 @@ void traverseTree(TreeNode *root)
     for (i = 0; i < 52; i++) {
         TreeNode *child = root->child[i];
         if (child == NULL) continue;
-        printf("char : %c childNum : %d endpoint %d\n", indexToChar(i), child->childNum,
-               root->cnt[i]);
         traverseTree(child);
     }
 }
@@ -58,7 +56,6 @@ void addStringToTrie(TreeNode *root, char *str)
     char ch = *str;
     int index = 0;
     index = charToIndex(ch);
-    printf("Current string [%s], index: %d\n", str, index);
     if (root->child[index] == NULL) {
         TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
         initNode(newNode);
@@ -165,16 +162,3 @@ TextList *matchPrefix(TreeNode *root, char *str)
     return textList;
 }
 
-void printAllString(TreeNode *root)
-{
-    TextList *list = (TextList *)malloc(sizeof(TextList));
-    initList(list);
-    char prefix[MAX_WORD_SIZE] = "";
-    getAllString(list, root, prefix);
-    puts("TRIE");
-    int i = 0;
-    printf("NUM = %d\n", list->listLen);
-    for (i = 0; i < list->listLen; i++)
-        printf("	%s\n", (char *)kthNode(list, i + 1)->datptr);
-    free(list);
-}

@@ -37,7 +37,7 @@ PosRC Redo(UndoRedo *ur)
         if (ur->nowNode->next == NULL) return posRC;
         ur->nowNode = ur->nowNode->next;
     }
-    //if(ur->nowNode == NULL) return posRC;
+
     Trace *trace = ur->nowNode->datptr;
     int rows, cols, rowt, colt;
     rows = trace->rows;

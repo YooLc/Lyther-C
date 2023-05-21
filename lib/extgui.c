@@ -28,7 +28,6 @@ static int barItem(int id, double x, double y, double w, double h, char *label,
     if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
         frameColor = gs_menu_color.hotFrame;
         labelColor = gs_menu_color.hotLabel;
-        printf("acting menu %d\n", gs_UIState.actingMenu);
         if (!gs_UIState.actingMenu && (gs_UIState.clickedItem == id
                                        || gs_UIState.clickedItem == 0)
             && gs_UIState.mousedown)
@@ -39,8 +38,6 @@ static int barItem(int id, double x, double y, double w, double h, char *label,
     }
     mySetPenColor(frameColor);
     drawBox(x, y, w, h, gs_menu_color.fillflag, label, 'L', labelColor);
-// printf("gs_UIState.clickedItem %d, id %d\n", gs_UIState.clickedItem, id);
-// printf("gs_UIState.mousedown: %d\n", gs_UIState.mousedown);
     if (gs_UIState.clickedItem == id && // must be clicked before
         !gs_UIState.mousedown) { // but now mouse button is up
         gs_UIState.clickedItem = 0;
@@ -54,10 +51,6 @@ int selectBar(int id, double x, double y, double w, double h, char *labels[], in
 {
     SetPenColor(gs_menu_color.frame);
     drawRectangle(x, y, w, h, 1);
-    //printf("actingMenu %d\n", gs_UIState.actingMenu);
-    // Because there's no layer
-// if( inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h) && !gs_UIState.actingMenu)
-// gs_UIState.actingMenu = id;
     int i, result = curSelect;
     double labelWidth, curPosX = x;
     for (i = 1; i <= count; i++) {
@@ -122,7 +115,6 @@ double vertivalScrollBar(int id, double x, double y, double w, double h, double 
 
 static int completeItem(int id, double x, double y, double w, double h, char *label)
 {
-    //puts("ABCD");
     char *frameColor = gs_menu_color.frame;
     char *labelColor = gs_menu_color.label;
     if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
@@ -147,7 +139,6 @@ static int completeItem(int id, double x, double y, double w, double h, char *la
 int completeList(int id, double x, double y, double w, double h, char *labels[], int n)
 {
     int result = -1;
-    // ´¦ÀíÊó±ê
     int k;
     for (k = 0; k < n; k++) {
         if (completeItem(GenUIID(k) + id, x, y - (k + 1)*h, w, h, labels[k]))

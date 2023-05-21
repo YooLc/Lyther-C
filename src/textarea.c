@@ -83,7 +83,6 @@ void addCodeToEditor(Editor *editor, FILE *fp, char *filePath)
         addString(form->passage, "\n", 1, 1);
     form->urStack = NEW(UndoRedo);
     initUndoRedoList(form->urStack, form->passage);
-    printPassage(form->passage);
 }
 
 void drawEditor(Editor *editor)
@@ -145,7 +144,6 @@ static void drawEditorComplete(Editor *editor)
         return;
     }
     getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c + 1, &offset);
-    //printf("OFFSET %d\n", offset);
     if (offset == 0 && form->realCaretPos.c >= 1) {
         Token *token = getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c,
                               &offset)->datptr;
@@ -155,7 +153,6 @@ static void drawEditorComplete(Editor *editor)
         }
         TextList *list = matchPrefix(form->passage->trie.root, token->content);
         char *labels[MAX_WORD_SIZE];
-        //if(list == NULL) printf("NULL %s", token->content);
         if (list == NULL || list->listLen == 0) {
             form->completeMode = 0;
             return;
@@ -164,7 +161,6 @@ static void drawEditorComplete(Editor *editor)
             labels[i] = (char *)malloc(sizeof(char) * MAX_WORD_SIZE);
             strcpy(labels[i], token->content);
             strcat(labels[i], kthNode(list, i + 1)->datptr);
-            //printf("COMP STR %s\n", labels[i]);
         }
         SetPointSize(textPointSize);
         double listx, listy, listw, listh;
@@ -183,7 +179,6 @@ static void drawEditorComplete(Editor *editor)
         //return;
         if (selection != -1) {
             int addLen = strlen(labels[selection]) - token->length;
-            printf("POS %d %d %d\n", form->realCaretPos.r, form->realCaretPos.c + 1, addLen);
             addTrace(form->urStack, ADD, form->realCaretPos.r, form->realCaretPos.c + 1,
                      form->realCaretPos.r,
                      form->realCaretPos.c + addLen, labels[selection] + token->length);
@@ -207,8 +202,6 @@ void drawEditorSelection(EditorForm *form)
     if (form->selectLeftPos.r == form->selectRightPos.r
         && form->selectLeftPos.c == form->selectRightPos.c) return;
     if (form->inSelectionMode == false) return;
-    //printf("Selected (%d, %d) - (%d, %d)\n", form->selectLeftPos.r, form->selectLeftPos.c,
-    // form->selectRightPos.r, form->selectRightPos.c);
     PosRC lRC = form->selectLeftPos, rRC = form->selectRightPos;
     if (form->selectLeftPos.r > form->selectRightPos.r ||
         (form->selectLeftPos.r == form->selectRightPos.r &&
@@ -329,7 +322,6 @@ static void drawSymbolMatch(EditorForm *form)
         || token->type == LEFT_BRACE) {
         matchPos = matchCharForward(form->passage, form->realCaretPos.r, form->realCaretPos.c,
                                     *typeTable[token->type], *typeTable[token->type + 1]);
-        // printf("matchPos F %d %d\n", matchPos.r, matchPos.c);
         x2 += (matchPos.c - 1) * TextStringWidth("a");
         y2 -= matchPos.r * textFontHeight;
         drawCharWithBackground(x1, y1, typeTable[token->type]);
@@ -337,7 +329,6 @@ static void drawSymbolMatch(EditorForm *form)
     } else {
         matchPos = matchCharBackward(form->passage, form->realCaretPos.r, form->realCaretPos.c,
                                      *typeTable[token->type], *typeTable[token->type - 1]);
-        // printf("matchPos B %d %d\n", matchPos.r, matchPos.c);
         x2 += (matchPos.c - 1) * TextStringWidth("a");
         y2 -= matchPos.r * textFontHeight;
         drawCharWithBackground(x1, y1, typeTable[token->type]);

@@ -54,10 +54,7 @@ void loadFile(Editor *editor)
     ofn.Flags = OFN_FILEMUSTEXIST;
     GetOpenFileName(&ofn);
     FILE *fp = fopen(openFile, "r");
-    if (fp == NULL) {
-        printf("FAILED TO OPEN FILE [%s]", openFile);
-        return;
-    }
+    if (fp == NULL) return;
     char *filePath = (char *)malloc(sizeof(char) * strlen(openFile));
     strcpy(filePath, openFile);
     addCodeToEditor(editor, fp, filePath);
@@ -73,16 +70,12 @@ void newFile(Editor *editor)
 
 void saveFile(Editor *editor)
 {
-    printf("FILE PATH : %s\n", editor->filePath[editor->curSelect]);
     if (editor->filePath[editor->curSelect][0] == '+') {
         saveAs(editor);
         return;
     }
     FILE *fp = fopen(editor->filePath[editor->curSelect], "w");
-    if (fp == NULL) {
-        printf("FAILED TO SAVE FILE [%s]", editor->filePath[editor->curSelect]);
-        return;
-    }
+    if (fp == NULL) return;
     // Write code to file
     EditorForm *form = editor->forms[editor->curSelect];
     Passage *p = form->passage;
@@ -116,18 +109,13 @@ void saveAs(Editor *editor)
     ofn.Flags = OFN_FILEMUSTEXIST;
     if (!GetSaveFileName(&ofn)) return;
     int len = strlen(saveFile);
-    printf("Save file: [%s]\n", saveFile);
     if (len >= 2 && saveFile[len - 2] != '.')
         strcat(saveFile, ".c");
     editor->filePath[editor->curSelect] = (char *)malloc(sizeof(char) * strlen(saveFile) + 1);
     strcpy(editor->filePath[editor->curSelect], saveFile);
     editor->fileName[editor->curSelect] = getFileName(saveFile);
-    printf("SAVE %s\n", saveFile);
     FILE *fp = fopen(saveFile, "w");
-    if (fp == NULL) {
-        puts("FAILURE IN SAVE FILE");
-        return;
-    }
+    if (fp == NULL) return;
     // Write code to file
     EditorForm *form = editor->forms[editor->curSelect];
     Passage *p = form->passage;
@@ -297,9 +285,6 @@ void handleKeyboardEvent(Editor *editor, int key, int event)
     }
     curForm->realCaretPos.r = curForm->caretPos.r;
     curForm->realCaretPos.c = col;
-    printf("Caret at (%d, %d), Real Caret at (%d, %d), curPos at (%d, %d)\n",
-           curForm->caretPos.r, curForm->caretPos.c,
-           curForm->realCaretPos.r, curForm->realCaretPos.c, curPos.r, curPos.c);
 }
 
 void handleInputEvent(Editor *editor, char ch)
@@ -307,14 +292,12 @@ void handleInputEvent(Editor *editor, char ch)
     EditorForm *form = editor->forms[editor->curSelect];
     PosRC curPos = form->realCaretPos;
     static char lastCn = 0; // Track the last Chinese character, if is not, this var is 0
-    // static bool completed = false;
     char tmpstr[MAX_LINE_SIZE] = "";
     if (ch < 0) {
         if (lastCn == 0) lastCn = ch;
         else {
             sprintf(tmpstr, "%c%c\0", lastCn, ch);
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 2, tmpstr);
-            LOG("Attempting to add %s\n", tmpstr);
             form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r,
                                                   curPos.c + 1);
             lastCn = 0;
@@ -322,7 +305,6 @@ void handleInputEvent(Editor *editor, char ch)
     } else if (ch >= 32 && ch < 127) {
         sprintf(tmpstr, "%c", ch);
         addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
-        LOG("Attempting to add %s\n", tmpstr);
         form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r,
                                               curPos.c + 1);
         curPos = form->realCaretPos;
@@ -338,7 +320,6 @@ void handleInputEvent(Editor *editor, char ch)
         case '(':
             ac = ')';
             break;
-        // case '<': ac = '>'; break;
         case '\"':
             ac = '\"';
             break;
@@ -357,7 +338,6 @@ void handleInputEvent(Editor *editor, char ch)
         for (i = 0; i < INDENT_LENGTH; i++) {
             sprintf(tmpstr, " ");
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
-            // LOG("Attempting to add [%s]\n", tmpstr);
             form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r,
                                                   curPos.c + 1);
             curPos = form->realCaretPos;
@@ -368,13 +348,11 @@ void handleInputEvent(Editor *editor, char ch)
         for (i = 0; i < lastToken->level * INDENT_LENGTH; i++) {
             sprintf(tmpstr, " ");
             addTrace(form->urStack, ADD, curPos.r, curPos.c + 1, curPos.r, curPos.c + 1, tmpstr);
-            LOG("Attempting to add [%s]\n", tmpstr);
             form->caretPos = form->realCaretPos = addString(form->passage, tmpstr, curPos.r,
                                                   curPos.c + 1);
             curPos = form->realCaretPos;
         }
     }
-    printPassage(form->passage);
 }
 
 /*

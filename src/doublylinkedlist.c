@@ -95,7 +95,6 @@ void deleteNode(LinkedList *list, int index)
 void deleteNodeByPtr(LinkedList *list, Listptr nowNode)
 {
     list->listLen--;
-//return ;
     if (nowNode->prev == NULL)
         list->head = nowNode->next;
     else {
@@ -114,7 +113,6 @@ void deleteNodeByPtr(LinkedList *list, Listptr nowNode)
 
 void addNode(LinkedList *list, int index, void *datptr)
 {
-    printf("Called addNode %d %d\n", index, list->listLen);
     if (index <= 0 || index > list->listLen + 1) return;
     if (index == 1) {
         addNodeToHead(list, datptr);
