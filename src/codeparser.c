@@ -7,10 +7,11 @@
 #include "textarea.h"
 #include "trie.h"
 
-char *KeyWord[32] = {"auto", "break", "case", "char", "const", "continue", "default", "do",
-                     "double", "else", "enum", "extern", "float", "for", "goto", "if",
-                     "int", "long", "register", "return", "short", "signed", "sizeof", "static",
-                     "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"
+char *KeyWord[32] = {"auto", "break", "case", "char", "const", "continue", "default", 
+                     "do", "double", "else", "enum", "extern", "float", "for", "goto", 
+                     "if", "int", "long", "register", "return", "short", "signed",
+                     "sizeof", "static", "struct", "switch", "typedef", "union",
+                     "unsigned", "void", "volatile", "while"
                     };
 
 /*
@@ -100,8 +101,7 @@ static void maintainLineLength(Line *line)
 
 static int isCharacter(char ch)
 {
-    if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch < 0)) return 1; //Chinese character
-
+    if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch < 0)) return 1;
     return 0;
 }
 
@@ -277,7 +277,8 @@ int parseLine(Passage *passage, int row)
 
             while (idx <= totLen) {
                 if (tmpLine[idx - 1] == '\n') break;
-
+                else if (tmpLine[idx - 1] == '(' || tmpLine[idx - 1] == '[' || tmpLine[idx - 1] == '{') levelCounter++;
+                else if (tmpLine[idx - 1] == ')' || tmpLine[idx - 1] == ']' || tmpLine[idx - 1] == '}') --levelCounter;
                 tmpWord[++cnt] = tmpLine[idx - 1];
                 idx++;
             }
@@ -291,6 +292,7 @@ int parseLine(Passage *passage, int row)
                 strncpy(token->content, &tmpLine[idx - 1], 1);
                 token->content[1] = '\0';
                 token->type = OTHER;
+                token->level = levelCounter;
                 idx++;
                 break;
             }
@@ -304,6 +306,7 @@ int parseLine(Passage *passage, int row)
 
             tmpWord[cnt] = '\0';
             setToken(token, tmpWord, levelCounter, STRING);
+            break;
         }
 
         token->length = strlen(token->content);
@@ -331,7 +334,8 @@ Listptr getPos(Passage *passage, int row, int col, int *offset)
 {
     // Get the pointer of line in 'row'
     Line *l = kthNode(&(passage->passList), row)->datptr;
-    Listptr nowNode = kthNode(&(l->lineList), 1); // get the pointer of the first node of this line
+    // Get the pointer of the first node of this line
+    Listptr nowNode = kthNode(&(l->lineList), 1);
 
     if (nowNode == NULL) return NULL;
 
@@ -483,7 +487,8 @@ PosRC addString(Passage *passage, char *str, int row, int col)
 PosRC deleteString(Passage *passage, int rows, int cols, int rowt, int colt)
 {
     int i = 0;
-    char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE]; //store string in the first and last row
+    //store string in the first and last row
+    char tmpLine1[MAX_LINE_SIZE], tmpLine2[MAX_LINE_SIZE];
     char prevLine[MAX_LINE_SIZE], nextLine[MAX_LINE_SIZE];
     char targetLine[4 * MAX_LINE_SIZE] = "\0";
 
@@ -627,7 +632,8 @@ void maintainLevel(Passage *passage, int row, int col)
     Token *token = nowNode->datptr;
     levelCounter = token->level;
 
-    if (token->type == LEFT_PARENTHESES || token->type == LEFT_BRACKETS || token->type == LEFT_BRACE)
+    if (token->type == LEFT_PARENTHESES || token->type == LEFT_BRACKETS
+        || token->type == LEFT_BRACE)
         levelCounter++;
 
     while (levelCounter >= 0) {
@@ -717,8 +723,8 @@ void printPassage(Passage *p)
 
         while (nowWordNode != NULL) {
             Token *w = nowWordNode->datptr;
-            printf("        content: \"%s\", len: %d, type: %d, level: %d\n", w->content, w->length, w->type,
-                   w->level);
+            printf("        content: \"%s\", len: %d, type: %d, level: %d\n", w->content, w->length,
+                   w->type, w->level);
             nowWordNode = nowWordNode->next;
         }
 
