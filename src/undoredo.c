@@ -32,15 +32,14 @@ PosRC Undo(UndoRedo *ur){
 PosRC Redo(UndoRedo *ur){
 	PosRC posRC = {-1,-1};
     if(ur->undoRedoList.listLen == 0) return posRC;
-    if(ur->nowNode->next == NULL) return posRC;
     
     if(ur->nowNode == NULL){    //If it is before the head of the list
         ur->nowNode = ur->undoRedoList.head;
     }else{
+    	if(ur->nowNode->next == NULL) return posRC;
         ur->nowNode = ur->nowNode->next;
     }
-    
-    if(ur->nowNode == NULL) return;
+    //if(ur->nowNode == NULL) return posRC;
     
     Trace *trace = ur->nowNode->datptr;
     int rows, cols, rowt, colt;
@@ -55,6 +54,7 @@ PosRC Redo(UndoRedo *ur){
         posRC.r = rows;
         posRC.c = cols-1;
     }
+    if(ur->nowNode->next != NULL) ur->nowNode = ur->nowNode->next;
     printf("NEW POS AFTER REDO %d %d\n", posRC.r, posRC.c);
     return posRC;
 }

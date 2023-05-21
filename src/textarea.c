@@ -145,7 +145,10 @@ void drawEditor(Editor* editor) {
 static void drawEditorComplete(Editor *editor){
 	int offset = -1, i;
 	EditorForm *form = editor->forms[editor->curSelect];
-	if(form->realCaretPos.c == 0) return;
+	if(form->realCaretPos.c == 0){
+		form->completeMode = 0;
+		return;
+	}
 	getPos(form->passage, form->realCaretPos.r, form->realCaretPos.c+1, &offset);
 	//printf("OFFSET %d\n", offset);
 	if(offset == 0 && form->realCaretPos.c >= 1){
