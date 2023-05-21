@@ -29,6 +29,7 @@ void Display(void)
 void KeyboardEventProcess(int key, int event)
 {
     uiGetKeyboard(key, event);
+
     if (!helperActivated() && !aboutActivated())
         handleKeyboardEvent(&editor, key, event);
 }
@@ -36,16 +37,20 @@ void KeyboardEventProcess(int key, int event)
 void CharEventProcess(char ch)
 {
     uiGetChar(ch);
+
     if (!helperActivated() && !aboutActivated())
         handleInputEvent(&editor, ch);
+
     Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event)
 {
     uiGetMouse(x, y, button, event);
+
     if (!helperActivated() && !aboutActivated())
         handleMouseEvent(&editor, x, y, button, event);
+
     if (event != MOUSEMOVE)
         Display();
 }
@@ -56,7 +61,7 @@ void TimerEventProcess(int timerID)
         Display();
 }
 
-void Main() 
+void Main()
 {
     // Initialize libgraphics and imgui
     SetWindowTitle("Lyther ÇáÓð");
@@ -64,18 +69,15 @@ void Main()
     InitGUI();
     // For debug use.
     // InitConsole();
-
     // The special point size is tofix werid offset when drawing text caused by libgraphics.
     // Note that this value varies to different fonts
     SetFont("Consolas");
     SetPointSize(TEXT_POINT_SIZE);
-
     // Initialize of data structures used in the editor
     initStyle();
     initEditor(&editor);
     initMenu();
     addCodeToEditor(&editor, NULL, "+\\Untitled 1");
-
     // Setup callback functions to handle various events
     startTimer(REFRESH_TIMER, 20);
     registerCharEvent(CharEventProcess);

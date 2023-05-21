@@ -14,9 +14,9 @@
 */
 typedef struct {
     char name[MAX_NAME_LEN];
-    
+
     // Colors for background and text(forground).
-    char background[MAX_NAME_LEN]; 
+    char background[MAX_NAME_LEN];
     char foreground[MAX_NAME_LEN];
 
     // Colors for line index part on the left.
@@ -33,7 +33,7 @@ typedef struct {
     // Colors for selection and line highlight
     char selection[MAX_NAME_LEN];
     char highlight[MAX_NAME_LEN];
-    
+
     // Colors for UI
     char caret[MAX_NAME_LEN];
     char frame[MAX_NAME_LEN];

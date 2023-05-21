@@ -1074,9 +1074,9 @@ static LONG FAR PASCAL GraphicsEventProc(HWND hwnd, UINT msg,
 {
     switch(msg)
     {
-		// 锟斤拷锟铰癸拷锟斤拷使锟斤拷锟斤拷double buffer, 锟街讹拷锟斤拷锟斤拷锟斤拷
-		//         锟斤拷锟皆诧拷锟斤拷锟斤拷锟斤拷锟斤拷息锟斤拷锟斤拷锟斤拷锟斤拷烁
-		//         锟斤拷谢18锟斤拷石锟斤拷同学锟斤拷锟结供锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷刷锟斤拷锟斤拷烁锟斤拷锟斤拷
+		// 刘新国：使用了double buffer, 手动清屏，
+		//         忽略擦除背景消息，避免闪烁
+		//         感谢18级石蒙同学，提供这个方法解决刷新闪烁问题
 		case WM_ERASEBKGND: 
 			return 0; 
 
