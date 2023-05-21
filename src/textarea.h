@@ -83,7 +83,8 @@ static void drawEditorForm(EditorForm *form);
     Function: drawCodeLine
     Display single line of code
 */
-static void drawCodeLine(EditorForm *form, Line *line, double x, double y, double w, double h);
+static void drawCodeLine(EditorForm *form, Line *line, double x, double y, double w,
+                         double h);
 /*
     Function: drawToken
     Display single token from parser, with code highlight

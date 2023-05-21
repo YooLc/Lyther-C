@@ -56,7 +56,6 @@ static string about_ZH_CN[] = {"ÇáÓð Version 1.3",
 void drawHelper(double x, double y, double w, double h)
 {
     if (!isHelperActivated) return;
-
     SetPenColor(getBackgroundColor());
     drawRectangle(x, y, w, h, 1);
     SetFont("Î¢ÈíÑÅºÚ");
@@ -68,7 +67,6 @@ void drawHelper(double x, double y, double w, double h)
 void drawAbout(double x, double y, double w, double h)
 {
     if (!isAboutActivated) return;
-
     SetPenColor(getBackgroundColor());
     drawRectangle(x, y, w, h, 1);
     SetFont("Î¢ÈíÑÅºÚ");
@@ -83,10 +81,8 @@ static void drawPassage(double x, double y, string passage[], int n)
     double fontHeight = GetFontHeight(), fontAscent = GetFontAscent();
     double currentY = y - fontHeight;
     SetPenColor(getForegroundColor());
-
     for (i = 0; i < n; i++) {
         if (passage[i][0] != '-') SetStyle(Bold);
-
         MovePen(x, currentY + fontAscent);
         DrawTextString(passage[i]);
         currentY -= fontHeight;

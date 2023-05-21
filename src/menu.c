@@ -22,13 +22,12 @@ void initMenu()
 static int inMenu(int x, int y)
 {
     if (!menu.activate) return 0;
-
     if (x >= menu.posx + menu.menuWidth * GetXResolution()
-        || y >= menu.posy + menu.menuHeight * GetYResolution() || x <= menu.posx || y <= menu.posy) {
+        || y >= menu.posy + menu.menuHeight * GetYResolution() || x <= menu.posx
+        || y <= menu.posy) {
         menu.selected = -1;
         return 0;
     }
-
     int entry = (y - menu.posy) / (menu.entryHeight * GetYResolution());
     menu.selected = entry;
     return 1;
@@ -37,7 +36,6 @@ static int inMenu(int x, int y)
 void menuGetMouse(EditorForm *form, int x, int y, int button, int event)
 {
     inMenu(x, y);
-
     switch (event) {
     case BUTTON_DOWN:
         if (button == RIGHT_BUTTON) {
@@ -47,37 +45,25 @@ void menuGetMouse(EditorForm *form, int x, int y, int button, int event)
         } else if (button == LEFT_BUTTON && menu.selected != -1) {
             menu.activate = 0;
             PosRC newPos;
-
             switch (menu.selected) {
             case 0:
                 if (form->inSelectionMode) Copy(form);
-
                 break;
-
             case 1:
                 if (form->inSelectionMode) Cut(form);
-
                 break;
-
             case 2:
                 Paste(form);
                 break;
-
             case 3:
                 newPos = Undo(form->urStack);
-
                 if (newPos.r != -1) form->caretPos = form->realCaretPos = newPos;
-
                 break;
-
             case 4:
                 newPos = Redo(form->urStack);
-
                 if (newPos.r != -1) form->caretPos = form->realCaretPos = newPos;
-
                 break;
             }
-
             //printf("%d %d %d %d\n", form->selectLeftPos.r, form->selectLeftPos.c, form->selectRightPos.r, form->selectRightPos.c);
             menu.selected = -1;
         } else
@@ -88,7 +74,6 @@ void menuGetMouse(EditorForm *form, int x, int y, int button, int event)
 void displayMenu()
 {
     if (!menu.activate) return;
-
     int i = 0;
     //Draw menu background
     SetPenColor("MenuBackground");
@@ -106,16 +91,13 @@ void displayMenu()
     DrawLine(-menu.menuWidth, 0);
     DrawLine(0, menu.menuHeight);
     SetPenColor("Black");
-
     for (i = 0; i < MENUENTRY; i++) {
         MovePen(ScaleXInches(menu.posx),
                 ScaleYInches(menu.posy) - (i + 1)*menu.entryHeight + GetFontDescent() + menu.entryMargin);
         DrawTextString(menuEntry[i]);
     }
-
     //Highlight selected entry
     if (menu.selected == -1) return;
-
     SetPenColor("MenuSelected");
     SetPenSize(1);
     MovePen(ScaleXInches(menu.posx) + menu.entryMargin,

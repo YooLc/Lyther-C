@@ -34,7 +34,8 @@ PosRC Redo(UndoRedo *ur);
     When there is a new IO event, add this trace in the undoRedoList
     This function will automatically delete all the nodes after this new node
 */
-void addTrace(UndoRedo *ur, TraceType type, int rows, int cols, int rowt, int colt, char *content);
+void addTrace(UndoRedo *ur, TraceType type, int rows, int cols, int rowt, int colt,
+              char *content);
 
 //Internal function
 static void clearRedo(UndoRedo *ur);
