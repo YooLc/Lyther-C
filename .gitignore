@@ -1,6 +1,8 @@
 # Files generated automatically by Dev-C++
 *.layout
 *.win
+CodeEditor_private.h
+CodeEditor_private.rc
 
 # Executable files
 *.exe
