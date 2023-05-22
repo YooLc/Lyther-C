@@ -1,5 +1,4 @@
 #include "menu.h"
-#include "locale.h"
 #include "extgraph.h"
 #include "undoredo.h"
 #include "clipboard.h"
