@@ -6,18 +6,18 @@
 
 #include "textarea.h"
 
-typedef struct {
+typedef struct{
     double menuWidth;
     double menuHeight;
     double entryHeight, entryMargin;
     int posx, posy;
     int activate;
     int selected;
-} Menu;
+}Menu;
 
 Menu menu;
 
-static char *menuEntry[] = {" Copy | (C)", " Cut | (X)", " Paste | (V)", " Undo | (Z)", " Redo | (Y)"};
+static char* menuEntry[] = {" Copy | (C)", " Cut | (X)", " Paste | (V)", " Undo | (Z)", " Redo | (Y)"};
 
 void initMenu();
 

@@ -9,7 +9,7 @@ typedef enum {
     DELE
 } TraceType;
 
-typedef struct {
+typedef struct{
     TraceType type;
     int rows, cols, rowt, colt; // closed interval
     char content[MAX_LINE_SIZE];
@@ -19,11 +19,11 @@ typedef struct {
     Struct of a UndoRedo abstract
     Creat a Instance of this struct for every passage
 */
-typedef struct {
+typedef struct{
     Passage *passage;
     LinkedList undoRedoList;
     Listptr nowNode;
-} UndoRedo;
+}UndoRedo;
 
 // Call this function when there is an Undo event
 PosRC Undo(UndoRedo *ur);
@@ -34,8 +34,7 @@ PosRC Redo(UndoRedo *ur);
     When there is a new IO event, add this trace in the undoRedoList
     This function will automatically delete all the nodes after this new node
 */
-void addTrace(UndoRedo *ur, TraceType type, int rows, int cols, int rowt, int colt,
-              char *content);
+void addTrace(UndoRedo *ur, TraceType type, int rows, int cols, int rowt, int colt, char *content);
 
 //Internal function
 static void clearRedo(UndoRedo *ur);

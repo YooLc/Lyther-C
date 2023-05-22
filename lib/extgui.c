@@ -3,11 +3,7 @@
 #include "graphics.h"
 #include "extgraph.h"
 
-<<<<<<< HEAD
 #include <windows.h> 
-=======
-#include <windows.h>
->>>>>>> dev
 #include <stdbool.h>
 
 extern UIState gs_UIState;
@@ -15,25 +11,20 @@ extern MenuPalette gs_menu_color;
 
 double barPos[10];
 
-<<<<<<< HEAD
 /* 测试：坐标点(x,y)是否位于包围和 [x1,x2] X [y1,y2] 内部 */
-=======
->>>>>>> dev
 static bool inBox(double x, double y, double x1, double x2, double y1, double y2)
 {
-    return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
+	return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
-static int barItem(int id, double x, double y, double w, double h, char *label,
-                   int selected)
+static int barItem(int id, double x, double y, double w, double h, char *label, int selected)
 {
-    char *frameColor = gs_menu_color.frame;
-    char *labelColor = gs_menu_color.label;
-    if (selected) {
-        frameColor = gs_menu_color.hotFrame;
-        labelColor = gs_menu_color.hotLabel;
+	char *frameColor = gs_menu_color.frame;
+	char *labelColor = gs_menu_color.label;
+	if (selected) {
+	    frameColor = gs_menu_color.hotFrame;
+		labelColor = gs_menu_color.hotLabel;
     }
-<<<<<<< HEAD
 	if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
 		frameColor = gs_menu_color.hotFrame;
 		labelColor = gs_menu_color.hotLabel;
@@ -61,35 +52,12 @@ static int barItem(int id, double x, double y, double w, double h, char *label,
 	}
 
 	return 0;
-=======
-    if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
-        frameColor = gs_menu_color.hotFrame;
-        labelColor = gs_menu_color.hotLabel;
-        if (!gs_UIState.actingMenu && (gs_UIState.clickedItem == id
-                                       || gs_UIState.clickedItem == 0)
-            && gs_UIState.mousedown)
-            gs_UIState.clickedItem = id;
-    } else {
-        if (gs_UIState.clickedItem == id)
-            gs_UIState.clickedItem = 0;
-    }
-    mySetPenColor(frameColor);
-    drawBox(x, y, w, h, gs_menu_color.fillflag, label, 'L', labelColor);
-    if (gs_UIState.clickedItem == id && // must be clicked before
-        !gs_UIState.mousedown) { // but now mouse button is up
-        gs_UIState.clickedItem = 0;
-        return 1;
-    }
-    return 0;
->>>>>>> dev
 }
 
-int selectBar(int id, double x, double y, double w, double h, char *labels[], int count,
-              int curSelect)
+int selectBar(int id, double x, double y, double w, double h, char *labels[], int count, int curSelect)
 {
     SetPenColor(gs_menu_color.frame);
     drawRectangle(x, y, w, h, 1);
-<<<<<<< HEAD
     
     //printf("actingMenu %d\n", gs_UIState.actingMenu);
     
@@ -112,30 +80,12 @@ int selectBar(int id, double x, double y, double w, double h, char *labels[], in
 
 double vertivalScrollBar(int id, double x, double y, double w, double h, double scale, double progress) 
 {   
-=======
-    int i, result = curSelect;
-    double labelWidth, curPosX = x;
-    for (i = 1; i <= count; i++) {
-        labelWidth = TextStringWidth(labels[i]) + GetFontAscent();
-        if (barItem(GenUIID(i), curPosX, y, labelWidth, h, labels[i], (i == curSelect)))
-            result = i;
-        curPosX += labelWidth;
-    }
-    if (gs_UIState.actingMenu) return curSelect;
-    return result;
-}
-
-double vertivalScrollBar(int id, double x, double y, double w, double h, double scale,
-                         double progress)
-{
->>>>>>> dev
     // Draw gutter
     double gutterX, gutterW;
     gutterW = GUTTER_WIDTH;
     gutterX = x + w - gutterW;
     SetPenColor(gs_menu_color.frame);
     drawRectangle(gutterX, y, gutterW, h, 1);
-<<<<<<< HEAD
     
     // Draw bar
     double barLength = scale * h;
@@ -144,21 +94,10 @@ double vertivalScrollBar(int id, double x, double y, double w, double h, double 
     
     // Handle drag event
     if (inBox(gs_UIState.mousex, gs_UIState.mousey, gutterX + gutterW / 10, gutterX + gutterW * 9 / 10, y + barPos, y + barPos + barLength)) {
-=======
-    // Draw bar
-    double barLength = scale * h;
-    char *barColor = gs_menu_color.hotFrame;
-    double barPos = (1 - progress) * h - barLength;
-    // Handle drag event
-    if (inBox(gs_UIState.mousex, gs_UIState.mousey, gutterX + gutterW / 10,
-              gutterX + gutterW * 9 / 10,
-              y + barPos, y + barPos + barLength)) {
->>>>>>> dev
         barColor = "White";
         if (gs_UIState.mousedown && gs_UIState.clickedItem == 0) {
             gs_UIState.clickedItem = id;
             gs_UIState.mousedy = 0;
-<<<<<<< HEAD
 		    gs_UIState.mousedx = 0;
         }
     }
@@ -192,40 +131,11 @@ double vertivalScrollBar(int id, double x, double y, double w, double h, double 
 	SetPenColor(barColor);
 	drawRectangle(gutterX + gutterW / 10, y + barPos, gutterW * 4 / 5, barLength, 1);
 	progress = (h - barPos - barLength) / h;
-=======
-            gs_UIState.mousedx = 0;
-        }
-    }
-    if (gs_UIState.mousedown && gs_UIState.clickedItem == id) {
-        barColor = "White";
-        if (gs_UIState.clickedItem == id)
-            barPos += gs_UIState.mousedy;
-        gs_UIState.mousedy = 0;
-        gs_UIState.mousedx = 0;
-    }
-    // Handle roll up/down event
-    if (gs_UIState.mouserolldown == 1) {
-        barPos -= h * scale * 0.15;
-        gs_UIState.mouserolldown = 0;
-    } else if (gs_UIState.mouserollup == 1) {
-        barPos += h * scale * 0.15;
-        gs_UIState.mouserollup = 0;
-    }
-    // Handle release event
-    if (!gs_UIState.mousedown && gs_UIState.clickedItem == id)
-        gs_UIState.clickedItem = 0;
-    barPos = max(0, barPos);
-    barPos = min(h - barLength, barPos);
-    SetPenColor(barColor);
-    drawRectangle(gutterX + gutterW / 10, y + barPos, gutterW * 4 / 5, barLength, 1);
-    progress = (h - barPos - barLength) / h;
->>>>>>> dev
     return progress;
 }
 
 static int completeItem(int id, double x, double y, double w, double h, char *label)
 {
-<<<<<<< HEAD
 	//puts("ABCD");
 	char * frameColor = gs_menu_color.frame;
 	char * labelColor = gs_menu_color.label;
@@ -252,32 +162,10 @@ static int completeItem(int id, double x, double y, double w, double h, char *la
 	}
 	
 	return 0;
-=======
-    char *frameColor = gs_menu_color.frame;
-    char *labelColor = gs_menu_color.label;
-    if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
-        frameColor = gs_menu_color.hotFrame;
-        labelColor = gs_menu_color.hotLabel;
-        if ((gs_UIState.clickedItem == id || gs_UIState.clickedItem == 0) && gs_UIState.mousedown)
-            gs_UIState.clickedItem = id;
-    } else {
-        if (gs_UIState.clickedItem == id)
-            gs_UIState.clickedItem = 0;
-    }
-    mySetPenColor(frameColor);
-    drawBox(x, y, w, h, gs_menu_color.fillflag, label, 'L', labelColor);
-    if (gs_UIState.clickedItem == id && // must be clicked before
-        ! gs_UIState.mousedown) { // but now mouse button is up
-        gs_UIState.clickedItem = 0;
-        return 1;
-    }
-    return 0;
->>>>>>> dev
 }
 
 int completeList(int id, double x, double y, double w, double h, char *labels[], int n)
 {
-<<<<<<< HEAD
 	int result = -1;
 	// 处理鼠标
 	int k;
@@ -289,13 +177,4 @@ int completeList(int id, double x, double y, double w, double h, char *labels[],
 	}
 
 	return result;
-=======
-    int result = -1;
-    int k;
-    for (k = 0; k < n; k++) {
-        if (completeItem(GenUIID(k) + id, x, y - (k + 1)*h, w, h, labels[k]))
-            result = k;
-    }
-    return result;
->>>>>>> dev
 }
