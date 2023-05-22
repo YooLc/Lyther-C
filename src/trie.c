@@ -2,7 +2,7 @@
 #include "trie.h"
 #include "codeparser.h"
 
-static void initNode(TreeNode *node)
+static void initNode(TreeNode *node) 
 {
     node->childNum = 0;
     int i = 0;
