@@ -6,10 +6,6 @@
 #define GUTTER_WIDTH .2
 #define SCROLL_DIST  3
 
-<<<<<<< HEAD
-int selectBar(int id, double x, double y, double w, double h, char *labels[], int count, int curSelect);
-double vertivalScrollBar(int id, double x, double y, double w, double h, double scale, double progress);
-=======
 static int barItem(int id, double x, double y, double w, double h, char *label,
                    int selected);
 int selectBar(int id, double x, double y, double w, double h, char *labels[], int count,
@@ -17,7 +13,6 @@ int selectBar(int id, double x, double y, double w, double h, char *labels[], in
 double vertivalScrollBar(int id, double x, double y, double w, double h, double scale,
                          double progress);
 static int completeItem(int id, double x, double y, double w, double h, char *label);
->>>>>>> dev
 int completeList(int id, double x, double y, double w, double h, char *labels[], int n);
 
 #endif
