@@ -10,53 +10,55 @@
 
 static bool isHelperActivated = false, isAboutActivated = false;
 static string manual_EN_US[] = { "Mannual",
-"I. Edit Operations",
-"- Press keys to type",
-"- You can select a range of text by dragging.",
-"- Hit <Ctrl> and scroll can zoom the codes",
-"- Use <Tab> to indent (Please note: <tab> will be replaced by spaces)",
-"- Hit <Enter> to auto complete (if shown), you can also use mouse to choose",
-"II. File Operations",
-"- Hit <Ctrl-N> to create a file",
-"- Hit <Ctrl-S> to save current file",
-"- Hit <Ctrl-M> to switch between code pages",
-"III. Personalization",
-"- Hit <Ctrl-P> to change theme (palette)",
-" ",
-"- Hit <Ctrl-H> to exit this page"
-};
+                                 "I. Edit Operations",
+                                 "- Press keys to type",
+                                 "- You can select a range of text by dragging.",
+                                 "- Hit <Ctrl> and scroll can zoom the codes",
+                                 "- Use <Tab> to indent (Please note: <tab> will be replaced by spaces)",
+                                 "- Hit <Enter> to auto complete (if shown), you can also use mouse to choose",
+                                 "II. File Operations",
+                                 "- Hit <Ctrl-N> to create a file",
+                                 "- Hit <Ctrl-S> to save current file",
+                                 "- Hit <Ctrl-M> to switch between code pages",
+                                 "III. Personalization",
+                                 "- Hit <Ctrl-P> to change theme (palette)",
+                                 " ",
+                                 "- Hit <Ctrl-H> to exit this page"
+                               };
 
-static string manual_ZH_CN[] = { "Ê¹ÓÃ½Ì³Ì",
-"Ò»¡¢±à¼­²Ù×÷",
-"- °´ÏÂ¼üÅÌ¼´¿ÉÊäÈë",
-"- Ê¹ÓÃÊó±êÍÏ×§¿ÉÑ¡ÖÐÒ»¶ÎÎÄ×Ö£¬<Ctrl-C> ¸´ÖÆ <Ctrl-V> Õ³Ìù <Ctrl-X> ¼ôÇÐ <Ctrl-Z> ³·Ïú <Ctrl-Y> ÖØ×ö",
-"- °´×¡ <Ctrl> ²¢Ê¹ÓÃÊó±ê¹öÂÖ¿ÉÒÔµ÷Õû×ÖÌå´óÐ¡" 
-"- Ê¹ÓÃ <Tab> ½øÐÐËõ½ø£¨Çë×¢Òâ£¬<Tab> ½«»á±»Ìæ»»Îª¿Õ¸ñ£©",
-"- °´ÏÂ <Enter> ¿ÉÒÔ½øÐÐ×Ô¶¯²¹È«£¨Èç¹ûÓÐÌáÊ¾¿ò£©£¬Ò²¿ÉÒÔÍ¨¹ýÊó±êÑ¡ÔñÆäËûµÄ²¹È«Ïî",
-"¶þ¡¢ÎÄ¼þ²Ù×÷",
-"- °´ÏÂ <Ctrl-N> ÐÂ½¨ÎÄ¼þ",
-"- °´ÏÂ <Ctrl-S> ±£´æÎÄ¼þ",
-"- °´ÏÂ <Ctrl-M> ¿ÉÒÔÇÐ»»²»Í¬ÎÄ¼þ",
-"Èý¡¢¸öÐÔ»¯ÉèÖÃ", 
-"- °´ÏÂ <Ctrl-P> ¿ÉÒÔÇÐ»»°µÉ« / ÁÁÉ«Ö÷Ìâ",
-" ",
-"- °´ÏÂ <Ctrl-H> ÍË³ö±¾½çÃæ"
-};
+static string manual_ZH_CN[] = { "Ê¹ï¿½Ã½Ì³ï¿½",
+                                 "Ò»ï¿½ï¿½ï¿½à¼­ï¿½ï¿½ï¿½ï¿½",
+                                 "- ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",
+                                 "- Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×§ï¿½ï¿½Ñ¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½<Ctrl-C> ï¿½ï¿½ï¿½ï¿½ <Ctrl-V> Õ³ï¿½ï¿½ <Ctrl-X> ï¿½ï¿½ï¿½ï¿½ <Ctrl-Z> ï¿½ï¿½ï¿½ï¿½ <Ctrl-Y> ï¿½ï¿½ï¿½ï¿½",
+                                 "- ï¿½ï¿½×¡ <Ctrl> ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¿ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡"
+                                 "- Ê¹ï¿½ï¿½ <Tab> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½â£¬<Tab> ï¿½ï¿½ï¿½á±»ï¿½æ»»Îªï¿½Õ¸ï¿½",
+                                 "- ï¿½ï¿½ï¿½ï¿½ <Enter> ï¿½ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ò£©£ï¿½Ò²ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½È«ï¿½ï¿½",
+                                 "ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½",
+                                 "- ï¿½ï¿½ï¿½ï¿½ <Ctrl-N> ï¿½Â½ï¿½ï¿½Ä¼ï¿½",
+                                 "- ï¿½ï¿½ï¿½ï¿½ <Ctrl-S> ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½",
+                                 "- ï¿½ï¿½ï¿½ï¿½ <Ctrl-M> ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Í¬ï¿½Ä¼ï¿½",
+                                 "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½",
+                                 "- ï¿½ï¿½ï¿½ï¿½ <Ctrl-P> ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½É« / ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½",
+                                 " ",
+                                 "- ï¿½ï¿½ï¿½ï¿½ <Ctrl-H> ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                               };
 
 static string about_EN_US[] = {"Lyther Version 1.3",
-"Built by TDM-GCC 4.9.2 64-bit Release",
-"Press <Ctrl+B> to exit."};
+                               "Built by TDM-GCC 4.9.2 64-bit Release",
+                               "Press <Ctrl+B> to exit."
+                              };
 
-static string about_ZH_CN[] = {"ÇáÓð Version 1.3",
-"ÓÉ TDM-GCC 4.9.2 64-bit Release ¹¹½¨",
-"°´ <Ctrl+B> ÍË³ö"};
+static string about_ZH_CN[] = {"ï¿½ï¿½ï¿½ï¿½ Version 1.3",
+                               "ï¿½ï¿½ TDM-GCC 4.9.2 64-bit Release ï¿½ï¿½ï¿½ï¿½",
+                               "ï¿½ï¿½ <Ctrl+B> ï¿½Ë³ï¿½"
+                              };
 
 void drawHelper(double x, double y, double w, double h)
 {
     if (!isHelperActivated) return;
     SetPenColor(getBackgroundColor());
     drawRectangle(x, y, w, h, 1);
-    SetFont("Î¢ÈíÑÅºÚ");
+    SetFont("Î¢ï¿½ï¿½ï¿½Åºï¿½");
     drawPassage(x + w / 10, y + h - 0.8, manual_ZH_CN, sizeof(manual_ZH_CN) / sizeof(string));
     SetFont("Consolas");
     drawPassage(x + w / 10, y + h - 4.2, manual_EN_US, sizeof(manual_EN_US) / sizeof(string));
@@ -67,7 +69,7 @@ void drawAbout(double x, double y, double w, double h)
     if (!isAboutActivated) return;
     SetPenColor(getBackgroundColor());
     drawRectangle(x, y, w, h, 1);
-    SetFont("Î¢ÈíÑÅºÚ");
+    SetFont("Î¢ï¿½ï¿½ï¿½Åºï¿½");
     drawPassage(x + w / 10, y + h - 1, about_ZH_CN, sizeof(about_ZH_CN) / sizeof(string));
     SetFont("Consolas");
     drawPassage(x + w / 10, y + h - 3, about_EN_US, sizeof(about_EN_US) / sizeof(string));
